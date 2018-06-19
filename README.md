@@ -111,20 +111,20 @@ class Soldier extends Unit {
     int attack_power;
     Actor attack_target;
     SoldierState state;
-    SoldierBuilder Builder() { return new SoldierBuilder(); }
+    static SoldierBuilder Builder() { return new SoldierBuilder(); }
     @Override Update();
 }
 
 class Villager extends Unit {
     VillagerState state;
-    VillagerBuilder Builder() { return new VillagerBuilder(); }
+    static VillagerBuilder Builder() { return new VillagerBuilder(); }
     @Override Update();
 }
 
 class Factory extends Actor {
     int production_rate; // in frames per unit? 
     FactoryState state;
-    FactoryBuilder Builder() { return new FactoryBuilder(); }
+    static FactoryBuilder Builder() { return new FactoryBuilder(); }
     @Override Update();
 }
 
