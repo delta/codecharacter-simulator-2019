@@ -19,4 +19,5 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(ext/googletest)
 add_subdirectory(src/main)
+add_subdirectory(src/physics)
 add_subdirectory(test)
