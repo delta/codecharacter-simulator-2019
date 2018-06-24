@@ -4,6 +4,7 @@ project(tests)
 
 set(SOURCE_FILES
     test_main.cpp
+    physics/vector_test.cpp
 )
 
 add_executable(tests ${SOURCE_FILES})
