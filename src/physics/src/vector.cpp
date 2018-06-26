@@ -3,7 +3,7 @@
  * Definitions for the 2D Vector class
  */
 
-#include "vector.h"
+#include "physics/vector.h"
 #include <cmath>
 
 namespace physics {
