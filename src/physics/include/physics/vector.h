@@ -14,10 +14,11 @@ namespace physics {
 /**
  * Class for 2D vectors
  */
+template <typename T>
 class PHYSICS_EXPORT Vector {
   public:
 	Vector();
-	Vector(double x, double y);
+	Vector(T x, T y);
 
 	/**
 	 * Equal to operator for vectors
@@ -26,7 +27,7 @@ class PHYSICS_EXPORT Vector {
 	 *
 	 * @return     true if the vectors are equal, else false
 	 */
-	bool operator==(const Vector &rhs) const;
+	bool operator==(const Vector<T> &rhs) const;
 
 	/**
 	 * Not equal to operator for vectors
@@ -35,7 +36,7 @@ class PHYSICS_EXPORT Vector {
 	 *
 	 * @return     true if the vectors are not equal, else false
 	 */
-	bool operator!=(const Vector &rhs) const;
+	bool operator!=(const Vector<T> &rhs) const;
 
 	/**
 	 * Addition operator for vectors
@@ -44,7 +45,7 @@ class PHYSICS_EXPORT Vector {
 	 *
 	 * @return     Sum of the vectors
 	 */
-	Vector operator+(const Vector &rhs) const;
+	Vector<T> operator+(const Vector<T> &rhs) const;
 
 	/**
 	 * Minus operator for vectors
@@ -54,7 +55,7 @@ class PHYSICS_EXPORT Vector {
 	 *
 	 * @return     Difference of the vectors
 	 */
-	Vector operator-(const Vector &rhs) const;
+	Vector<T> operator-(const Vector<T> &rhs) const;
 
 	/**
 	 * Scalar Addition operator
@@ -64,7 +65,8 @@ class PHYSICS_EXPORT Vector {
 	 *
 	 * @return     The new vector
 	 */
-	Vector operator+(const double &scalar) const;
+	template <typename T2>
+	Vector<T> operator+(const T2 &scalar) const;
 
 	/**
 	 * Scalar Subtraction operator
@@ -74,7 +76,8 @@ class PHYSICS_EXPORT Vector {
 	 *
 	 * @return     The new vector
 	 */
-	Vector operator-(const double &scalar) const;
+	template <typename T2>
+	Vector<T> operator-(const T2 &scalar) const;
 
 	/**
 	 * Scalar multiplication operator
@@ -83,7 +86,8 @@ class PHYSICS_EXPORT Vector {
 	 *
 	 * @return     The scaled vector
 	 */
-	Vector operator*(const double &scalar) const;
+	template <typename T2>
+	Vector<T> operator*(const T2 &scalar) const;
 
 	/**
 	 * Scalar division operator
@@ -92,10 +96,12 @@ class PHYSICS_EXPORT Vector {
 	 *
 	 * @return     The scaled vector
 	 */
-	Vector operator/(const double &scalar) const;
+	template <typename T2>
+	Vector<T> operator/(const T2 &scalar) const;
 
+	template <typename T2>
 	PHYSICS_EXPORT friend std::ostream &operator<<(std::ostream &ostream,
-	                                               const Vector &vector);
+	                                               const Vector<T2> &vector);
 
 	/**
 	 * Dot product of vectors
@@ -104,7 +110,7 @@ class PHYSICS_EXPORT Vector {
 	 *
 	 * @return     The result of the dot product
 	 */
-	double dot(const Vector &rhs) const;
+	double dot(const Vector<T> &rhs) const;
 
 	/**
 	 * The magnitude of the vector
@@ -120,24 +126,24 @@ class PHYSICS_EXPORT Vector {
 	 *
 	 * @return     The distance between the two vectors
 	 */
-	double distance(const Vector &other) const;
+	double distance(const Vector<T> &other) const;
 
 	/**
 	 * Calculates floor of the members of the vector
 	 *
 	 * @return     The result Vector with floored values
 	 */
-	Vector floor() const;
+	Vector<T> floor() const;
 
 	/**
 	 * Calculates ceiling of the members of the vector
 	 *
 	 * @return     The result Vector with ceiled values
 	 */
-	Vector ceil() const;
+	Vector<T> ceil() const;
 
-	double x;
-	double y;
+	T x;
+	T y;
 };
 }
 
