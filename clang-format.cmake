@@ -17,9 +17,9 @@ file(GLOB_RECURSE ALL_SOURCE_FILES src/*.cpp src/*.h src/*.proto test/*.cpp test
 
 # Add target to build
 add_custom_target(
-        clangformat
-        COMMAND ${CLANG_FORMAT_EXECUTABLE}
-        -style=file
-        -i
-        ${ALL_SOURCE_FILES}
+    clangformat
+    COMMAND ${CLANG_FORMAT_EXECUTABLE}
+    -style=file
+    -i
+    ${ALL_SOURCE_FILES}
 )
