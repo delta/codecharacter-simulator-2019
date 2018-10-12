@@ -1,78 +1,60 @@
-#include "vector"
+#include "physics/vector.hpp"
 #include "gtest/gtest.h"
-#include <iostream>
+#include <cstdint>
 
 using namespace std;
 using namespace physics;
 using namespace testing;
 
-class VectorTest : public Test {
-  protected:
-	unique_ptr<Vector<double>> vectorA, vectorB, vectorC;
-	VectorTest() {
-		this->vectorA = make_unique<Vector<double>>();
-		this->vectorB = make_unique<Vector<double>>();
-		this->vectorC = make_unique<Vector<double>>();
-	}
-};
+TEST(VectorTest, EqualityTest) {
+	Vector<int64_t> a1 = {2, 4};
+	Vector<int64_t> a2 = {2, 4};
 
-TEST_F(VectorTest, EqualityTest) {
-	vectorA->x = 1.0;
-	vectorA->y = 2.0;
-	vectorB->x = 1.0;
-	vectorB->y = 2.0;
-	ASSERT_EQ(*vectorA == *vectorB, true);
+	ASSERT_EQ(a1, a2);
 }
 
-TEST_F(VectorTest, AdditionTest) {
-	vectorA->x = 1.0;
-	vectorA->y = 2.0;
-	vectorB->x = 1.0;
-	vectorB->y = 2.0;
-	vectorC->x = 2.0;
-	vectorC->y = 4.0;
-	ASSERT_EQ((*vectorA + *vectorB) == *vectorC, true);
+TEST(VectorTest, AdditionTest) {
+	Vector<int32_t> a = {2, 4};
+	Vector<int32_t> b = {1, 2};
+
+	Vector<int32_t> c = {3, 6};
+	ASSERT_EQ(a + b, c);
 }
 
-TEST_F(VectorTest, ScalarMultiplicationTest) {
-	vectorA->x = 1.0;
-	vectorA->y = 2.0;
+TEST(VectorTest, ScalarMultiplicationTest) {
+	Vector<float> a = {2, 4};
 	int scalar = 3;
-	vectorC->x = 3.0;
-	vectorC->y = 6.0;
-	ASSERT_EQ(((*vectorA)*scalar) == *vectorC, true);
+
+	Vector<float> ans = {6, 12};
+	ASSERT_EQ(a * scalar, ans);
 }
 
-TEST_F(VectorTest, ScalarDivisionTest) {
-	vectorA->x = 1.0;
-	vectorA->y = 2.0;
+TEST(VectorTest, ScalarDivisionTest) {
+	Vector<float> a = {2, 4};
 	int scalar = 2;
-	vectorC->x = 0.5;
-	vectorC->y = 1.0;
-	ASSERT_EQ(((*vectorA) / scalar) == *vectorC, true);
+
+	Vector<float> ans = {1, 2};
+	ASSERT_EQ(a / scalar, ans);
 }
 
-TEST_F(VectorTest, DotProductTest) {
-	vectorA->x = 1.0;
-	vectorA->y = 2.0;
-	vectorB->x = 0.5;
-	vectorB->y = 1.0;
-	double dotProduct = 2.5;
-	ASSERT_EQ(vectorA->dot(*vectorB) == dotProduct, true);
+TEST(VectorTest, DotProductTest) {
+	Vector<float> a = {1, 2};
+	Vector<float> b = {0.5, 1};
+
+	double c = 2.5;
+	ASSERT_EQ(a.dot(b), c);
 }
 
-TEST_F(VectorTest, MagnitudeTest) {
-	vectorA->x = 3.0;
-	vectorA->y = 4.0;
-	double magnitude = 5.0;
-	ASSERT_EQ(vectorA->magnitude() == magnitude, true);
+TEST(VectorTest, MagnitudeTest) {
+	Vector<uint8_t> a = {3, 4};
+
+	double mag = 5;
+	ASSERT_EQ(a.magnitude(), mag);
 }
-/* 
-TEST_F(VectorTest, FloorTest) {
-	vectorA->x = 3.99;
-	vectorA->y = 4.01;
-	vectorB->x = 3;
-	vectorB->y = 4;
-	ASSERT_EQ(vectorA->floor() == *vectorB, true);
+
+TEST(VectorTest, FloorTest) {
+	Vector<double> a = {3.99, 4.01};
+
+	Vector<double> ans = {3, 4};
+	ASSERT_EQ(a.floor(), ans);
 }
- */

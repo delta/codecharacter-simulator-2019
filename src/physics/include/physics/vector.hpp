@@ -1,20 +1,20 @@
 /**
- * @file vector.h
+ * @file vector.hpp
  * Declares 2D Vector class
  */
 
-#ifndef PHYSICS_VECTOR_H
-#define PHYSICS_VECTOR_H
+#ifndef PHYSICS_VECTOR_HPP
+#define PHYSICS_VECTOR_HPP
 
-#include "physics/physics_export.h"
 #include <iostream>
+#include <cmath>
 
 namespace physics {
 
 /**
  * Class for 2D vectors
  */
-template <typename T> class PHYSICS_EXPORT Vector {
+template <typename T> class Vector {
   public:
 	Vector();
 	Vector(T x, T y);
@@ -95,7 +95,7 @@ template <typename T> class PHYSICS_EXPORT Vector {
 	template <typename T2> Vector<T> operator/(const T2 &scalar) const;
 
 	template <typename T2>
-	PHYSICS_EXPORT friend std::ostream &operator<<(std::ostream &ostream,
+ friend std::ostream &operator<<(std::ostream &ostream,
 	                                               const Vector<T2> &vector);
 
 	/**
@@ -141,79 +141,79 @@ template <typename T> class PHYSICS_EXPORT Vector {
 	T y;
 };
 
-template <typename T> inline Vector<T>::Vector() : x(), y() {}
+template <typename T> Vector<T>::Vector() : x(), y() {}
 
-template <typename T> inline Vector<T>::Vector(T x, T y) : x(x), y(y) {}
+template <typename T> Vector<T>::Vector(T x, T y) : x(x), y(y) {}
 
 template <typename T>
-inline bool Vector<T>::operator==(const Vector<T> &rhs) const {
+bool Vector<T>::operator==(const Vector<T> &rhs) const {
 	return (x == rhs.x && y == rhs.y);
 }
 
 template <typename T>
-inline bool Vector<T>::operator!=(const Vector<T> &rhs) const {
+bool Vector<T>::operator!=(const Vector<T> &rhs) const {
 	return (x != rhs.x || y != rhs.y);
 }
 
 template <typename T>
-inline Vector<T> Vector<T>::operator+(const Vector<T> &rhs) const {
+Vector<T> Vector<T>::operator+(const Vector<T> &rhs) const {
 	return Vector(x + rhs.x, y + rhs.y);
 }
 
 template <typename T>
-inline Vector<T> Vector<T>::operator-(const Vector<T> &rhs) const {
+Vector<T> Vector<T>::operator-(const Vector<T> &rhs) const {
 	return Vector(x - rhs.x, y - rhs.y);
 }
 
 template <typename T>
 template <typename T2>
-inline Vector<T> Vector<T>::operator+(const T2 &scalar) const {
+Vector<T> Vector<T>::operator+(const T2 &scalar) const {
 	return Vector(x + scalar, y + scalar);
 }
 
 template <typename T>
 template <typename T2>
-inline Vector<T> Vector<T>::operator-(const T2 &scalar) const {
+Vector<T> Vector<T>::operator-(const T2 &scalar) const {
 	return Vector(x - scalar, y - scalar);
 }
 
 template <typename T>
 template <typename T2>
-inline Vector<T> Vector<T>::operator*(const T2 &scalar) const {
+Vector<T> Vector<T>::operator*(const T2 &scalar) const {
 	return Vector(x * scalar, y * scalar);
 }
 
 template <typename T>
 template <typename T2>
-inline Vector<T> Vector<T>::operator/(const T2 &scalar) const {
+Vector<T> Vector<T>::operator/(const T2 &scalar) const {
 	return Vector(x / scalar, y / scalar);
 }
 
 template <typename T>
-inline std::ostream &operator<<(std::ostream &ostream,
+std::ostream &operator<<(std::ostream &ostream,
                                 const Vector<T> &vector) {
 	ostream << "(" << vector.x << ", " << vector.y << ")";
 	return ostream;
 }
 
-template <typename T> inline double Vector<T>::dot(const Vector<T> &rhs) const {
+template <typename T> double Vector<T>::dot(const Vector<T> &rhs) const {
 	return (x * rhs.x + y * rhs.y);
 }
 
-template <typename T> inline double Vector<T>::magnitude() const {
+template <typename T> double Vector<T>::magnitude() const {
 	return sqrt(x * x + y * y);
 }
 
 template <typename T>
-inline double Vector<T>::distance(const Vector<T> &other) const {
+double Vector<T>::distance(const Vector<T> &other) const {
 	return sqrt(pow(x - other.x, 2) + pow(y - other.y, 2));
 }
 
-template <typename T> inline Vector<T> Vector<T>::floor() const {
+template <typename T> Vector<T> Vector<T>::floor() const {
 	return Vector<T>(std::floor(x), std::floor(y));
 }
 
-template <typename T> inline Vector<T> Vector<T>::ceil() const {
+template <typename T> Vector<T> Vector<T>::ceil() const {
 	return Vector<T>(std::ceil(x), std::ceil(y));
 }
 } // namespace physics
