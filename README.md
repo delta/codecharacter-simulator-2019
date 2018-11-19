@@ -172,4 +172,149 @@ class FactoryBuilder {
     Factory Build();
     FactoryBuilder setParam(param); // One setter for each class constructor member
 }
+
+/* Player State Design */
+
+namespace player_state {
+
+
+/**
+ * Define a name for each soldier state
+ */
+    enum class SoldierState {
+        // Soldier is doing nothing
+        IDLE,
+        // Soldier is moving
+        MOVE,
+        // Soldier is currently attacking another actor
+        ATTACK,
+        // Soldier is currently moving to attack another actor
+        PURSUIT,
+        // Soldier is dead
+        DEAD
+    }
+
+/**
+ * Define a name for each villager state
+ */
+    enum class VillagerState {
+        // Villager is doing nothing
+        IDLE,
+        // Villager is moving
+        MOVE,
+        // Villager is currently attacking another actor
+        ATTACK,
+        // Villager is currently moving to attack another actor
+        PURSUIT,
+        // Villager is currently mining resources
+        MINE,
+        // Villager is currently moving to build target
+        MOVE_TO_BUILD,
+        // Villager is currently building a factory
+        BUILD,
+        // Villager is dead
+        DEAD
+    }
+
+/**
+ * Define a name for each villager state
+ */
+    enum class FactoryState {
+        // Factory is not yet completely built
+        UNBUILT,
+        // Factory is built and idle
+        IDLE,
+        // Factory is currently producing villager
+        VILLAGER_PRODUCTION,
+        // Factory is currently producing soldier
+        SOLDIER_PRODUCTION,
+        // Factory is destroyed
+        DESTROYED
+    }
+
+/**
+ * Struct holding information about a soldier unit
+ */
+    public class Soldier {
+        int id;
+        Vector position;
+        int hp;
+        SoldierState state;
+
+        int factory_target;
+        int soldier_target;
+        int villager_target;
+
+        Vector destination;
+    }
+
+/**
+ * Struct holding information about a villager unit
+ */
+    public class Villager {
+        int id;
+        Vector position;
+        int hp;
+        VillagerState state;
+
+        int factory_target;
+        int soldier_target;
+        int villager_target;
+        int build_target;
+
+        Vector destination;
+    }
+
+/**
+ * Struct holding information about a factory unit
+ */
+    public class Factory {
+        int id;
+        Vector position;
+        int hp;
+        FactoryState state;
+        int build_percent;
+
+        boolean suicide;
+    }
+
+/**
+ * Struct holding information about each map grid element
+ */
+    public class MapElement {
+        boolean build_factory;
+    }
+
+    public class State {
+        std::vector<std::vector<MapElement, MAP_SIZE>, MAP_SIZE> map;
+
+        std::vector<Soldier, MAX_NUM_SOLDIERS> soldiers;
+
+        std::vector<Soldier, MAX_NUM_SOLDIERS> enemy_soldiers;
+
+        std::vector<Villager, MAX_NUM_VILLAGERS> villagers;
+
+        std::vector<Villager, MAX_NUM_VILLAGERS> enemy_villagers;
+
+        std::vector<Factory, MAX_NUM_FACTORIES> factories;
+
+        std::vector<Factory, MAX_NUM_VILLAGERS> enemy_factories;
+
+        int num_soldiers;
+
+        int num_enemy_soldiers;
+
+        int num_villagers;
+
+        int num_enemy_villagers;
+
+        int num_factories;
+
+        int num_enemy_factories;
+
+        int score;
+
+        int money;
+    }
+}
 ```
