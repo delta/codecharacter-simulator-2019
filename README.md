@@ -186,8 +186,6 @@ enum class SoldierState {
     MOVE,
     // Soldier is currently attacking another actor
     ATTACK,
-    // Soldier is currently moving to attack another actor
-    PURSUIT,
     // Soldier is dead
     DEAD
 }
@@ -203,12 +201,8 @@ enum class VillagerState {
     // Villager is currently attacking another actor
     ATTACK,
     // Villager is currently moving to attack another actor
-    PURSUIT,
-    // Villager is currently mining resources
     MINE,
     // Villager is currently moving to build target
-    MOVE_TO_BUILD,
-    // Villager is currently building a factory
     BUILD,
     // Villager is dead
     DEAD
@@ -239,9 +233,7 @@ public class Soldier {
     int hp;
     SoldierState state;
 
-    int factory_target;
-    int soldier_target;
-    int villager_target;
+    int target;
 
     physics::Vector destination;
 }
@@ -255,9 +247,7 @@ public class Villager {
     int hp;
     VillagerState state;
 
-    int factory_target;
-    int soldier_target;
-    int villager_target;
+    int target;
     int build_target;
 
     physics::Vector destination;
@@ -280,7 +270,7 @@ public class Factory {
 * Struct holding information about each map grid element
 */
 public class MapElement {
-    boolean build_factory;
+    TerrainType type;
 }
 
 public class State {
