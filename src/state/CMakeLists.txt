@@ -11,7 +11,7 @@ set(EXPORTS_DIR ${CMAKE_BINARY_DIR}/exports)
 set(EXPORTS_FILE_PATH ${EXPORTS_DIR}/state/state_export.h)
 
 add_library(state SHARED ${SOURCE_FILES})
-include_directories(${CMAKE_SOURCE_DIR}/src/physics/include)
+target_link_libraries(state physics)
 
 generate_export_header(state EXPORT_FILE_NAME ${EXPORTS_FILE_PATH})
 
