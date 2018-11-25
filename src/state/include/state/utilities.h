@@ -21,6 +21,11 @@ typedef int64_t ActorId;
 enum class ActorType { SOLDIER, VILLAGER, FACTORY_SOLDIER, FACTORY_VILLAGER };
 
 /**
+ * Enum for the different types of terrain on the map
+ */
+enum class TerrainType { LAND, WATER, GOLD_MINE };
+
+/**
  * Enum for the two game players
  */
 enum class PlayerId : int {
