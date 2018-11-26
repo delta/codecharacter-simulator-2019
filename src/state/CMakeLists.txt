@@ -3,6 +3,8 @@ project(state)
 
 set(SOURCE_FILES
 	src/state.cpp
+	src/state_syncer.cpp
+	src/command_giver.cpp
 )
 
 set(INCLUDE_PATH include)
