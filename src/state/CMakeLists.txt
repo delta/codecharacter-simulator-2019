@@ -5,6 +5,9 @@ set(SOURCE_FILES
 	src/state.cpp
 	src/state_syncer.cpp
 	src/command_giver.cpp
+	src/actor/actor.cpp
+	src/actor/unit.cpp
+	src/actor/soldier.cpp
 )
 
 set(INCLUDE_PATH include)
