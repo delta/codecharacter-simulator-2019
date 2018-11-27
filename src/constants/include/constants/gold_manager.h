@@ -17,4 +17,16 @@ const int64_t GOLD_MAX = INT64_MAX;
 //Reward for killing one soldier
 const int64_t SOLDIER_KILL_REWARD_AMOUNT = 200;
 
+//Reward for killing one villager
+const int64_t VILLAGER_KILL_REWARD_AMOUNT = 100;
+
+//Amount of gold to create soldier
+const int64_t SOLDIER_COST = 200;
+
+//Amount of gold to create soldier
+const int64_t VILLAGER_COST = 200;
+
+//Amount of gold to create soldier
+const int64_t FACTORY_COST = 500;
+
 #endif
