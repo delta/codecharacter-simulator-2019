@@ -7,7 +7,7 @@
 #define STATE_INCLUDE_STATE_GOLD_MANAGER_H
 
 #include<state/actor/actor.h>
-#include<state/utilitites.h>
+#include<state/utilities.h>
 #include<cstdint>
 #include<vector>
 
@@ -123,7 +123,7 @@ namespace state {
 		 */
 		int64_t GetMaxGold();
 
-	}
+	};
 
 }
 

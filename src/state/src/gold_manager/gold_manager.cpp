@@ -3,7 +3,7 @@
  * Defines the methods of the GoldManager Class
  */
 
-#include "state/include/gold_manager/gold_manager.h"
+#include "state/gold_manager/gold_manager.h"
 #include "physics/vector.hpp"
 #include <stdexcept>
 
@@ -46,12 +46,12 @@ namespace state{
 
 		if(amount <= 0){
 
-			throw std::out_of_bounds("The amount of descrese in gold must be positive");
+			throw std::out_of_range("The amount of descrese in gold must be positive");
 		}
 
 		if(amount >= players_gold[current_player_id]){
 
-			throw std::out_of_boudns("The decrease in gold is greater than current balance");
+			throw std::out_of_range("The decrease in gold is greater than current balance");
 		}
 
 		players_gold[current_player_id] -= amount;
@@ -78,14 +78,14 @@ namespace state{
 			reward_amount = soldier_kill_reward_amount;
 		}
 
-		else if(enemy_actor_type == ActorType::VILLAGER){
+		else{
 			reward_amount = villager_kill_reward_amount;
 		}
 
 		Increase(player_id, reward_amount);
 	}
 
-	int64_t CreateUnitCost(Actor *actor){
+	int64_t GoldManager::CreateUnitCost(Actor *actor){
 
 		ActorType unit_type = actor->GetActorType();
 
@@ -99,13 +99,13 @@ namespace state{
 			return villager_cost;
 		}
 
-		else if(unit_type == ActorType::SOLDIER)
+		else
 		{
 			return soldier_cost;
 		}
 	}
 
-	void CreateCost(PlayerId player_id, Actor *actor){
+	void GoldManager::CreateCost(PlayerId player_id, Actor *actor){
 
 		int64_t actor_cost = CreateUnitCost(actor);
 		int64_t current_balance = GetBalance(player_id);
@@ -113,7 +113,7 @@ namespace state{
 		//Decreasing player's gold if they can buy the unit
 		if(current_balance < actor_cost){
 
-			throw std::out_of_bounds('Do not possess enough gold to buy unit');
+			throw std::out_of_range("Do not possess enough gold to buy unit");
 		}
 		
 		else{
@@ -126,11 +126,11 @@ namespace state{
 
 	int64_t GoldManager::GetBalance(PlayerId player_id){
 
-		return players_gold[static_cast<int>(player_id)]
+		return players_gold[static_cast<int>(player_id)];
 
 	}
 
-	int64_t GoldManager::GetMaxGold(PlayerId player_id){
+	int64_t GoldManager::GetMaxGold(){
 
 		return max_gold;
 		
