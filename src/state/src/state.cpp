@@ -5,4 +5,8 @@
 
 #include "state/state.h"
 
-namespace state {}
+namespace state {
+
+State::State(std::unique_ptr<Map> map) : map(std::move(map)) {}
+
+} // namespace state
