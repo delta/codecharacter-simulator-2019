@@ -8,6 +8,7 @@ set(SOURCE_FILES
 	src/actor/actor.cpp
 	src/actor/unit.cpp
 	src/actor/soldier.cpp
+	src/map/map.cpp
 )
 
 set(INCLUDE_PATH include)
