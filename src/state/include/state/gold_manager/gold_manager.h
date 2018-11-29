@@ -120,9 +120,9 @@ class STATE_EXPORT GoldManager {
 	/**
 	 * Decreases player's gold for creating specific actor type
 	 *
-	 * @param[in]  actor_type Pointer to the actor which player wants tp build
+	 * @param[in]  actor_type Pointer to the actor which player wants to build
 	 */
-	void GetCreateCost(PlayerId player_id, Actor *actor);
+	void DeductUnitCreateCost(PlayerId player_id, Actor *actor);
 
 	/**
 	* Get the current balance amount of the PlayerId passed
@@ -145,7 +145,7 @@ class STATE_EXPORT GoldManager {
 	 *
 	 * @param[in]  player_id Player who triggered the suicide
 	 */
-	void GetFactorySuicideCost(PlayerId player_id);
+	void DeductFactorySuicidePenalty(PlayerId player_id);
 
 	/**
 	 * Penalty for player triggering suicide

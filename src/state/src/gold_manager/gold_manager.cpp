@@ -97,7 +97,7 @@ int64_t GoldManager::GetCreateUnitCost(Actor *actor) {
 	}
 }
 
-void GoldManager::GetCreateCost(PlayerId player_id, Actor *actor) {
+void GoldManager::DeductUnitCreateCost(PlayerId player_id, Actor *actor) {
 
 	auto actor_cost = GetCreateUnitCost(actor);
 	auto current_balance = GetBalance(player_id);
@@ -117,7 +117,7 @@ int64_t GoldManager::GetBalance(PlayerId player_id) {
 
 int64_t GoldManager::GetMaxGold() { return max_gold; }
 
-void GoldManager::GetFactorySuicideCost(PlayerId player_id){
+void GoldManager::DeductFactorySuicidePenalty(PlayerId player_id){
 	auto suicide_penalty = factory_suicide_penalty_amount;
 	Decrease(player_id, suicide_penalty);
 }
