@@ -20,6 +20,7 @@ Actor::Actor(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
 
 ActorId Actor::GetActorId() { return id; }
 
+int64_t Actor::actor_id_increment = 0;
 void Actor::SetActorIdIncrement(ActorId actor_id) {
 	if (actor_id < 0) {
 		throw std::out_of_range("`actor_id` cannot be negative");

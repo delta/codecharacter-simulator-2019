@@ -61,7 +61,7 @@ class STATE_EXPORT Actor : public IUpdatable {
 	Actor(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
 	      int64_t max_hp, physics::Vector<int64_t> position);
 
-	virtual ~Actor();
+	virtual ~Actor() {}
 
 	/**
 	 * Gets the next actor id to assign to new actors

@@ -77,7 +77,7 @@ class STATE_EXPORT Unit : public Actor {
 	     int64_t max_hp, physics::Vector<int64_t> position, int64_t speed,
 	     int64_t attack_range, int64_t attack_damage);
 
-	virtual ~Unit();
+	virtual ~Unit() {}
 
 	/**
 	 * Get the unit's speed stat
