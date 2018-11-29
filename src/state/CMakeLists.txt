@@ -9,6 +9,7 @@ set(SOURCE_FILES
 	src/actor/unit.cpp
 	src/actor/soldier.cpp
 	src/map/map.cpp
+	src/gold_manager/gold_manager.cpp
 )
 
 set(INCLUDE_PATH include)
