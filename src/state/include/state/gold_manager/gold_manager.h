@@ -1,7 +1,7 @@
 /**
  * @file gold_manager.h
  * Manages dat gold
-*/
+ */
 
 #ifndef STATE_INCLUDE_STATE_GOLD_MANAGER_H
 #define STATE_INCLUDE_STATE_GOLD_MANAGER_H
@@ -60,7 +60,7 @@ class STATE_EXPORT GoldManager {
 	 * Amount of gold to create any factory
 	 */
 	int64_t factory_cost;
-	
+
 	/**
 	 * Reward for 1 villager mining gold for 1 unit of time
 	 */
@@ -76,13 +76,14 @@ class STATE_EXPORT GoldManager {
 
   public:
 	/**
-	* Constructor for Gold Manager class
-	*/
+	 * Constructor for Gold Manager class
+	 */
 	GoldManager();
 
 	GoldManager(std::array<int64_t, 2> player_gold, int64_t max_gold,
 	            int64_t soldier_kill_reward_amount,
-	            int64_t villager_kill_reward_amount, int64_t factory_kill_reward_amount,
+	            int64_t villager_kill_reward_amount,
+	            int64_t factory_kill_reward_amount,
 	            int64_t factory_suicide_penalty_amount, int64_t villager_cost,
 	            int64_t soldier_cost, int64_t soldier_factory_cost,
 	            int64_t mining_reward);
@@ -125,11 +126,11 @@ class STATE_EXPORT GoldManager {
 	void DeductUnitCreateCost(PlayerId player_id, Actor *actor);
 
 	/**
-	* Get the current balance amount of the PlayerId passed
+	 * Get the current balance amount of the PlayerId passed
 	 *
-	* @param[in]  player_id  The player identifier
-	*
-	* @return     The balance.
+	 * @param[in]  player_id  The player identifier
+	 *
+	 * @return     The balance.
 	 */
 	int64_t GetBalance(PlayerId player_id);
 
@@ -154,7 +155,6 @@ class STATE_EXPORT GoldManager {
 	 */
 	void RewardMineGold(PlayerId player_id);
 };
-}
+} // namespace state
 
 #endif
-				

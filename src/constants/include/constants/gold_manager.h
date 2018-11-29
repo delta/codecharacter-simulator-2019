@@ -6,7 +6,7 @@
 #ifndef CONSTANTS_INCLUDE_CONSTANTS_GOLD_MANAGER_H
 #define CONSTANTS_INCLUDE_CONSTANTS_GOLD_MANAGER_H
 
-#include <cstddef>
+#include <cstdint>
 
 // Amount of gold each player has at the start of the game
 const int64_t GOLD_START = 300;
@@ -29,13 +29,13 @@ const int64_t VILLAGER_COST = 200;
 // Amount of gold to create soldier
 const int64_t FACTORY_COST = 500;
 
-//Amount of gold for destroying a factory
+// Amount of gold for destroying a factory
 const int64_t FACTORY_KILL_REWARD = 600;
 
-//Amount of gold recieved for factory suiciding
+// Amount of gold recieved for factory suiciding
 const int64_t FACTORY_SUICIDE_PENALTY = 200;
 
-//Amount of gold increase per villager mining
+// Amount of gold increase per villager mining
 const int64_t MINING_REWARD = 10;
 
 #endif
