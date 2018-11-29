@@ -15,7 +15,7 @@ set(INCLUDE_PATH include)
 set(EXPORTS_DIR ${CMAKE_BINARY_DIR}/exports)
 set(EXPORTS_FILE_PATH ${EXPORTS_DIR}/state/state_export.h)
 
-add_library(state SHARED ${SOURCE_FILES})
+add_library(state STATIC ${SOURCE_FILES})
 target_link_libraries(state physics constants)
 
 generate_export_header(state EXPORT_FILE_NAME ${EXPORTS_FILE_PATH})
@@ -31,7 +31,6 @@ install(TARGETS state EXPORT state_config
 	LIBRARY DESTINATION lib
 	RUNTIME DESTINATION bin
 )
-
 install(EXPORT state_config DESTINATION lib)
 install(DIRECTORY ${INCLUDE_PATH}/ DESTINATION include)
 install(FILES ${EXPORTS_FILE_PATH} DESTINATION include/state)
