@@ -119,7 +119,8 @@ int64_t GoldManager::GetMaxGold() { return max_gold; }
 
 //Needs to enforce penalty for factory suiciding
 void GoldManager::GetFactorySuicideCost(PlayerId player_id){
-
+	int64_t suicide_penalty = factory_suicide_penalty_amount;
+	Decrease(player_id, suicide_penalty);
 }
 
 }
