@@ -15,7 +15,7 @@ namespace state {
 
 class STATE_EXPORT IStateSyncer {
   public:
-	virtual ~IStateSyncer();
+	virtual ~IStateSyncer() {}
 
 	/**
 	 * Method to call updates on the command taker after the player states
