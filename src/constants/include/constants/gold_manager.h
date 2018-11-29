@@ -35,4 +35,7 @@ const int64_t FACTORY_KILL_REWARD = 600;
 //Amount of gold recieved for factory suiciding
 const int64_t FACTORY_SUICIDE_PENALTY = 200;
 
+//Amount of gold increase per villager mining
+const int64_t MINING_REWARD = 10;
+
 #endif

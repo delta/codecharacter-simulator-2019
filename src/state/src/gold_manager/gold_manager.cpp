@@ -15,18 +15,18 @@ GoldManager::GoldManager(std::array<int64_t, 2> players_gold, int64_t max_gold,
                          int64_t soldier_kill_reward_amount,
                          int64_t villager_kill_reward_amount, int64_t factory_kill_reward_amount,
                          int64_t factory_suicide_penalty_amount, int64_t villager_cost, int64_t soldier_cost,
-                         int64_t factory_cost)
+                         int64_t factory_cost, int64_t mining_reward)
     : players_gold(players_gold), max_gold(max_gold),
       soldier_kill_reward_amount(soldier_kill_reward_amount),
       villager_kill_reward_amount(villager_kill_reward_amount),
       factory_kill_reward_amount(factory_kill_reward_amount),
       factory_suicide_penalty_amount(factory_suicide_penalty_amount),
       villager_cost(villager_cost), soldier_cost(soldier_cost),
-      factory_cost(factory_cost) {}
+      factory_cost(factory_cost), mining_reward(mining_reward) {}
 
 void GoldManager::Increase(PlayerId player_id, int64_t amount) {
 
-	int64_t current_player_id = static_cast<int>(player_id);
+	auto current_player_id = static_cast<int>(player_id);
 
 	if (amount <= 0) {
 		throw std::out_of_range("Increase in gold amount should be positive");
@@ -39,7 +39,7 @@ void GoldManager::Increase(PlayerId player_id, int64_t amount) {
 
 void GoldManager::Decrease(PlayerId player_id, int64_t amount) {
 
-	int64_t current_player_id = static_cast<int>(player_id);
+	auto current_player_id = static_cast<int>(player_id);
 
 	if (amount <= 0) {
 		throw std::out_of_range("The amount of descrese in gold must be positive");
@@ -99,8 +99,8 @@ int64_t GoldManager::GetCreateUnitCost(Actor *actor) {
 
 void GoldManager::GetCreateCost(PlayerId player_id, Actor *actor) {
 
-	int64_t actor_cost = GetCreateUnitCost(actor);
-	int64_t current_balance = GetBalance(player_id);
+	auto actor_cost = GetCreateUnitCost(actor);
+	auto current_balance = GetBalance(player_id);
 
 	// Decreasing player's gold if they can buy the unit
 	if (current_balance < actor_cost) {
@@ -117,10 +117,14 @@ int64_t GoldManager::GetBalance(PlayerId player_id) {
 
 int64_t GoldManager::GetMaxGold() { return max_gold; }
 
-//Needs to enforce penalty for factory suiciding
 void GoldManager::GetFactorySuicideCost(PlayerId player_id){
-	int64_t suicide_penalty = factory_suicide_penalty_amount;
+	auto suicide_penalty = factory_suicide_penalty_amount;
 	Decrease(player_id, suicide_penalty);
+}
+
+void GoldManager::RewardMineGold(PlayerId player_id){
+	auto reward_mining = mining_reward;
+	Increase(player_id, reward_mining);
 }
 
 }

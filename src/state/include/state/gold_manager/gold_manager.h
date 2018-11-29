@@ -62,6 +62,11 @@ class STATE_EXPORT GoldManager {
 	int64_t factory_cost;
 	
 	/**
+	 * Reward for 1 villager mining gold for 1 unit of time
+	 */
+	int64_t mining_reward;
+
+	/**
 	 * Returns the cost for creating a particular unit
 	 *
 	 * @param[in]  actor   Pointer to the type of actor that is trying to be
@@ -79,7 +84,8 @@ class STATE_EXPORT GoldManager {
 	            int64_t soldier_kill_reward_amount,
 	            int64_t villager_kill_reward_amount, int64_t factory_kill_reward_amount,
 	            int64_t factory_suicide_penalty_amount, int64_t villager_cost,
-	            int64_t soldier_cost, int64_t soldier_factory_cost);
+	            int64_t soldier_cost, int64_t soldier_factory_cost,
+	            int64_t mining_reward);
 
 	/**
 	 * Method to increase player money
@@ -141,7 +147,14 @@ class STATE_EXPORT GoldManager {
 	 */
 	void GetFactorySuicideCost(PlayerId player_id);
 
+	/**
+	 * Penalty for player triggering suicide
+	 *
+	 * @param[in]  player_id Player who triggered the suicide
+	 */
+	void RewardMineGold(PlayerId player_id);
 };
 }
 
 #endif
+				
