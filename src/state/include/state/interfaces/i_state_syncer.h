@@ -3,8 +3,7 @@
  * Declares the StateSyncer class
  */
 
-#ifndef STATE_INTERFACES_I_STATE_SYNCER_H
-#define STATE_INTERFACES_I_STATE_SYNCER_H
+#pragma once
 
 #include "state/player_state.h"
 #include "state/utilities.h"
@@ -37,5 +36,3 @@ class STATE_EXPORT IStateSyncer {
 };
 
 } // namespace state
-
-#endif

@@ -3,8 +3,7 @@
  * Declares 2D Vector class
  */
 
-#ifndef PHYSICS_VECTOR_HPP
-#define PHYSICS_VECTOR_HPP
+#pragma once
 
 #include <iostream>
 #include <cmath>
@@ -218,4 +217,3 @@ template <typename T> Vector<T> Vector<T>::ceil() const {
 }
 } // namespace physics
 
-#endif

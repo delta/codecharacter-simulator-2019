@@ -3,8 +3,7 @@
  * Declares the updatable interfacs, which gives classs an update method
  */
 
-#ifndef STATE_INTERFACES_I_UPDATABLE
-#define STATE_INTERFACES_I_UPDATABLE
+#pragma once
 
 #include "state/state_export.h"
 
@@ -19,5 +18,3 @@ class STATE_EXPORT IUpdatable {
 	virtual void Update() = 0;
 };
 } // namespace state
-
-#endif

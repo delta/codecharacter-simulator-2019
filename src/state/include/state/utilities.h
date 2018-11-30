@@ -3,8 +3,7 @@
  * Set of types and utilities functions for state
  */
 
-#ifndef STATE_UTILITIES_H
-#define STATE_UTILITIES_H
+#pragma once
 
 #include <cstdint>
 
@@ -34,5 +33,3 @@ enum class PlayerId : int {
 	PLAYER_COUNT = 2,
 };
 } // namespace state
-
-#endif

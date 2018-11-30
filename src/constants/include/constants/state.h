@@ -3,8 +3,7 @@
  * Constants related to game state
  */
 
-#ifndef CONSTANTS_INCLUDE_CONSTANTS_STATE_H
-#define CONSTANTS_INCLUDE_CONSTANTS_STATE_H
+#pragma once
 
 #include <cstddef>
 
@@ -19,5 +18,3 @@ const size_t MAX_NUM_FACTORIES = 50;
 
 // Size of the map in grid elements
 const size_t MAP_SIZE = 50;
-
-#endif

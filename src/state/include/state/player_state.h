@@ -3,8 +3,7 @@
  * Player structure for accessing and game state and setting game actions
  */
 
-#ifndef STATE_INCLUDE_STATE_PLAYER_STATE_H
-#define STATE_INCLUDE_STATE_PLAYER_STATE_H
+#pragma once
 
 #include "constants/state.h"
 #include "physics/vector.hpp"
@@ -210,5 +209,3 @@ struct State {
 };
 
 } // namespace player_state
-
-#endif

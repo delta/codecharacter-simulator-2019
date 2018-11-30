@@ -3,8 +3,7 @@
  * Manages dat gold
  */
 
-#ifndef STATE_INCLUDE_STATE_GOLD_MANAGER_H
-#define STATE_INCLUDE_STATE_GOLD_MANAGER_H
+#pragma once
 
 #include <cstdint>
 #include <state/actor/actor.h>
@@ -156,5 +155,3 @@ class STATE_EXPORT GoldManager {
 	void RewardMineGold(PlayerId player_id);
 };
 } // namespace state
-
-#endif

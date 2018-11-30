@@ -3,8 +3,7 @@
  * Declares the StateSyncer class
  */
 
-#ifndef STATE_STATE_SYNCER_H
-#define STATE_STATE_SYNCER_H
+#pragma once
 
 #include "state/interfaces/i_command_giver.h"
 #include "state/interfaces/i_command_taker.h"
@@ -44,5 +43,3 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 };
 
 } // namespace state
-
-#endif
