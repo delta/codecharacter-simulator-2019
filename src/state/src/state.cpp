@@ -16,4 +16,84 @@ State::State(std::unique_ptr<Map> map,
       soldiers(std::move(soldiers)), villagers(std::move(villagers)),
       factories(std::move(factories)) {}
 
+void State::MoveUnit(PlayerId player_id, ActorId actor_id,
+                     physics::Vector<int64_t> position) {
+	// TODO
+}
+
+void State::AttackActor(PlayerId player_id, ActorId unit_id,
+                        ActorId enemy_actor_id) {
+	// TODO
+}
+
+void State::BuildFactory(PlayerId player_id, ActorId villager_id,
+                         physics::Vector<int64_t> offset) {
+	// TODO
+}
+
+void State::BuildFactory(PlayerId player_id, ActorId villager_id,
+                         ActorId factory_id) {
+	// TODO
+}
+
+/**
+ * Helper function to get raw pointers from state's actors lists
+ *
+ * @tparam T Actor type (Soldier, Villager, or Factory)
+ * @param actors (Array of Vector of UniquePtrs to Actors)
+ * @return const std::array<std::vector<T *>, 2> List of Raw Pointers
+ */
+template <typename T>
+const std::array<std::vector<T *>, 2> GetRawPtrsFromUniquePtrs(
+    std::array<std::vector<std::unique_ptr<T>>, 2> &actors) {
+	// Let's get the raw pointers from unique pointers
+	auto ret_actors = std::array<std::vector<T *>, 2>{};
+
+	// For each player,
+	for (int i = 0; i < 2; ++i) {
+		auto player_actors = std::vector<T *>{};
+		player_actors.reserve(actors[i].size());
+
+		// For each actor,
+		for (int j = 0; j < actors[i].size(); ++j) {
+			player_actors.push_back(actors[i][j].get());
+		}
+		ret_actors[i] = player_actors;
+	}
+
+	return ret_actors;
+}
+
+const std::array<std::vector<Soldier *>, 2> State::GetSoldiers() {
+	return GetRawPtrsFromUniquePtrs(soldiers);
+}
+
+const std::array<std::vector<Villager *>, 2> State::GetVillagers() {
+	return GetRawPtrsFromUniquePtrs(villagers);
+}
+
+const std::array<std::vector<Factory *>, 2> State::GetFactories() {
+	return GetRawPtrsFromUniquePtrs(factories);
+}
+
+const Map *State::GetMap() { return map.get(); }
+
+const std::array<int64_t, 2> State::GetMoney() {
+	auto gold = std::array<int64_t, 2>{};
+
+	gold[0] = gold_manager->GetBalance(PlayerId::PLAYER1);
+	gold[1] = gold_manager->GetBalance(PlayerId::PLAYER2);
+
+	return gold;
+}
+
+const std::array<int64_t, 2> State::GetScores() {
+	// TODO: Implement scores
+	return std::array<int64_t, 2>{0, 0};
+}
+
+void State::Update() {
+	// TODO
+}
+
 } // namespace state
