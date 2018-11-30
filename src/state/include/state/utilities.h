@@ -25,6 +25,11 @@ enum class ActorType { SOLDIER, VILLAGER, FACTORY_SOLDIER, FACTORY_VILLAGER };
 enum class TerrainType { LAND, WATER, GOLD_MINE };
 
 /**
+ * Enum for the type of unit a factory is currently producing
+ */
+enum class ProductionState { SOLDIER, VILLAGER };
+
+/**
  * Enum for the two game players
  */
 enum class PlayerId : int {
