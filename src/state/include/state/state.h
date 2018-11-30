@@ -3,8 +3,7 @@
  * Declarations for State which representing the internal state of the game
  */
 
-#ifndef STATE_STATE_H
-#define STATE_STATE_H
+#pragma once
 
 #include "constants/state.h"
 #include "physics/vector.hpp"
@@ -31,5 +30,3 @@ class STATE_EXPORT State {
 	State(std::unique_ptr<Map> map);
 };
 } // namespace state
-
-#endif

@@ -3,8 +3,7 @@
  * Interface for game state changing calls
  */
 
-#ifndef STATE_INTERFACES_I_COMMAND_TAKER
-#define STATE_INTERFACES_I_COMMAND_TAKER
+#pragma once
 
 #include "physics/vector.hpp"
 #include "state/interfaces/i_updatable.h"
@@ -68,5 +67,3 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	//		 i.e. GetSoldiers, GetVillagers, GetMap, etc.
 };
 } // namespace state
-
-#endif

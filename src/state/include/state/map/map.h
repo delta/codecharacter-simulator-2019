@@ -3,8 +3,7 @@
  * Declares the Map class that specifies the game map terrain
  */
 
-#ifndef STATE_MAP_MAP_H
-#define STATE_MAP_MAP_H
+#pragma once
 
 #include "state/utilities.h"
 
@@ -76,5 +75,3 @@ class Map {
 };
 
 } // namespace state
-
-#endif

@@ -3,8 +3,7 @@
  * Constants related to gold
  */
 
-#ifndef CONSTANTS_INCLUDE_CONSTANTS_GOLD_MANAGER_H
-#define CONSTANTS_INCLUDE_CONSTANTS_GOLD_MANAGER_H
+#pragma once
 
 #include <cstdint>
 
@@ -37,5 +36,3 @@ const int64_t FACTORY_SUICIDE_PENALTY = 200;
 
 // Amount of gold increase per villager mining
 const int64_t MINING_REWARD = 10;
-
-#endif

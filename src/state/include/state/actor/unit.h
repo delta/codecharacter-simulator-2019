@@ -3,8 +3,7 @@
  * Declares the Base Unit class that all mobile actors derive from
  */
 
-#ifndef STATE_ACTOR_UNIT_H
-#define STATE_ACTOR_UNIT_H
+#pragma once
 
 #include "physics/vector.hpp"
 #include "state/actor/actor.h"
@@ -228,5 +227,3 @@ class STATE_EXPORT Unit : public Actor {
 	virtual void Update() = 0;
 };
 } // namespace state
-
-#endif

@@ -3,8 +3,7 @@
  * Declares the Base Soldier class for each troop
  */
 
-#ifndef STATE_ACTOR_SOLDIER_H
-#define STATE_ACTOR_SOLDIER_H
+#pragma once
 
 #include "physics/vector.hpp"
 #include "state/actor/unit.h"
@@ -37,5 +36,3 @@ class STATE_EXPORT Soldier : public Unit {
 	void Update() override;
 };
 } // namespace state
-
-#endif

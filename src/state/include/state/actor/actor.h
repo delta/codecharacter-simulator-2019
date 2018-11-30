@@ -3,8 +3,7 @@
  * Declares the Base Actor class that all actors derive from
  */
 
-#ifndef STATE_ACTOR_ACTOR_H
-#define STATE_ACTOR_ACTOR_H
+#pragma once
 
 #include "physics/vector.hpp"
 #include "state/interfaces/i_updatable.h"
@@ -152,5 +151,3 @@ class STATE_EXPORT Actor : public IUpdatable {
 	physics::Vector<int64_t> GetPosition();
 };
 } // namespace state
-
-#endif

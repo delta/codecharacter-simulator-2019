@@ -3,8 +3,7 @@
  * Interface for class that calls command taker methods
  */
 
-#ifndef STATE_INTERFACES_I_COMMAND_GIVER_H
-#define STATE_INTERFACES_I_COMMAND_GIVER_H
+#pragma once
 
 #include "state/interfaces/i_command_taker.h"
 #include "state/player_state.h"
@@ -32,5 +31,3 @@ class STATE_EXPORT ICommandGiver {
 };
 
 } // namespace state
-
-#endif
