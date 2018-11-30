@@ -5,13 +5,22 @@
 
 #pragma once
 
+#include "state/state_export.h"
+#include "state/utilities.h"
+
+#include <array>
 #include <cstdint>
-#include <state/actor/actor.h>
-#include <state/utilities.h>
-#include <vector>
 
 namespace state {
 
+/**
+ * Forward Declare Actor class
+ */
+class Actor;
+
+/**
+ * Gold Manager class that handles player gold
+ */
 class STATE_EXPORT GoldManager {
 
   private:

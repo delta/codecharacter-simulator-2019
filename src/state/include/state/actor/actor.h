@@ -6,6 +6,7 @@
 #pragma once
 
 #include "physics/vector.hpp"
+#include "state/gold_manager/gold_manager.h"
 #include "state/interfaces/i_updatable.h"
 #include "state/state_export.h"
 #include "state/utilities.h"
@@ -54,11 +55,17 @@ class STATE_EXPORT Actor : public IUpdatable {
 	 */
 	physics::Vector<int64_t> position;
 
+	/**
+	 * Gold manager instance to perform transactions
+	 */
+	GoldManager *gold_manager;
+
   public:
 	Actor();
 
 	Actor(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
-	      int64_t max_hp, physics::Vector<int64_t> position);
+	      int64_t max_hp, physics::Vector<int64_t> position,
+	      GoldManager *gold_manager);
 
 	virtual ~Actor() {}
 
