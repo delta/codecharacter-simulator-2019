@@ -12,11 +12,13 @@ namespace state {
 Unit::Unit() {
 	// Init none
 }
+
 Unit::Unit(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
-           int64_t max_hp, physics::Vector<int64_t> position, int64_t speed,
-           int64_t attack_range, int64_t attack_damage)
-    : Actor(id, player_id, actor_type, hp, max_hp, position), speed(speed),
-      attack_range(attack_range), attack_damage(attack_damage),
+           int64_t max_hp, physics::Vector<int64_t> position,
+           GoldManager *gold_manager, int64_t speed, int64_t attack_range,
+           int64_t attack_damage)
+    : Actor(id, player_id, actor_type, hp, max_hp, position, gold_manager),
+      speed(speed), attack_range(attack_range), attack_damage(attack_damage),
       attack_target(nullptr), destination(physics::Vector<int64_t>(0, 0)),
       is_destination_set(false), new_position(physics::Vector<int64_t>(0, 0)),
       is_new_position_set(false), damage_incurred(0) {}

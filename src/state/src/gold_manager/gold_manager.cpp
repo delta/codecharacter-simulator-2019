@@ -5,6 +5,7 @@
 
 #include "state/gold_manager/gold_manager.h"
 #include "physics/vector.hpp"
+#include "state/actor/actor.h"
 #include <stdexcept>
 
 namespace state {
