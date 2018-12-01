@@ -33,6 +33,13 @@ class STATE_EXPORT Soldier : public Unit {
 	        int64_t attack_damage);
 
 	/**
+	 * Get the name of the current state
+	 *
+	 * @return     Name of current state of type SoldierStateName
+	 */
+	SoldierStateName GetState();
+
+	/**
 	 * Late Update function of the soldier
 	 */
 	void LateUpdate() override;

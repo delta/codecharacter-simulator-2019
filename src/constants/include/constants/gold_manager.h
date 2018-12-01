@@ -29,7 +29,7 @@ const int64_t VILLAGER_COST = 200;
 const int64_t FACTORY_COST = 500;
 
 // Amount of gold for destroying a factory
-const int64_t FACTORY_KILL_REWARD = 600;
+const int64_t FACTORY_KILL_REWARD_AMOUNT = 600;
 
 // Amount of gold recieved for factory suiciding
 const int64_t FACTORY_SUICIDE_PENALTY = 200;

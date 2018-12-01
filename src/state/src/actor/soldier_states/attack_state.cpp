@@ -43,7 +43,8 @@ std::unique_ptr<SoldierState> AttackState::Update() {
 
 	// Execute attack code
 	// Inflict damage on opponent
-	soldier->GetAttackTarget()->Damage(soldier->GetAttackDamage());
+	auto target = soldier->GetAttackTarget();
+	target->Damage(soldier->GetAttackDamage());
 
 	// Check if opponent is now dead
 	if (soldier->GetAttackTarget()->GetLatestHp() == 0) {
