@@ -112,6 +112,14 @@ class STATE_EXPORT Actor : public IUpdatable {
 	 *
 	 * @return     Actor HP
 	 */
+
+	/**
+	 * Get the unit's GoldManager Pointer
+	 *
+	 * @return     gold_manager  Unit's GoldManager Pointer
+	 */
+	GoldManager *GetGoldManager();
+
 	int64_t GetHp();
 
 	/**
