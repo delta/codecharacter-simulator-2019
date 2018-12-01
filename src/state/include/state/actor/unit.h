@@ -108,13 +108,6 @@ class STATE_EXPORT Unit : public Actor {
 	Actor *GetAttackTarget();
 
 	/**
-	 * Get the unit's GoldManager Pointer
-	 *
-	 * @return     gold_manager  Unit's GoldManager Pointer
-	 */
-	GoldManager *GetGoldManager();
-
-	/**
 	 * Set the soldier's attack target
 	 *
 	 * @param[in]  attack_target  Soldier's Attack Target

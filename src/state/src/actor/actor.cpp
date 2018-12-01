@@ -35,6 +35,8 @@ PlayerId Actor::GetPlayerId() { return player_id; }
 
 ActorType Actor::GetActorType() { return actor_type; }
 
+GoldManager *Actor::GetGoldManager() { return gold_manager; }
+
 int64_t Actor::GetHp() { return hp; }
 
 int64_t Actor::GetMaxHp() { return max_hp; }
