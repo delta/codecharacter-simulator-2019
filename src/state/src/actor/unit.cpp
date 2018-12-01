@@ -31,6 +31,8 @@ int64_t Unit::GetAttackDamage() { return attack_damage; }
 
 Actor *Unit::GetAttackTarget() { return attack_target; }
 
+GoldManager *Unit::GetGoldManager() { return gold_manager; }
+
 void Unit::SetAttackTarget(Actor *attack_target) {
 	this->attack_target = attack_target;
 };

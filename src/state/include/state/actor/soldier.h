@@ -6,6 +6,7 @@
 #pragma once
 
 #include "physics/vector.hpp"
+#include "state/actor/soldier_states/soldier_state.h"
 #include "state/actor/unit.h"
 
 namespace state {
@@ -15,6 +16,11 @@ namespace state {
  */
 class STATE_EXPORT Soldier : public Unit {
   protected:
+	/*
+	 * State class that controls logic for soldier's current state
+	 */
+	std::unique_ptr<SoldierState> state;
+
   public:
 	/**
 	 * Soldier Constructor
