@@ -22,6 +22,8 @@ Soldier::Soldier(ActorId id, PlayerId player_id, ActorType actor_type,
            attack_range, attack_damage),
       state(std::make_unique<IdleState>(this)) {}
 
+SoldierStateName Soldier::GetState() { return state->GetName(); }
+
 void Soldier::LateUpdate() {
 	// If a move was performed, copy new_position into position
 	if (IsNewPositionSet()) {

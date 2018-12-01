@@ -12,6 +12,12 @@ set(SOURCE_FILES
 	src/actor/factory.cpp
 	src/map/map.cpp
 	src/gold_manager/gold_manager.cpp
+	src/actor/soldier_states/soldier_state.cpp
+	src/actor/soldier_states/idle_state.cpp
+	src/actor/soldier_states/attack_state.cpp
+	src/actor/soldier_states/move_state.cpp
+	src/actor/soldier_states/dead_state.cpp
+	src/actor/soldier_states/pursuit_state.cpp
 )
 
 set(INCLUDE_PATH include)
