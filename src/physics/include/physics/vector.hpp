@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 namespace physics {
 
@@ -94,8 +94,8 @@ template <typename T> class Vector {
 	template <typename T2> Vector<T> operator/(const T2 &scalar) const;
 
 	template <typename T2>
- friend std::ostream &operator<<(std::ostream &ostream,
-	                                               const Vector<T2> &vector);
+	friend std::ostream &operator<<(std::ostream &ostream,
+	                                const Vector<T2> &vector);
 
 	/**
 	 * Dot product of vectors
@@ -144,13 +144,11 @@ template <typename T> Vector<T>::Vector() : x(), y() {}
 
 template <typename T> Vector<T>::Vector(T x, T y) : x(x), y(y) {}
 
-template <typename T>
-bool Vector<T>::operator==(const Vector<T> &rhs) const {
+template <typename T> bool Vector<T>::operator==(const Vector<T> &rhs) const {
 	return (x == rhs.x && y == rhs.y);
 }
 
-template <typename T>
-bool Vector<T>::operator!=(const Vector<T> &rhs) const {
+template <typename T> bool Vector<T>::operator!=(const Vector<T> &rhs) const {
 	return (x != rhs.x || y != rhs.y);
 }
 
@@ -189,8 +187,7 @@ Vector<T> Vector<T>::operator/(const T2 &scalar) const {
 }
 
 template <typename T>
-std::ostream &operator<<(std::ostream &ostream,
-                                const Vector<T> &vector) {
+std::ostream &operator<<(std::ostream &ostream, const Vector<T> &vector) {
 	ostream << "(" << vector.x << ", " << vector.y << ")";
 	return ostream;
 }
@@ -203,8 +200,7 @@ template <typename T> double Vector<T>::magnitude() const {
 	return sqrt(x * x + y * y);
 }
 
-template <typename T>
-double Vector<T>::distance(const Vector<T> &other) const {
+template <typename T> double Vector<T>::distance(const Vector<T> &other) const {
 	return sqrt(pow(x - other.x, 2) + pow(y - other.y, 2));
 }
 
@@ -216,4 +212,3 @@ template <typename T> Vector<T> Vector<T>::ceil() const {
 	return Vector<T>(std::ceil(x), std::ceil(y));
 }
 } // namespace physics
-
