@@ -11,8 +11,11 @@
 #include "state/utilities.h"
 
 #include <array>
+#include <vector>
 
 namespace player_state {
+
+using Vec2D = physics::Vector<int64_t>;
 
 enum class SoldierState {
 	// Soldier is doing nothing
@@ -20,9 +23,7 @@ enum class SoldierState {
 	// Soldier is moving
 	MOVE,
 	// Soldier is currently attacking another actor
-	ATTACK,
-	// Soldier is dead
-	DEAD
+	ATTACK
 };
 
 inline std::ostream &operator<<(std::ostream &os, SoldierState soldier_state) {
@@ -35,9 +36,6 @@ inline std::ostream &operator<<(std::ostream &os, SoldierState soldier_state) {
 		break;
 	case SoldierState::ATTACK:
 		os << "ATTACK";
-		break;
-	case SoldierState::DEAD:
-		os << "DEAD";
 		break;
 	}
 	return os;
@@ -53,9 +51,7 @@ enum class VillagerState {
 	// Villager is currently mining resources
 	MINE,
 	// Villager is currently building a factory
-	BUILD,
-	// Villager is dead
-	DEAD
+	BUILD
 };
 
 inline std::ostream &operator<<(std::ostream &os,
@@ -76,9 +72,6 @@ inline std::ostream &operator<<(std::ostream &os,
 	case VillagerState::MINE:
 		os << "MINE";
 		break;
-	case VillagerState::DEAD:
-		os << "DEAD";
-		break;
 	}
 	return os;
 }
@@ -92,8 +85,6 @@ enum class FactoryState {
 	VILLAGER_PRODUCTION,
 	// Factory is currently producing soldiers
 	SOLDIER_PRODUCTION,
-	// Factory is dead
-	DEAD
 };
 
 enum class FactoryProduction {
@@ -117,29 +108,27 @@ inline std::ostream &operator<<(std::ostream &os, FactoryState factory_state) {
 	case FactoryState::SOLDIER_PRODUCTION:
 		os << "SOLDIER_PRODUCTION";
 		break;
-	case FactoryState::DEAD:
-		os << "DEAD";
-		break;
 	}
 	return os;
 }
 
 struct _Actor {
 	int64_t id;
-	physics::Vector<int64_t> position;
+	Vec2D position;
 	int64_t hp;
 };
 
 struct _Unit : _Actor {
-	// Player mutable
-	physics::Vector<int64_t> destination;
+	Vec2D destination;
 	int64_t target;
 
-	void move(physics::Vector<int64_t> p_destination) {
-		destination = p_destination;
-	}
+	void move(Vec2D p_destination) { destination = p_destination; }
 
+	// Attack with actor id
 	void attack(int64_t p_target) { target = p_target; }
+
+	// Attack with actor object
+	void attack(_Actor &p_target) { target = p_target.id; }
 };
 
 struct Soldier : _Unit {
@@ -147,23 +136,30 @@ struct Soldier : _Unit {
 };
 
 struct Villager : _Unit {
-	// Player mutable
-	physics::Vector<int64_t> _build_position;
-	FactoryProduction _build_factory_type;
+	int64_t target_factory_id;
+	Vec2D build_position;
+	FactoryProduction build_factory_type; // Note: Defaults to villager if unset
 
-	void
-	build(physics::Vector<int64_t> build_position,
-	      FactoryProduction build_factory_type = FactoryProduction::SOLDIER) {
-		build_position = _build_position;
-		build_factory_type = _build_factory_type;
+	// Build a new factory
+	void build(Vec2D p_build_position, FactoryProduction p_build_factory_type) {
+		build_position = p_build_position;
+		build_factory_type = p_build_factory_type;
 	}
+
+	// Join build at an existing factory using position
+	void build(Vec2D p_build_position) { build_position = p_build_position; }
+
+	// Join build at an existing factory using actor id
+	void build(int64_t p_factory_id) { target_factory_id = p_factory_id; }
 };
 
 struct Factory : _Actor {
 	double_t build_percent;
 	bool built;
 
-	// Player mutable
+	// Suicide if set
+	bool _suicide;
+
 	FactoryProduction production_state;
 
 	void toggle_production() {
@@ -177,32 +173,28 @@ struct Factory : _Actor {
 	void produce_soldiers() { production_state = FactoryProduction::SOLDIER; }
 
 	void produce_villagers() { production_state = FactoryProduction::VILLAGER; }
+
+	void suicide() { _suicide = true; }
 };
 
-struct MapElement {
-	state::TerrainType type;
-};
+enum class TerrainType { LAND, WATER, GOLD_MINE };
 
 /**
  * Main player state object. One such struct is provided to each player
  */
 struct State {
-	std::array<std::array<MapElement, MAP_SIZE>, MAP_SIZE> map;
+	std::array<std::array<TerrainType, MAP_SIZE>, MAP_SIZE> map;
 
-	std::array<Soldier, MAX_NUM_SOLDIERS> soldiers;
-	std::array<Soldier, MAX_NUM_SOLDIERS> enemy_soldiers;
-	int64_t num_soldiers;
-	int64_t num_enemy_soldiers;
+	std::vector<Soldier> soldiers;
+	std::vector<Soldier> enemy_soldiers;
 
-	std::array<Villager, MAX_NUM_VILLAGERS> villagers;
-	std::array<Villager, MAX_NUM_VILLAGERS> enemy_villagers;
-	int64_t num_villagers;
-	int64_t num_enemy_villagers;
+	std::vector<Villager> villagers;
+	std::vector<Villager> enemy_villagers;
 
-	std::array<Factory, MAX_NUM_FACTORIES> factories;
-	std::array<Factory, MAX_NUM_FACTORIES> enemy_factories;
-	int64_t num_factories;
-	int64_t num_enemy_factories;
+	std::vector<Factory> factories;
+	std::vector<Factory> enemy_factories;
+
+	std::vector<Vec2D> gold_mine_locations;
 
 	int64_t score;
 	int64_t gold;
