@@ -38,7 +38,8 @@ void Soldier::LateUpdate() {
 	if (this->hp == 0 && state->GetName() != SoldierStateName::DEAD) {
 		auto new_state = state->Update();
 		state->Exit();
-		state = std::move(new_state);
+		state = std::unique_ptr<SoldierState>(
+		    static_cast<SoldierState *>(new_state.release()));
 		state->Enter();
 		state->Update();
 	}
@@ -50,7 +51,8 @@ void Soldier::Update() {
 	while (new_state != nullptr) {
 		// State transition has occured
 		state->Exit();
-		state = std::move(new_state);
+		state = std::unique_ptr<SoldierState>(
+		    static_cast<SoldierState *>(new_state.release()));
 		state->Enter();
 		new_state = state->Update();
 	}

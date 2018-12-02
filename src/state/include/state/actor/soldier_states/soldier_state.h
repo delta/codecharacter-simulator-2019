@@ -3,6 +3,7 @@
  * Declares an interface for soldier states
  */
 
+#include "state/actor/interfaces/i_actor_state.h"
 #include "state/actor/soldier.fwd.h"
 #include "state/state_export.h"
 #include <memory>
@@ -30,7 +31,7 @@ enum class SoldierStateName {
 /**
  * The base state that other SoldierStates inherit from
  */
-class STATE_EXPORT SoldierState {
+class STATE_EXPORT SoldierState : public IActorState {
   protected:
 	/**
 	 * Name of this state
@@ -47,25 +48,6 @@ class STATE_EXPORT SoldierState {
 	 * Constructor for SoldierState
 	 */
 	SoldierState(SoldierStateName state_name, Soldier *soldier);
-
-	/**
-	 * Called right after the soldier switches to this state
-	 */
-	virtual void Enter() = 0;
-
-	/**
-	 * Executes state code when called
-	 * Returns the next soldier state when a state transition occurs
-	 * Returns nullptr if state code has been executed (no transition)
-	 *
-	 * @return      A pointer to the new state
-	 */
-	virtual std::unique_ptr<SoldierState> Update() = 0;
-
-	/**
-	 * Called before the Soldier switches to another state
-	 */
-	virtual void Exit() = 0;
 
 	/**
 	 * Get this state's name

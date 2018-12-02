@@ -17,7 +17,7 @@ PursuitState::PursuitState(Soldier *soldier)
 
 void PursuitState::Enter() {}
 
-std::unique_ptr<SoldierState> PursuitState::Update() {
+std::unique_ptr<IActorState> PursuitState::Update() {
 	// Check if the soldier is dead
 	if (soldier->GetHp() == 0) {
 		soldier->SetAttackTarget(nullptr);

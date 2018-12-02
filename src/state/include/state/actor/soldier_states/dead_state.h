@@ -20,18 +20,18 @@ class STATE_EXPORT DeadState : public SoldierState {
 	/**
 	 * Called right after the soldier switches to this state
 	 */
-	void Enter();
+	void Enter() override;
 
 	/**
 	 * Performs state transitions
 	 *
 	 * @return      A pointer to the new state
 	 */
-	std::unique_ptr<SoldierState> Update();
+	std::unique_ptr<IActorState> Update() override;
 
 	/**
 	 * Called before the Soldier switches to another state
 	 */
-	void Exit();
+	void Exit() override;
 };
 } // namespace state
