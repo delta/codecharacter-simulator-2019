@@ -22,8 +22,8 @@ class STATE_EXPORT IStateSyncer {
 	 *
 	 * @param[in] player_states Reference to two player states
 	 */
-	virtual void
-	    UpdateMainState(std::array<player_state::State, 2> &player_states) = 0;
+	virtual void UpdateMainState(
+	    const std::array<player_state::State, 2> &player_states) = 0;
 
 	/**
 	 * Method to update the two player state instances with the new values from
@@ -33,6 +33,11 @@ class STATE_EXPORT IStateSyncer {
 	 */
 	virtual void UpdatePlayerStates(
 	    std::array<player_state::State, 2> &player_states) = 0;
+
+	/**
+	 * Method to get both players' scores
+	 */
+	virtual std::array<int64_t, 2> GetScores() = 0;
 };
 
 } // namespace state

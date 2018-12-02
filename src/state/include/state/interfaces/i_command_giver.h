@@ -27,7 +27,7 @@ class STATE_EXPORT ICommandGiver {
 	 */
 	virtual void
 	RunCommands(ICommandTaker *state,
-	            std::array<player_state::State, 2> player_states) = 0;
+	            const std::array<player_state::State, 2> &player_states) = 0;
 };
 
 } // namespace state
