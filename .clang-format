@@ -97,5 +97,5 @@ Language: Proto
 DisableFormat: false
 TabWidth:        4
 IndentWidth:     4
-UseTab:          ForIndentation
+UseTab:          Never
 ...
