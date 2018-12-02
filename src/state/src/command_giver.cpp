@@ -11,7 +11,8 @@ namespace state {
 CommandGiver::CommandGiver() {}
 
 void CommandGiver::RunCommands(
-    ICommandTaker *state, std::array<player_state::State, 2> player_states) {
+    ICommandTaker *state,
+    const std::array<player_state::State, 2> &player_states) {
 
 	// TODO:
 	// Validate and evaluate player moves, make calls to ICommandTaker methods

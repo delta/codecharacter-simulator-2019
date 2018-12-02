@@ -33,13 +33,18 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 	 * @see IStateSyncer#UpdateMainState
 	 */
 	void UpdateMainState(
-	    std::array<player_state::State, 2> &player_states) override;
+	    const std::array<player_state::State, 2> &player_states) override;
 
 	/**
 	 * @see IStateSyncer#UpdatePlayerStates
 	 */
 	void UpdatePlayerStates(
 	    std::array<player_state::State, 2> &player_states) override;
+
+	/**
+	 * @see IStateSyncer#GetScores
+	 */
+	std::array<int64_t, 2> GetScores() override;
 };
 
 } // namespace state
