@@ -13,7 +13,7 @@ DeadState::DeadState(Soldier *soldier)
 
 void DeadState::Enter() {}
 
-std::unique_ptr<SoldierState> DeadState::Update() { return nullptr; }
+std::unique_ptr<IActorState> DeadState::Update() { return nullptr; }
 
 void DeadState::Exit() {}
 } // namespace state

@@ -22,7 +22,7 @@ class STATE_EXPORT MoveState : public SoldierState {
 	 *
 	 * Clear attack target
 	 */
-	void Enter();
+	void Enter() override;
 
 	/**
 	 * Performs state transitions
@@ -35,13 +35,13 @@ class STATE_EXPORT MoveState : public SoldierState {
 	 *
 	 * @return      A pointer to the new state
 	 */
-	std::unique_ptr<SoldierState> Update();
+	std::unique_ptr<IActorState> Update() override;
 
 	/**
 	 * Called before the Soldier switches to another state
 	 *
 	 * Clear destination
 	 */
-	void Exit();
+	void Exit() override;
 };
 } // namespace state

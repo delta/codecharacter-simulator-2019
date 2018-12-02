@@ -17,7 +17,7 @@ AttackState::AttackState(Soldier *soldier)
 
 void AttackState::Enter() {}
 
-std::unique_ptr<SoldierState> AttackState::Update() {
+std::unique_ptr<IActorState> AttackState::Update() {
 	// Check if the soldier is dead
 	if (soldier->GetHp() == 0) {
 		soldier->SetAttackTarget(nullptr);

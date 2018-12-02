@@ -35,7 +35,7 @@ class STATE_EXPORT AttackState : public SoldierState {
 	 *
 	 * @return      A pointer to the new state
 	 */
-	std::unique_ptr<SoldierState> Update();
+	std::unique_ptr<IActorState> Update() override;
 
 	/**
 	 * Called before the Soldier switches to another state

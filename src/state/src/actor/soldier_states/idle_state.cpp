@@ -17,7 +17,7 @@ IdleState::IdleState(Soldier *soldier)
 
 void IdleState::Enter() {}
 
-std::unique_ptr<SoldierState> IdleState::Update() {
+std::unique_ptr<IActorState> IdleState::Update() {
 	// Check if the soldier is dead
 	if (soldier->GetHp() == 0) {
 		return std::make_unique<DeadState>(soldier);

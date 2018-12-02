@@ -17,7 +17,7 @@ MoveState::MoveState(Soldier *soldier)
 
 void MoveState::Enter() {}
 
-std::unique_ptr<SoldierState> MoveState::Update() {
+std::unique_ptr<IActorState> MoveState::Update() {
 	// Check if the soldier is dead
 	if (soldier->GetHp() == 0) {
 		return std::make_unique<DeadState>(soldier);
