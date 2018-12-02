@@ -12,7 +12,7 @@ else()
 endif()
 
 # Get all project files
-file(GLOB_RECURSE ALL_SOURCE_FILES src/*.cpp src/*.h src/*.proto test/*.cpp test/*.h)
+file(GLOB_RECURSE ALL_SOURCE_FILES src/*.cpp src/*.h src/*.proto test/*.cpp test/*.h test/*.hpp)
 
 # Add target to build
 add_custom_target(
