@@ -87,9 +87,9 @@ class STATE_EXPORT Unit : public Actor {
 	int64_t GetSpeed();
 
 	/**
-	 * Get the soldier's attack range
+	 * Get the unit's attack range
 	 *
-	 * @return     Soldier's Attack Range
+	 * @return     Unit's Attack Range
 	 */
 	int64_t GetAttackRange();
 

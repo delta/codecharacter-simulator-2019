@@ -5,7 +5,7 @@
 
 #include "state/actor/soldier.h"
 #include "physics/vector.hpp"
-#include "state/actor/soldier_states/idle_state.h"
+#include "state/actor/soldier_states/soldier_idle_state.h"
 #include "state/actor/soldier_states/soldier_state.h"
 #include "state/actor/unit.h"
 
@@ -20,7 +20,7 @@ Soldier::Soldier(ActorId id, PlayerId player_id, ActorType actor_type,
                  int64_t attack_damage)
     : Unit(id, player_id, actor_type, hp, max_hp, position, gold_manager, speed,
            attack_range, attack_damage),
-      state(std::make_unique<IdleState>(this)) {}
+      state(std::make_unique<SoldierIdleState>(this)) {}
 
 SoldierStateName Soldier::GetState() { return state->GetName(); }
 

@@ -1,6 +1,6 @@
 /**
- * @file move_state.h
- * Declares the soldier move state
+ * @file idle_state.h
+ * Declares the soldier idle state
  */
 
 #include "state/actor/soldier.fwd.h"
@@ -11,16 +11,16 @@
 namespace state {
 
 /**
- * The move soldier state class
+ * The idle soldier state class
  */
-class STATE_EXPORT MoveState : public SoldierState {
+class STATE_EXPORT SoldierIdleState : public SoldierState {
   public:
-	MoveState(Soldier *soldier);
+	SoldierIdleState(Soldier *soldier);
 
 	/**
 	 * Called right after the soldier switches to this state
 	 *
-	 * Clear attack target
+	 * Clear any attack target or destination
 	 */
 	void Enter() override;
 
@@ -28,10 +28,10 @@ class STATE_EXPORT MoveState : public SoldierState {
 	 * Performs state transitions
 	 *
 	 * If soldier is dead, switch to dead state
-	 * If there's a target in range, switch to attack state
-	 * If there's a target out of range, switch to pursuit state
-	 * If destination has been reached, switch to idle state
-	 * Else, remain in move state. Move towards the destination
+	 * If there's a destination set, switch to move state
+	 * If there's an attack target in range, switch to attack state
+	 * If it's not in range, switch to pursuit state
+	 * Else, remain in idle state. Do nothing
 	 *
 	 * @return      A pointer to the new state
 	 */
@@ -39,8 +39,6 @@ class STATE_EXPORT MoveState : public SoldierState {
 
 	/**
 	 * Called before the Soldier switches to another state
-	 *
-	 * Clear destination
 	 */
 	void Exit() override;
 };
