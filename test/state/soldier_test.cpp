@@ -1,6 +1,7 @@
 #include "constants/gold_manager.h"
 #include "gmock/gmock.h"
 #include "state/actor/soldier.h"
+#include "state/actor/villager.h"
 #include "state/gold_manager/gold_manager.h"
 #include "gtest/gtest.h"
 

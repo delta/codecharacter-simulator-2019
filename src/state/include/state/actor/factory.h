@@ -31,6 +31,12 @@ class STATE_EXPORT Factory : public Actor {
 	 */
 	ProductionState production_state;
 
+	/**
+	 * Amount of damage the factory incurred in the current turn
+	 * Applied to hp at the end of the turn
+	 */
+	int64_t damage_incurred;
+
   public:
 	Factory();
 
@@ -67,6 +73,30 @@ class STATE_EXPORT Factory : public Actor {
 	 * @return false otherwise
 	 */
 	bool IsConstructionComplete();
+
+	/**
+	 * Returns factory's new_hp
+	 *
+	 * @see Actor#GetLatestHp
+	 *
+	 * @return     The factory's new_hp
+	 */
+	int64_t GetLatestHp() override;
+
+	/**
+	 * @see Actor#Damage
+	 */
+	void Damage(int64_t damage_amount) override;
+
+	/**
+	 * Update function of the Factory
+	 */
+	void LateUpdate();
+
+	/**
+	 * Update function of the Factory
+	 */
+	void Update();
 };
 
 } // namespace state

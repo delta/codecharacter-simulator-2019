@@ -6,6 +6,7 @@ set(SOURCE_FILES
 	physics/vector_test.cpp
 	state/map_test.cpp
 	state/soldier_test.cpp
+	state/villager_test.cpp
 )
 
 add_executable(tests ${SOURCE_FILES})
