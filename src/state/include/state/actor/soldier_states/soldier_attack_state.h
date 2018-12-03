@@ -13,9 +13,9 @@ namespace state {
 /**
  * The attack soldier state class
  */
-class STATE_EXPORT AttackState : public SoldierState {
+class STATE_EXPORT SoldierAttackState : public SoldierState {
   public:
-	AttackState(Soldier *soldier);
+	SoldierAttackState(Soldier *soldier);
 
 	/**
 	 * Called right after the soldier switches to this state

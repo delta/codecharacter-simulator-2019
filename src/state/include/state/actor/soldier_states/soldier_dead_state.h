@@ -1,6 +1,6 @@
 /**
- * @file pursuit_state.h
- * Declares the soldier pursuit state
+ * @file dead_state.h
+ * Declares the soldier dead state
  */
 
 #include "state/actor/soldier.fwd.h"
@@ -11,27 +11,19 @@
 namespace state {
 
 /**
- * The pursuit soldier state class
+ * The dead soldier state class
  */
-class STATE_EXPORT PursuitState : public SoldierState {
+class STATE_EXPORT SoldierDeadState : public SoldierState {
   public:
-	PursuitState(Soldier *soldier);
+	SoldierDeadState(Soldier *soldier);
 
 	/**
 	 * Called right after the soldier switches to this state
-	 *
-	 * Clear destination
 	 */
 	void Enter() override;
 
 	/**
 	 * Performs state transitions
-	 *
-	 * If soldier is dead, switch to dead state
-	 * If there's a destination set, switch to move state
-	 * If there target is dead, switch to idle state
-	 * If the target is in range, switch to attack state
-	 * Else, remain in pursuit state. Move towards the attack target
 	 *
 	 * @return      A pointer to the new state
 	 */

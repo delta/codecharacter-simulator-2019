@@ -3,42 +3,42 @@
  * Defines the soldier attack state
  */
 
-#include "state/actor/soldier_states/attack_state.h"
+#include "state/actor/soldier_states/soldier_attack_state.h"
 #include "state/actor/soldier.h"
-#include "state/actor/soldier_states/dead_state.h"
-#include "state/actor/soldier_states/idle_state.h"
-#include "state/actor/soldier_states/move_state.h"
-#include "state/actor/soldier_states/pursuit_state.h"
+#include "state/actor/soldier_states/soldier_dead_state.h"
+#include "state/actor/soldier_states/soldier_idle_state.h"
+#include "state/actor/soldier_states/soldier_move_state.h"
+#include "state/actor/soldier_states/soldier_pursuit_state.h"
 
 namespace state {
 
-AttackState::AttackState(Soldier *soldier)
+SoldierAttackState::SoldierAttackState(Soldier *soldier)
     : SoldierState(SoldierStateName::ATTACK, soldier) {}
 
-void AttackState::Enter() {}
+void SoldierAttackState::Enter() {}
 
-std::unique_ptr<IActorState> AttackState::Update() {
+std::unique_ptr<IActorState> SoldierAttackState::Update() {
 	// Check if the soldier is dead
 	if (soldier->GetHp() == 0) {
 		soldier->SetAttackTarget(nullptr);
-		return std::make_unique<DeadState>(soldier);
+		return std::make_unique<SoldierDeadState>(soldier);
 	}
 
 	// Check if the destination is set
 	if (soldier->IsDestinationSet()) {
 		soldier->SetAttackTarget(nullptr);
-		return std::make_unique<MoveState>(soldier);
+		return std::make_unique<SoldierMoveState>(soldier);
 	}
 
 	// Check if the target is dead
 	if (soldier->GetAttackTarget()->GetLatestHp() == 0) {
 		soldier->SetAttackTarget(nullptr);
-		return std::make_unique<IdleState>(soldier);
+		return std::make_unique<SoldierIdleState>(soldier);
 	}
 
 	// Check if the target is out of range
 	if (not soldier->IsAttackTargetInRange()) {
-		return std::make_unique<PursuitState>(soldier);
+		return std::make_unique<SoldierPursuitState>(soldier);
 	}
 
 	// Execute attack code
@@ -55,5 +55,5 @@ std::unique_ptr<IActorState> AttackState::Update() {
 	return nullptr;
 }
 
-void AttackState::Exit() {}
+void SoldierAttackState::Exit() {}
 } // namespace state
