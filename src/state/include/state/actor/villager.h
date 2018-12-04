@@ -39,6 +39,22 @@ class STATE_EXPORT Villager : public Unit {
 	 */
 	int64_t build_range;
 
+	/**
+	 * Location of mine to mine gold at
+	 */
+	physics::Vector<int64_t> mine_target;
+
+	/**
+	 * True if there is a current mine target set
+	 * False otherwise
+	 */
+	bool mine_target_set;
+
+	/**
+	 * Distance from which a villager can mine
+	 */
+	int64_t mine_range;
+
   public:
 	/**
 	 * Villager Constructor
@@ -48,7 +64,8 @@ class STATE_EXPORT Villager : public Unit {
 	Villager(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
 	         int64_t max_hp, physics::Vector<int64_t> position,
 	         GoldManager *gold_manager, int64_t speed, int64_t attack_range,
-	         int64_t attack_damage, int64_t build_effort, int64_t build_range);
+	         int64_t attack_damage, int64_t build_effort, int64_t build_range,
+	         int64_t mine_range);
 
 	/**
 	 * Get the villager's build range
@@ -98,6 +115,47 @@ class STATE_EXPORT Villager : public Unit {
 	 * @param[in]     build_target  The target factory to build
 	 */
 	void Build(Factory *build_target);
+
+	/**
+	 * Method to give the Mine command to this villager
+	 *
+	 * @param mine_target
+	 */
+	void Mine(physics::Vector<int64_t> mine_target);
+
+	/**
+	 * Get the Mine Target
+	 *
+	 * @return physics::Vector<int64_t> mine_target
+	 */
+	physics::Vector<int64_t> GetMineTarget();
+
+	/**
+	 * @brief Set the Mine Target
+	 *
+	 * @param mine_target Target position to set
+	 */
+	void SetMineTarget(physics::Vector<int64_t> mine_target);
+
+	/**
+	 * Unset the mine target
+	 */
+	void ClearMineTarget();
+
+	/**
+	 * Return the mine_target_set field
+	 *
+	 * @return mine_target_set boolean
+	 */
+	bool IsMineTargetSet();
+
+	/**
+	 * Is the villager inside target tile
+	 *
+	 * @return true if the villager is inside the mine target tile
+	 * @return false otherwise
+	 */
+	bool IsMineTargetInRange();
 
 	/**
 	 * Get the name of the current state

@@ -9,7 +9,9 @@
 #include "state/actor/villager_states/villager_build_state.h"
 #include "state/actor/villager_states/villager_dead_state.h"
 #include "state/actor/villager_states/villager_idle_state.h"
+#include "state/actor/villager_states/villager_mine_state.h"
 #include "state/actor/villager_states/villager_move_to_build_state.h"
+#include "state/actor/villager_states/villager_move_to_mine_state.h"
 #include "state/actor/villager_states/villager_pursuit_state.h"
 
 namespace state {
@@ -27,20 +29,17 @@ std::unique_ptr<IActorState> VillagerMoveState::Update() {
 
 	// Check if the build target is set
 	if (villager->IsBuildTargetSet()) {
-		if (villager->IsBuildTargetInRange()) {
-			return std::make_unique<VillagerBuildState>(villager);
-		} else {
-			return std::make_unique<VillagerMoveToBuildState>(villager);
-		}
+		return std::make_unique<VillagerBuildState>(villager);
 	}
 
 	// Check if there's an attack target set
 	if (villager->IsAttackTargetSet()) {
-		if (villager->IsAttackTargetInRange()) {
-			return std::make_unique<VillagerAttackState>(villager);
-		} else {
-			return std::make_unique<VillagerPursuitState>(villager);
-		}
+		return std::make_unique<VillagerAttackState>(villager);
+	}
+
+	// Check if there's a mine target set
+	if (villager->IsMineTargetSet()) {
+		return std::make_unique<VillagerMineState>(villager);
 	}
 
 	// Check if destination has been reached

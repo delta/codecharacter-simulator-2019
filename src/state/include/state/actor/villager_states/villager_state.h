@@ -28,7 +28,9 @@ enum class VillagerStateName {
 	MOVE_TO_BUILD,
 	// Villager is building build target
 	BUILD,
-	// Villager is mining or moving to mine target
+	// Villager is moving to mine mine
+	MOVE_TO_MINE,
+	// Villager is mining
 	MINE,
 	// Villager is dead
 	DEAD
@@ -50,6 +52,8 @@ class STATE_EXPORT VillagerState : public IActorState {
 	Villager *villager;
 
   public:
+	virtual ~VillagerState(){};
+
 	/**
 	 * Constructor for VillagerState
 	 */

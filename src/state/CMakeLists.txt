@@ -24,6 +24,8 @@ set(SOURCE_FILES
 	src/actor/villager_states/villager_build_state.cpp
 	src/actor/villager_states/villager_move_state.cpp
 	src/actor/villager_states/villager_move_to_build_state.cpp
+	src/actor/villager_states/villager_mine_state.cpp
+	src/actor/villager_states/villager_move_to_mine_state.cpp
 	src/actor/villager_states/villager_dead_state.cpp
 	src/actor/villager_states/villager_pursuit_state.cpp
 )
