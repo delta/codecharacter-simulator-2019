@@ -24,7 +24,9 @@ enum class VillagerStateName {
 	ATTACK,
 	// Villager is currently moving to attack another actor
 	PURSUIT,
-	// Villager is building or moving to build target
+	// Villager is moving towards build target
+	MOVE_TO_BUILD,
+	// Villager is building build target
 	BUILD,
 	// Villager is mining or moving to mine target
 	MINE,
