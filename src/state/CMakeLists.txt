@@ -18,6 +18,14 @@ set(SOURCE_FILES
 	src/actor/soldier_states/soldier_move_state.cpp
 	src/actor/soldier_states/soldier_dead_state.cpp
 	src/actor/soldier_states/soldier_pursuit_state.cpp
+	src/actor/villager_states/villager_state.cpp
+	src/actor/villager_states/villager_idle_state.cpp
+	src/actor/villager_states/villager_attack_state.cpp
+	src/actor/villager_states/villager_build_state.cpp
+	src/actor/villager_states/villager_move_state.cpp
+	src/actor/villager_states/villager_move_to_build_state.cpp
+	src/actor/villager_states/villager_dead_state.cpp
+	src/actor/villager_states/villager_pursuit_state.cpp
 )
 
 set(INCLUDE_PATH include)

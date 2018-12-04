@@ -1,6 +1,6 @@
 /**
  * @file build_state.h
- * Declares the villager build state
+ * Declares the villager move_to_build state
  */
 
 #include "state/actor/villager.fwd.h"
@@ -11,11 +11,11 @@
 namespace state {
 
 /**
- * The build villager state class
+ * The move_to_build villager state class
  */
-class STATE_EXPORT VillagerBuildState : public VillagerState {
+class STATE_EXPORT VillagerMoveToBuildState : public VillagerState {
   public:
-	VillagerBuildState(Villager *villager);
+	VillagerMoveToBuildState(Villager *villager);
 
 	/**
 	 * Called right after the villager switches to this state
@@ -32,7 +32,8 @@ class STATE_EXPORT VillagerBuildState : public VillagerState {
 	 * If there's an attack target in range, switch to attack state
 	 * If it's not in range, switch to pursuit state
 	 * If the build target is complete, switch to idle state
-	 * Else, remain in build state. Increment Effort to build target factory
+	 * If the build target is in range, switch to build state
+	 * Else, remain in move_to_build state. Move towards build target
 	 *
 	 * @return      A pointer to the new state
 	 */

@@ -1,25 +1,25 @@
 /**
- * @file build_state.cpp
- * Defines the villager build state
+ * @file soldier_move_to_build_state.cpp
+ * Defines the villager move_to_build state
  */
 
-#include "state/actor/villager_states/villager_build_state.h"
+#include "state/actor/villager_states/villager_move_to_build_state.h"
 #include "state/actor/villager.h"
 #include "state/actor/villager_states/villager_attack_state.h"
+#include "state/actor/villager_states/villager_build_state.h"
 #include "state/actor/villager_states/villager_dead_state.h"
 #include "state/actor/villager_states/villager_idle_state.h"
 #include "state/actor/villager_states/villager_move_state.h"
-#include "state/actor/villager_states/villager_move_to_build_state.h"
 #include "state/actor/villager_states/villager_pursuit_state.h"
 
 namespace state {
 
-VillagerBuildState::VillagerBuildState(Villager *villager)
-    : VillagerState(VillagerStateName::BUILD, villager) {}
+VillagerMoveToBuildState::VillagerMoveToBuildState(Villager *villager)
+    : VillagerState(VillagerStateName::MOVE_TO_BUILD, villager) {}
 
-void VillagerBuildState::Enter() {}
+void VillagerMoveToBuildState::Enter() {}
 
-std::unique_ptr<IActorState> VillagerBuildState::Update() {
+std::unique_ptr<IActorState> VillagerMoveToBuildState::Update() {
 	// Check if the villager is dead
 	if (villager->GetHp() == 0) {
 		villager->SetBuildTarget(nullptr);
@@ -49,18 +49,14 @@ std::unique_ptr<IActorState> VillagerBuildState::Update() {
 	}
 
 	// Check if the build target is out of range
-	// Not sure if this is necessary
-	if (not villager->IsBuildTargetInRange()) {
-		return std::make_unique<VillagerMoveToBuildState>(villager);
+	if (villager->IsBuildTargetInRange()) {
+		return std::make_unique<VillagerBuildState>(villager);
 	}
 
-	// Build target
-	// Add Effort to target factory construction
-	auto target = villager->GetBuildTarget();
-	target->IncrementConstructionCompletion(villager->GetBuildEffort());
+	// TODO : Set position of Villager towards build target
 
 	return nullptr;
 }
 
-void VillagerBuildState::Exit() {}
+void VillagerMoveToBuildState::Exit() {}
 } // namespace state
