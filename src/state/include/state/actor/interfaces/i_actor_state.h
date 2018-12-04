@@ -12,6 +12,8 @@ namespace state {
 
 class STATE_EXPORT IActorState {
   public:
+	virtual ~IActorState() {}
+
 	/**
 	 * Called right after the actor switches to this state
 	 */

@@ -18,12 +18,14 @@ Villager::Villager(ActorId id, PlayerId player_id, ActorType actor_type,
                    int64_t hp, int64_t max_hp,
                    physics::Vector<int64_t> position, GoldManager *gold_manager,
                    int64_t speed, int64_t attack_range, int64_t attack_damage,
-                   int64_t build_effort, int64_t build_range)
+                   int64_t build_effort, int64_t build_range,
+                   int64_t mine_range)
     : Unit(id, player_id, actor_type, hp, max_hp, position, gold_manager, speed,
            attack_range, attack_damage),
       state(std::make_unique<VillagerIdleState>(this)),
       build_range(build_range), build_effort(build_effort),
-      build_target(nullptr) {}
+      build_target(nullptr), mine_target(physics::Vector<int64_t>{}),
+      mine_target_set(false), mine_range(mine_range) {}
 
 VillagerStateName Villager::GetState() { return state->GetName(); }
 
@@ -55,6 +57,35 @@ bool Villager::IsBuildTargetInRange() {
 void Villager::Build(Factory *build_target) {
 	this->build_target = build_target;
 	this->is_destination_set = false;
+}
+
+void Villager::Mine(physics::Vector<int64_t> mine_target) {
+	this->SetMineTarget(mine_target);
+}
+
+void Villager::SetMineTarget(physics::Vector<int64_t> mine_target) {
+	this->mine_target = mine_target;
+	this->mine_target_set = true;
+}
+
+physics::Vector<int64_t> Villager::GetMineTarget() {
+	if (!IsMineTargetSet()) {
+		throw std::logic_error("No Mine target set!");
+	}
+
+	return this->mine_target;
+}
+
+void Villager::ClearMineTarget() { this->mine_target_set = false; }
+
+bool Villager::IsMineTargetSet() { return this->mine_target_set; }
+
+bool Villager::IsMineTargetInRange() {
+	if (!IsMineTargetSet()) {
+		throw std::logic_error("No Mine target set!");
+	}
+
+	return this->position.distance(mine_target) <= mine_range;
 }
 
 void Villager::LateUpdate() {

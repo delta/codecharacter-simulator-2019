@@ -23,6 +23,13 @@ class VillagerTest : public Test {
 	unique_ptr<Villager> villager;
 
   public:
+	std::unique_ptr<Villager> MakeTestVillager() {
+		return std::move(std::make_unique<Villager>(
+		    2, PlayerId::PLAYER2, ActorType::VILLAGER, 100, 100,
+		    physics::Vector<int64_t>(15, 15), gold_manager.get(), 10, 10, 10,
+		    10, 10, 10));
+	}
+
 	VillagerTest() {
 		for (int i = 0; i < (int)PlayerId::PLAYER_COUNT; ++i) {
 			player_gold[i] = 5000; // Start balance
@@ -42,15 +49,12 @@ class VillagerTest : public Test {
 		this->villager =
 		    make_unique<Villager>(1, PlayerId::PLAYER1, ActorType::VILLAGER,
 		                          100, 100, physics::Vector<int64_t>(10, 10),
-		                          gold_manager.get(), 10, 10, 10, 10, 10);
+		                          gold_manager.get(), 10, 10, 10, 10, 10, 10);
 	}
 };
 
-TEST_F(VillagerTest, MoveToAttackState) {
-	auto target_villager =
-	    make_unique<Villager>(2, PlayerId::PLAYER2, ActorType::VILLAGER, 100,
-	                          100, physics::Vector<int64_t>(15, 15),
-	                          gold_manager.get(), 10, 10, 10, 10, 10);
+TEST_F(VillagerTest, TransitionToAttackState) {
+	auto target_villager = MakeTestVillager();
 
 	this->villager->Attack(target_villager.get());
 
@@ -62,14 +66,20 @@ TEST_F(VillagerTest, MoveToAttackState) {
 	ASSERT_EQ(this->villager->GetState(), VillagerStateName::ATTACK);
 }
 
+TEST_F(VillagerTest, TransitionToMineState) {
+	this->villager->Mine(physics::Vector<int64_t>(10, 10));
+
+	this->villager->Update();
+	this->villager->LateUpdate();
+
+	ASSERT_EQ(this->villager->GetState(), VillagerStateName::MINE);
+}
+
 TEST_F(VillagerTest, DecreaseHpOnAttack) {
 	int64_t initial_hp = 100;
 	int64_t attack_damage = 10;
 
-	auto target_villager =
-	    make_unique<Villager>(2, PlayerId::PLAYER2, ActorType::VILLAGER, 100,
-	                          100, physics::Vector<int64_t>(15, 15),
-	                          gold_manager.get(), 10, 10, 10, 10, 10);
+	auto target_villager = MakeTestVillager();
 
 	this->villager->Attack(target_villager.get());
 
@@ -81,14 +91,11 @@ TEST_F(VillagerTest, DecreaseHpOnAttack) {
 	ASSERT_EQ(target_villager->GetHp(), (initial_hp - attack_damage));
 }
 
-TEST_F(VillagerTest, MoveToDeadState) {
+TEST_F(VillagerTest, TransitionToDeadState) {
 	int64_t initial_hp = 100;
 	int64_t attack_damage = 10;
 
-	auto target_villager =
-	    make_unique<Villager>(2, PlayerId::PLAYER2, ActorType::VILLAGER, 100,
-	                          100, physics::Vector<int64_t>(15, 15),
-	                          gold_manager.get(), 10, 10, 10, 10, 10);
+	auto target_villager = MakeTestVillager();
 
 	this->villager->Attack(target_villager.get());
 
@@ -105,10 +112,7 @@ TEST_F(VillagerTest, MoveToDeadState) {
 TEST_F(VillagerTest, VillagerKillReward) {
 	int64_t initial_gold = player_gold[0];
 
-	auto target_villager =
-	    make_unique<Villager>(2, PlayerId::PLAYER2, ActorType::VILLAGER, 100,
-	                          100, physics::Vector<int64_t>(15, 15),
-	                          gold_manager.get(), 10, 10, 10, 10, 10);
+	auto target_villager = MakeTestVillager();
 
 	this->villager->Attack(target_villager.get());
 
@@ -124,10 +128,7 @@ TEST_F(VillagerTest, VillagerKillReward) {
 }
 
 TEST_F(VillagerTest, SimultaneousKill) {
-	auto target_villager =
-	    make_unique<Villager>(2, PlayerId::PLAYER2, ActorType::VILLAGER, 100,
-	                          100, physics::Vector<int64_t>(15, 15),
-	                          gold_manager.get(), 10, 10, 10, 10, 10);
+	auto target_villager = MakeTestVillager();
 
 	villager->Attack(target_villager.get());
 	target_villager->Attack(villager.get());

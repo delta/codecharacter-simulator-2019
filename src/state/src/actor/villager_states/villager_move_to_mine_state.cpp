@@ -1,54 +1,60 @@
 /**
- * @file idle_state.cpp
- * Defines the villager idle state
+ * @file soldier_move_to_mine_state.cpp
+ * Defines the villager move_to_mine state
  */
 
-#include "state/actor/villager_states/villager_idle_state.h"
+#include "state/actor/villager_states/villager_move_to_mine_state.h"
 #include "state/actor/villager.h"
 #include "state/actor/villager_states/villager_attack_state.h"
 #include "state/actor/villager_states/villager_build_state.h"
 #include "state/actor/villager_states/villager_dead_state.h"
+#include "state/actor/villager_states/villager_idle_state.h"
 #include "state/actor/villager_states/villager_mine_state.h"
 #include "state/actor/villager_states/villager_move_state.h"
 #include "state/actor/villager_states/villager_move_to_build_state.h"
-#include "state/actor/villager_states/villager_move_to_mine_state.h"
 #include "state/actor/villager_states/villager_pursuit_state.h"
 
 namespace state {
 
-VillagerIdleState::VillagerIdleState(Villager *villager)
-    : VillagerState(VillagerStateName::IDLE, villager) {}
+VillagerMoveToMineState::VillagerMoveToMineState(Villager *villager)
+    : VillagerState(VillagerStateName::MOVE_TO_MINE, villager) {}
 
-void VillagerIdleState::Enter() {}
+void VillagerMoveToMineState::Enter() {}
 
-std::unique_ptr<IActorState> VillagerIdleState::Update() {
+std::unique_ptr<IActorState> VillagerMoveToMineState::Update() {
 	// Check if the villager is dead
 	if (villager->GetHp() == 0) {
+		villager->ClearMineTarget();
 		return std::make_unique<VillagerDeadState>(villager);
 	}
 
 	// Check if the destination is set
 	if (villager->IsDestinationSet()) {
+		villager->ClearMineTarget();
 		return std::make_unique<VillagerMoveState>(villager);
+	}
+
+	// Check if the attack target is set
+	if (villager->IsAttackTargetSet()) {
+		villager->ClearMineTarget();
+		return std::make_unique<VillagerAttackState>(villager);
 	}
 
 	// Check if the build target is set
 	if (villager->IsBuildTargetSet()) {
+		villager->ClearMineTarget();
 		return std::make_unique<VillagerBuildState>(villager);
 	}
 
-	// Check if the mine target is set
-	if (villager->IsMineTargetSet()) {
+	// Check if the mine target is in range
+	if (villager->IsMineTargetInRange()) {
 		return std::make_unique<VillagerMineState>(villager);
 	}
 
-	// Check if there's an attack target set
-	if (villager->IsAttackTargetSet()) {
-		return std::make_unique<VillagerAttackState>(villager);
-	}
+	// TODO : Set position of Villager towards mine target
 
 	return nullptr;
 }
 
-void VillagerIdleState::Exit() {}
+void VillagerMoveToMineState::Exit() {}
 } // namespace state

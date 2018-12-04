@@ -28,10 +28,10 @@ class STATE_EXPORT VillagerMoveState : public VillagerState {
 	 * Performs state transitions
 	 *
 	 * If villager is dead, switch to dead state
+	 * If there's a destination set, switch to move state
 	 * If the build target is set, switch to build state
-	 * If there's a target in range, switch to attack state
-	 * If there's a target out of range, switch to pursuit state
-	 * If destination has been reached, switch to idle state
+	 * If the mine target is set, switch to mine state
+	 * If the attack target is set, switch to attack state
 	 * Else, remain in move state. Move towards the destination
 	 *
 	 * @return      A pointer to the new state
