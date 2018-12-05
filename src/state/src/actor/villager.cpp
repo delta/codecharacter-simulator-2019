@@ -5,6 +5,8 @@
 
 #include "state/actor/villager.h"
 #include "physics/vector.hpp"
+#include "state/actor/factory.h"
+#include "state/actor/soldier.h"
 #include "state/actor/unit.h"
 #include "state/actor/villager_states/villager_idle_state.h"
 #include "state/actor/villager_states/villager_state.h"
