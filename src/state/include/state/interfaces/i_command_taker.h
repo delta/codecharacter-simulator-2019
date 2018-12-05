@@ -39,6 +39,16 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	                      physics::Vector<int64_t> position) = 0;
 
 	/**
+	 * Command villgaer to mine a mine
+	 *
+	 * @param player_id      player to act upon
+	 * @param villager_id    villager to act upon
+	 * @param mine_location  Vector indicating mine location
+	 */
+	virtual void MineLocation(PlayerId player_id, ActorId villager_id,
+	                          physics::Vector<int64_t> mine_location) = 0;
+
+	/**
 	 * Handles attack on actor
 	 *
 	 * @param[in]  player_id     player to act upon
@@ -73,6 +83,26 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	 */
 	virtual void BuildFactory(PlayerId player_id, ActorId villager_id,
 	                          ActorId factory_id) = 0;
+
+	/**
+	 * Command factory to change production
+	 *
+	 * @param player_id      player to act upon
+	 * @param factory_id     factory to act upon
+	 * @param production     actor type to produce
+	 */
+	virtual void SetFactoryProduction(PlayerId player_id, ActorId factory_id,
+	                                  ActorType production) = 0;
+
+	/**
+	 * Command factory to stop or start factory
+	 *
+	 * @param player_id      player to act upon
+	 * @param factory_id     factory to act upop
+	 * @param should_stop    true to stop, false to start
+	 */
+	virtual void StopOrStartFactory(PlayerId player_id, ActorId factory_id,
+	                                bool should_stop) = 0;
 
 	/**
 	 * Get all soldiers from state

@@ -137,6 +137,7 @@ struct Soldier : _Unit {
 
 struct Villager : _Unit {
 	int64_t target_factory_id;
+	Vec2D mine_target;
 	Vec2D build_position;
 	FactoryProduction build_factory_type; // Note: Defaults to villager if unset
 
@@ -151,17 +152,22 @@ struct Villager : _Unit {
 
 	// Join build at an existing factory using actor id
 	void build(int64_t p_factory_id) { target_factory_id = p_factory_id; }
+
+	// Mine at a particular location
+	void mine(Vec2D p_mine_target) { mine_target = p_mine_target; }
 };
 
 struct Factory : _Actor {
 	double_t build_percent;
 	bool built;
+	bool stopped;
 
 	// Suicide if set
 	bool _suicide;
 
 	FactoryProduction production_state;
 
+	// Helper to quickly toggle prodution states
 	void toggle_production() {
 		if (production_state == FactoryProduction::SOLDIER) {
 			production_state = FactoryProduction::VILLAGER;
@@ -174,6 +180,11 @@ struct Factory : _Actor {
 
 	void produce_villagers() { production_state = FactoryProduction::VILLAGER; }
 
+	void stop() { stopped = true; }
+
+	void start() { stopped = false; }
+
+	// Self destruct
 	void suicide() { _suicide = true; }
 };
 

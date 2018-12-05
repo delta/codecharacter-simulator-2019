@@ -63,6 +63,12 @@ class STATE_EXPORT State : public ICommandTaker {
 	              physics::Vector<int64_t> position) override;
 
 	/**
+	 * @see ICommandTaker#MineLocation
+	 */
+	void MineLocation(PlayerId player_id, ActorId villager_id,
+	                  physics::Vector<int64_t> mine_location) override;
+
+	/**
 	 * @see ICommandTaker#AttackActor
 	 */
 	void AttackActor(PlayerId player_id, ActorId unit_id,
@@ -79,6 +85,18 @@ class STATE_EXPORT State : public ICommandTaker {
 	 */
 	void BuildFactory(PlayerId player_id, ActorId villager_id,
 	                  ActorId factory_id) override;
+
+	/**
+	 * @see ICommandTaker#SetFactoryProduction
+	 */
+	void SetFactoryProduction(PlayerId player_id, ActorId factory_id,
+	                          ActorType production) override;
+
+	/**
+	 * @see ICommandTaker#StopOrStartFactory
+	 */
+	void StopOrStartFactory(PlayerId player_id, ActorId factory_id,
+	                        bool should_stop) override;
 
 	/**
 	 * @see ICommandTaker#GetSoldiers
