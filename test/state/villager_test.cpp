@@ -144,10 +144,13 @@ TEST_F(VillagerTest, SimultaneousKill) {
 }
 
 TEST_F(VillagerTest, BuildFactory) {
+	auto villager_list = std::vector<std::unique_ptr<Villager>>{};
+	auto soldier_list = std::vector<std::unique_ptr<Soldier>>{};
 	auto target_factory = std::make_unique<Factory>(
-	    2, PlayerId::PLAYER2, ActorType::FACTORY_VILLAGER, 100, 100,
-	    physics::Vector<int64_t>(15, 15), gold_manager.get(), 0, 100,
-	    ProductionState::VILLAGER);
+	    2, PlayerId::PLAYER1, ActorType::FACTORY_VILLAGER, 100, 100,
+	    physics::Vector<int64_t>(10, 10), gold_manager.get(), 0, 100,
+	    ActorType::VILLAGER, 5, 5, Villager{}, Soldier{}, villager_list,
+	    soldier_list);
 
 	this->villager->Build(target_factory.get());
 
