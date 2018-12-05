@@ -21,6 +21,11 @@ void State::MoveUnit(PlayerId player_id, ActorId actor_id,
 	// TODO
 }
 
+void State::MineLocation(PlayerId player_id, ActorId villager_id,
+                         physics::Vector<int64_t> mine_location) {
+	// TODO
+}
+
 void State::AttackActor(PlayerId player_id, ActorId unit_id,
                         ActorId enemy_actor_id) {
 	// TODO
@@ -33,6 +38,16 @@ void State::BuildFactory(PlayerId player_id, ActorId villager_id,
 
 void State::BuildFactory(PlayerId player_id, ActorId villager_id,
                          ActorId factory_id) {
+	// TODO
+}
+
+void State::SetFactoryProduction(PlayerId player_id, ActorId factory_id,
+                                 ActorType production) {
+	// TODO
+}
+
+void State::StopOrStartFactory(PlayerId player_id, ActorId factory_id,
+                               bool should_stop) {
 	// TODO
 }
 
