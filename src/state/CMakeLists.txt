@@ -28,6 +28,11 @@ set(SOURCE_FILES
 	src/actor/villager_states/villager_move_to_mine_state.cpp
 	src/actor/villager_states/villager_dead_state.cpp
 	src/actor/villager_states/villager_pursuit_state.cpp
+	src/actor/factory_states/factory_state.cpp
+	src/actor/factory_states/factory_idle_state.cpp
+	src/actor/factory_states/factory_production_state.cpp
+	src/actor/factory_states/factory_unbuilt_state.cpp
+	src/actor/factory_states/factory_dead_state.cpp
 )
 
 set(INCLUDE_PATH include)
