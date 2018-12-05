@@ -4,6 +4,7 @@
  */
 
 #include "state/actor/villager_states/villager_state.h"
+#include "state/actor/factory.h"
 #include "state/actor/villager.h"
 
 namespace state {

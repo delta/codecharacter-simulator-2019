@@ -6,6 +6,7 @@
 #pragma once
 
 #include "physics/vector.hpp"
+#include "state/actor/factory.fwd.h"
 #include "state/actor/soldier_states/soldier_state.h"
 #include "state/actor/unit.h"
 

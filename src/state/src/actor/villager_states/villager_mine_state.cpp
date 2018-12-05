@@ -4,16 +4,16 @@
  */
 
 #include "state/actor/villager_states/villager_mine_state.h"
-#include "state/actor/villager.h"
+#include "state/actor/factory.h"
 #include "state/actor/villager_states/villager_attack_state.h"
 #include "state/actor/villager_states/villager_build_state.h"
 #include "state/actor/villager_states/villager_dead_state.h"
 #include "state/actor/villager_states/villager_idle_state.h"
-#include "state/actor/villager_states/villager_mine_state.h"
 #include "state/actor/villager_states/villager_move_state.h"
 #include "state/actor/villager_states/villager_move_to_build_state.h"
 #include "state/actor/villager_states/villager_move_to_mine_state.h"
 #include "state/actor/villager_states/villager_pursuit_state.h"
+#include "state/actor/villager_states/villager_state.h"
 
 namespace state {
 
