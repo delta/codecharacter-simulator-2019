@@ -83,10 +83,7 @@ void GoldManager::RewardKill(Actor *enemy_actor) {
 	Increase(player_id, reward_amount);
 }
 
-int64_t GoldManager::GetCreateUnitCost(Actor *actor) {
-
-	ActorType unit_type = actor->GetActorType();
-
+int64_t GoldManager::GetCreateUnitCost(ActorType unit_type) {
 	if (unit_type == ActorType::FACTORY_SOLDIER ||
 	    unit_type == ActorType::FACTORY_VILLAGER) {
 		return factory_cost;
@@ -99,7 +96,7 @@ int64_t GoldManager::GetCreateUnitCost(Actor *actor) {
 
 void GoldManager::DeductUnitCreateCost(PlayerId player_id, Actor *actor) {
 
-	auto actor_cost = GetCreateUnitCost(actor);
+	auto actor_cost = GetCreateUnitCost(actor->GetActorType());
 	auto current_balance = GetBalance(player_id);
 
 	// Decreasing player's gold if they can buy the unit

@@ -74,14 +74,6 @@ class STATE_EXPORT GoldManager {
 	 */
 	int64_t mining_reward;
 
-	/**
-	 * Returns the cost for creating a particular unit
-	 *
-	 * @param[in]  actor   Pointer to the type of actor that is trying to be
-	 * created
-	 */
-	int64_t GetCreateUnitCost(Actor *actor);
-
   public:
 	/**
 	 * Constructor for Gold Manager class
@@ -125,6 +117,13 @@ class STATE_EXPORT GoldManager {
 	 * @param[in]  enemy_actor  Pointer to the killed enemy
 	 */
 	void RewardKill(Actor *enemy_actor);
+
+	/**
+	 * Returns the cost for creating a particular unit
+	 *
+	 * @param[in]  actor_type  ActorType to fetch cost
+	 */
+	int64_t GetCreateUnitCost(ActorType unit_type);
 
 	/**
 	 * Decreases player's gold for creating specific actor type
