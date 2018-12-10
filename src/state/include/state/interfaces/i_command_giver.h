@@ -16,18 +16,33 @@ namespace state {
  * ICommandGiver interface to call command taker methods
  */
 class STATE_EXPORT ICommandGiver {
+    private:
+        ICommandTaker *state;
+
+    virtual void
+    AttackActor(ICommandTaker * state, PlayerId player_id,
+            ActorId unit_id, ActorId enemy_actor_id) = 0;
+
+    virtual void
+    CreateFactory(ICommandTaker * state, PlayerId player_id,
+            ActorId villager_id, physics::Vector<int64_t> offset) = 0;
+
+    virtual void
+    BuildFactory(ICommandTaker * state, PlayerId player_id,
+            ActorId villager_id, ActorId factory_id) = 0;
+
+    virtual void
+    MoveUnit(ICommandTaker * state, PlayerId player_id, ActorId actor_id,
+                  physics::Vector<int64_t> position) = 0;
+
   public:
+
 	virtual ~ICommandGiver() {}
 
-	/**
-	 * Runs the necessary commands on the command taker (state)
-	 *
-	 * @param[in] state main game state that to which commands must be give
-	 * @param[in] player_states Player state from which we get commands to run
-	 */
-	virtual void
-	RunCommands(ICommandTaker *state,
-	            const std::array<player_state::State, 2> &player_states) = 0;
+    virtual void
+	RunCommands(ICommandTaker *state, const std::array<player_state::State, 2> &player_states) = 0;
+
 };
 
 } // namespace state
+
