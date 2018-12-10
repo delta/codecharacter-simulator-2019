@@ -77,7 +77,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	/**
 	 * @see ICommandTaker#BuildFactory
 	 */
-	void BuildFactory(PlayerId player_id, ActorId villager_id,
+	void CreateFactory(PlayerId player_id, ActorId villager_id,
 	                  physics::Vector<int64_t> offset) override;
 
 	/**
