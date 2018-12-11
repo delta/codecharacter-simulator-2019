@@ -7,6 +7,7 @@
 
 #include "state/interfaces/i_command_giver.h"
 #include "state/interfaces/i_command_taker.h"
+#include "state/state_export.h"
 #include "state/utilities.h"
 
 namespace state {

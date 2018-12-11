@@ -67,35 +67,35 @@ void CommandGiver::RunCommands(ICommandTaker *state, const std::array<player_sta
 	for(int player_id = 0; player_id < player_states.size(); ++player_id){
 		for(int64_t villager_index = 0; villager_index < state_villagers[player_id].size(); ++villager_index){
 			//Checking for build targets
-			auto const &villagers = player_states[player_id].villagers[villager_index];
+			auto const &villager = player_states[player_id].villagers[villager_index];
 
 			//Checking if a villager wants to build a new factory or wants to continue building a factory that already exists
-			bool build_factory = villagers.build_position != Vec2d(-1, -1);
-			bool targetting_factory = villagers.target_factory_id != -1;
+			bool build_factory = villager.build_position != Vec2d(-1, -1);
+			bool targetting_factory = villager.target_factory_id != -1;
 
 			if(build_factory && targetting_factory){
 				//TODO: Need to log error because the villager is trying to do 2 things at the same time
 			}
 
-            bool new_factory   = false;
-			int64_t factory_target = villagers.target_factory_id;
+            bool new_factory   = true;
+			int64_t factory_target = villager.target_factory_id;
 
             //Iterating through the factories to check whether the factory already exists
 			for (auto &factory : state_factories[player_id]) {
 			    if (factory->GetActorId() == factory_target) {
-        			new_factory = true;
+        			new_factory = false;
         			break;
    				 }
 			}
 
 			//If villager is creating a new factory
 			if(build_factory && new_factory){
-				CreateFactory(static_cast<PlayerId>(player_id), villagers.id, villagers.build_position);
+				CreateFactory(static_cast<PlayerId>(player_id), villager.id, villager.build_position);
 			}
 
 			//If villager is building an existing factory
 			else if(build_factory){
-				BuildFactory(static_cast<PlayerId>(player_id), villagers.id, villagers.target_factory_id);
+				BuildFactory(static_cast<PlayerId>(player_id), villager.id, villager.target_factory_id);
 			}
 		}
 	}
