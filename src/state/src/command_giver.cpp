@@ -38,15 +38,10 @@ void CommandGiver::RunCommands(ICommandTaker *state, const std::array<player_sta
 	auto state_factories = state->GetFactories();
 
 	//Iterating through the soldiers and assigning soldier tasks
-	for(int player_id = 0; player_id < player_states.size(); ++player_id)
-	{
-		for(int64_t soldier_index = 0; soldier_index < state_soldiers[player_id].size(); ++soldier_index)
-		{
-		    //Getting soldier data from the player state
-			auto const &soldiers = player_states[player_id].soldiers[soldier_index];
-
-			bool is_attacking = soldiers.target != -1;
-			bool is_moving    = (soldiers.destination != Vec2d(-1, -1));
+	for(int player_id = 0; player_id < player_states.size(); ++player_id){
+		for(auto &soldier: player_states[player_id].soldiers){
+			bool is_attacking = soldier.target != -1;
+			bool is_moving    = (soldier.destination != Vec2d(-1, -1));
 
 			if(is_attacking && is_moving){
 				//TODO: Need to log errors here for assigning 2 tasks to a soldier at a time
@@ -54,10 +49,10 @@ void CommandGiver::RunCommands(ICommandTaker *state, const std::array<player_sta
 			else
 			{
 				if(is_attacking) {
-                    AttackActor(static_cast<PlayerId>(player_id), soldiers.id, soldiers.target);
+                    AttackActor(static_cast<PlayerId>(player_id), soldier.id, soldier.target);
                 }
 				else if (is_moving){
-					MoveUnit(static_cast<PlayerId>(player_id), soldiers.id, soldiers.destination);
+					MoveUnit(static_cast<PlayerId>(player_id), soldier.id, soldier.destination);
 				}
 			}
 		}	
@@ -65,10 +60,7 @@ void CommandGiver::RunCommands(ICommandTaker *state, const std::array<player_sta
 
 	//Iterating through the villagers and assigning tasks
 	for(int player_id = 0; player_id < player_states.size(); ++player_id){
-		for(int64_t villager_index = 0; villager_index < state_villagers[player_id].size(); ++villager_index){
-			//Checking for build targets
-			auto const &villager = player_states[player_id].villagers[villager_index];
-
+		for(auto &villager: player_states[player_id].villagers){
 			//Checking if a villager wants to build a new factory or wants to continue building a factory that already exists
 			bool build_factory = villager.build_position != Vec2d(-1, -1);
 			bool targetting_factory = villager.target_factory_id != -1;
