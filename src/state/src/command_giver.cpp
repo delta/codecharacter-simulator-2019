@@ -6,7 +6,7 @@
 #include "state/command_giver.h"
 #include <algorithm>
 
-using Vec2d = physics::Vector<int64_t>;
+using Vec2D = physics::Vector<int64_t>;
 
 namespace state {
 
@@ -47,7 +47,7 @@ void CommandGiver::RunCommands(
 	for (int player_id = 0; player_id < player_states.size(); ++player_id) {
 		for (auto &soldier : player_states[player_id].soldiers) {
 			bool is_attacking = soldier.target != -1;
-			bool is_moving = (soldier.destination != Vec2d(-1, -1));
+			bool is_moving = (soldier.destination != Vec2D(-1, -1));
 
 			if (is_attacking && is_moving) {
 				// TODO: Need to log errors here for assigning 2 tasks to a
@@ -69,13 +69,14 @@ void CommandGiver::RunCommands(
 		for (auto &villager : player_states[player_id].villagers) {
 			// Checking if a villager wants to build a new factory or wants to
 			// continue building a factory that already exists
-			bool build_factory = villager.build_position != Vec2d(-1, -1);
+			bool build_factory = villager.build_position != Vec2D(-1, -1);
 			bool targetting_factory = villager.target_factory_id != -1;
-			bool is_moving = villager.destination != Vec2d(-1, -1);
+			bool is_moving = villager.destination != Vec2D(-1, -1);
 			bool is_attacking = villager.target != -1;
+			bool is_mining = villager.mine_target != Vec2D(-1, -1);
 
 			std::vector<bool> checks{build_factory, targetting_factory,
-			                         is_moving, is_attacking};
+			                         is_moving, is_attacking, is_mining};
 
 			if (std::count(checks.begin(), checks.end(), true) > 1) {
 				// TODO: Need to log error because the villager is trying to do
@@ -85,33 +86,30 @@ void CommandGiver::RunCommands(
 			bool new_factory = true;
 			int64_t factory_target = villager.target_factory_id;
 
-			// Iterating through the factories to check whether the factory
-			// already exists
-			for (auto &factory : state_factories[player_id]) {
-				if (factory->GetActorId() == factory_target) {
-					new_factory = false;
+			if (build_factory) {
+				// Iterating through the factories to check whether the factory
+				// already exists
+				for (auto &factory : state_factories[player_id]) {
+					if (factory->GetActorId() == factory_target)
+						new_factory = false;
 					break;
 				}
+				// If villager is creating a new factory
+				if (new_factory) {
+					CreateFactory(static_cast<PlayerId>(player_id), villager.id,
+					              villager.build_position);
+				}
+				// If villager is building an existing factory
+				else {
+					BuildFactory(static_cast<PlayerId>(player_id), villager.id,
+					             villager.target_factory_id);
+				}
 			}
-
-			// If villager is creating a new factory
-			if (build_factory && new_factory) {
-				CreateFactory(static_cast<PlayerId>(player_id), villager.id,
-				              villager.build_position);
-			}
-
-			// If villager is building an existing factory
-			else if (build_factory) {
-				BuildFactory(static_cast<PlayerId>(player_id), villager.id,
-				             villager.target_factory_id);
-			}
-
 			// If the villager is moving to another destination
 			else if (is_moving) {
 				MoveUnit(static_cast<PlayerId>(player_id), villager.id,
 				         villager.destination);
 			}
-
 			// If the villager is attacking another unit
 			else if (is_attacking) {
 				AttackActor(static_cast<PlayerId>(player_id), villager.id,
