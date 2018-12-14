@@ -97,7 +97,7 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	 * Command factory to stop or start factory
 	 *
 	 * @param player_id      player to act upon
-	 * @param factory_id     factory to act upop
+	 * @param factory_id     factory to act upon
 	 * @param should_stop    true to stop, false to start
 	 */
 	virtual void StopOrStartFactory(PlayerId player_id, ActorId factory_id,

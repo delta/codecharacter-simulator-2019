@@ -34,6 +34,21 @@ void CommandGiver::MoveUnit(PlayerId player_id, ActorId actor_id,
 	state->MoveUnit(player_id, actor_id, position);
 }
 
+void CommandGiver::SetFactoryProduction(PlayerId player_id, ActorId factory_id,
+                                        ActorType actor_type) {
+	state->SetFactoryProduction(player_id, factory_id, actor_type);
+}
+
+void CommandGiver::StopOrStartFactory(PlayerId player_id, ActorId factory_id,
+                                      bool should_stop) {
+	state->StopOrStartFactory(player_id, factory_id, should_stop);
+}
+
+void CommandGiver::MineLocation(PlayerId player_id, ActorId villager_id,
+                                physics::Vector<int64_t> mine_location) {
+	state->MineLocation(player_id, villager_id, mine_location);
+}
+
 void CommandGiver::RunCommands(
     ICommandTaker *state,
     const std::array<player_state::State, 2> &player_states) {
@@ -74,6 +89,8 @@ void CommandGiver::RunCommands(
 			bool is_moving = villager.destination != Vec2D(-1, -1);
 			bool is_attacking = villager.target != -1;
 			bool is_mining = villager.mine_target != Vec2D(-1, -1);
+			bool new_factory = true;
+			int64_t factory_target = villager.target_factory_id;
 
 			std::vector<bool> checks{build_factory, targetting_factory,
 			                         is_moving, is_attacking, is_mining};
@@ -81,12 +98,7 @@ void CommandGiver::RunCommands(
 			if (std::count(checks.begin(), checks.end(), true) > 1) {
 				// TODO: Need to log error because the villager is trying to do
 				// 2 things at the same time
-			}
-
-			bool new_factory = true;
-			int64_t factory_target = villager.target_factory_id;
-
-			if (build_factory) {
+			} else if (build_factory) {
 				// Iterating through the factories to check whether the factory
 				// already exists
 				for (auto &factory : state_factories[player_id]) {
@@ -110,10 +122,37 @@ void CommandGiver::RunCommands(
 				MoveUnit(static_cast<PlayerId>(player_id), villager.id,
 				         villager.destination);
 			}
-			// If the villager is attacking another unit
+			// If the villager is attacking another to
 			else if (is_attacking) {
 				AttackActor(static_cast<PlayerId>(player_id), villager.id,
 				            villager.target);
+			}
+			// If the villager is wants to mine gold
+			else if (is_mining) {
+				MineLocation(static_cast<PlayerId>(player_id), villager.id,
+				             villager.mine_target);
+			}
+		}
+	}
+
+	// Iterating through all the factories
+	for (int player_id = 0; player_id < player_states.size(); ++player_id) {
+		for (auto &factory : player_states[player_id].factories) {
+			// Starting or stopping factory production
+			StopOrStartFactory(static_cast<PlayerId>(player_id), factory.id,
+			                   factory.stopped);
+
+			// Changing the production state of the factory if changed, else it
+			// stays the same
+			auto build_factory_type = factory.production_state;
+			if (build_factory_type ==
+			    player_state::FactoryProduction::VILLAGER) {
+				SetFactoryProduction(static_cast<PlayerId>(player_id),
+				                     factory.id, ActorType::VILLAGER);
+			} else if (build_factory_type ==
+			           player_state::FactoryProduction::SOLDIER) {
+				SetFactoryProduction(static_cast<PlayerId>(player_id),
+				                     factory.id, ActorType::SOLDIER);
 			}
 		}
 	}
