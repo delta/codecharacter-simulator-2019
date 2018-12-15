@@ -32,7 +32,7 @@ void State::AttackActor(PlayerId player_id, ActorId unit_id,
 }
 
 void State::CreateFactory(PlayerId player_id, ActorId villager_id,
-                         physics::Vector<int64_t> offset) {
+                          physics::Vector<int64_t> offset) {
 	// TODO
 }
 

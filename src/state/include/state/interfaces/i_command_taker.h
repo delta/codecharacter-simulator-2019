@@ -70,7 +70,7 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	 * @throw      std::exception  if the operation was not possible
 	 */
 	virtual void CreateFactory(PlayerId player_id, ActorId villager_id,
-	                          physics::Vector<int64_t> offset) = 0;
+	                           physics::Vector<int64_t> offset) = 0;
 
 	/**
 	 *
