@@ -8,6 +8,7 @@ set(SOURCE_FILES
 	state/soldier_test.cpp
 	state/villager_test.cpp
 	state/factory_test.cpp
+	state/path_planner_test.cpp
 )
 
 add_executable(tests ${SOURCE_FILES})
