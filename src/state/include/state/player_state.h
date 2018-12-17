@@ -132,7 +132,7 @@ struct _Unit : _Actor {
 };
 
 struct Soldier : _Unit {
-	//
+	SoldierState state;
 };
 
 struct Villager : _Unit {
@@ -140,6 +140,7 @@ struct Villager : _Unit {
 	Vec2D mine_target;
 	Vec2D build_position;
 	FactoryProduction build_factory_type; // Note: Defaults to villager if unset
+	VillagerState state;
 
 	// Build a new factory
 	void build(Vec2D p_build_position, FactoryProduction p_build_factory_type) {
@@ -166,6 +167,7 @@ struct Factory : _Actor {
 	bool _suicide;
 
 	FactoryProduction production_state;
+	FactoryState state;
 
 	// Helper to quickly toggle prodution states
 	void toggle_production() {

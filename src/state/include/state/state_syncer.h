@@ -26,6 +26,32 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 	 */
 	ICommandTaker *state;
 
+
+	/**
+	 * Flips map orientation to facilitate easily modification of player 2's state
+	 */
+	void FlipMap(std::array<std::array<TerrainType, MAP_SIZE>, MAP_SIZE> &player_map);
+
+	/**
+	 * Flips an induvidual position to know it's equivalent position that player 2 will have
+	 */
+	physics::Vector<int64_t> FlipPosition(const state::Map *map, physics::Vector<int64_t> position);
+
+	/**
+	 * Assiging the soldiers' attribues to default values 
+	 */
+	void AssignVillagerAttributes(int64_t id, std::array<player_state::Villager, MAX_NUM_VILLAGERS> &player_villagers, bool is_enemy);
+
+	/**
+	 * Assiging the villagers' attribues to default values 
+	 */
+	void AssignSoldierAttributes(int64_t id, std::array<player_state::Soldier, MAX_NUM_SOLDIERS> &player_soldiers, bool is_enemy);
+
+	/**
+	 * Assiging the factories' attribues to default values 
+	 */
+	void AssignFactoryAttributes(int64_t id, std::array<player_state::Factory, MAX_NUM_FACTORIES> &player_factories, bool is_enemy);
+  
   public:
 	StateSyncer(ICommandGiver *command_giver, ICommandTaker *state);
 
