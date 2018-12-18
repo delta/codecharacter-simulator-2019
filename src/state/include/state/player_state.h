@@ -15,8 +15,6 @@
 
 namespace player_state {
 
-using Vec2D = physics::Vector<int64_t>;
-
 enum class SoldierState {
 	// Soldier is doing nothing
 	IDLE,
