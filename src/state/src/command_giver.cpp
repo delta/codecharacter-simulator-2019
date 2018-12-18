@@ -122,7 +122,8 @@ void CommandGiver::RunCommands(
 				MoveUnit(static_cast<PlayerId>(player_id), villager.id,
 				         villager.destination);
 			}
-			// If the villager is attacking another to
+
+			// If the villager is attacking another unit
 			else if (is_attacking) {
 				AttackActor(static_cast<PlayerId>(player_id), villager.id,
 				            villager.target);
