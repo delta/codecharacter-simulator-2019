@@ -136,7 +136,7 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	 *
 	 * @return money
 	 */
-	virtual const std::array<int64_t, 2> GetMoney() = 0;
+	virtual const std::array<int64_t, 2> GetGold() = 0;
 
 	/**
 	 * Get game scores from state

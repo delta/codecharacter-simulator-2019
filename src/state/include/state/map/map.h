@@ -62,7 +62,7 @@ class Map {
 	 * @param y
 	 * @return the tile's terrain type
 	 */
-	TerrainType GetTerrainTypeByOffset(int64_t x, int64_t y);
+	TerrainType GetTerrainTypeByOffset(int64_t x, int64_t y) const;
 
 	/**
 	 * Get the Terrain type of the element from any position on the map
@@ -71,7 +71,7 @@ class Map {
 	 * @param y
 	 * @return the tile's terrain type
 	 */
-	TerrainType GetTerrainTypeByPosition(int64_t x, int64_t y);
+	TerrainType GetTerrainTypeByPosition(int64_t x, int64_t y) const;
 };
 
 } // namespace state

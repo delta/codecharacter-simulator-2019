@@ -25,7 +25,82 @@ void StateSyncer::UpdateMainState(
 void StateSyncer::UpdatePlayerStates(
     std::array<player_state::State, 2> &player_states) {
 
-	// TODO: Get information from main state and build new player states
+	//Getting all information from the main state
+	auto state_soldiers  = state->GetSoldiers();
+	auto state_villagers = state->GetVillagers();
+	auto state_factories = state->GetFactories();
+	auto state_money     = state->GetGold();
+	auto *map            = state->GetMap();
+
+	//Creating the player map
+	std::array<std::array<TerrainType, MAP_SIZE>, MAP_SIZE> player_map;
+	for(int x = 0; x < map->GetSize(); ++x){
+		std::array<TerrainType, MAP_SIZE> map_row;
+		for(int y = 0; y < map->GetSize(); ++y){
+			//Initializing the map element
+			TerrainType map_element = map->GetTerrainTypeByOffset(x, y);
+			map_row[y] = map_element;
+		}
+		std::move(map_row.begin(), map_row.end(), player_map[x].begin());
+	}
+
+	//Iterrating throught the players
+	for(int64_t player_id = 0; player_id < player_states.size(); ++player_id){
+		//Flipping the map if player 2 is playing 
+		if(static_cast<PlayerId>(player_id) == PlayerId::PLAYER2){
+			FlipMap(player_map);
+		}
+
+		//Changing map elements from type state::TerrainType to player_state::TerrainType
+		std::array<std::array<player_state::TerrainType, MAP_SIZE>, MAP_SIZE> new_map;
+		for(int i = 0; i < map->GetSize(); ++i){
+			std::array<player_state::TerrainType, MAP_SIZE> &new_row = new_map[i];
+			for(int j = 0; j < map->GetSize(); ++j){
+				player_state::TerrainType &new_map_element = new_row[j];
+				switch(player_map[i][j]){
+					case TerrainType::LAND:
+						new_map_element = player_state::TerrainType::LAND;
+					break;
+					case TerrainType::WATER:
+						new_map_element = player_state::TerrainType::WATER;
+					break;
+					case TerrainType::GOLD_MINE:
+						new_map_element = player_state::TerrainType::GOLD_MINE;
+					break;
+				}
+			}
+		}
+
+		//Creating the enemy id
+		int64_t enemy_id = (player_id + 1) % static_cast<int>(PlayerId::PLAYER_COUNT);
+
+		//Assinging the default values and positions of the new player states
+		AssignSoldierAttributes(player_id, player_states[player_id].soldiers, false);
+		AssignSoldierAttributes(enemy_id, player_states[player_id].enemy_soldiers, true);
+		AssignVillagerAttributes(player_id, player_states[player_id].villagers, false);
+		AssignVillagerAttributes(enemy_id, player_states[player_id].enemy_villagers, true);
+		AssignFactoryAttributes(player_id, player_states[player_id].factories, false);
+		AssignFactoryAttributes(enemy_id, player_states[player_id].enemy_factories, true);
+
+		//Assigning the gold for each player
+		player_states[player_id].gold = state_money[player_id];
+
+		//Assigning the map to the player states
+		//Copying data for player 1
+		if(static_cast<PlayerId>(player_id) == PlayerId::PLAYER1){
+			for(int i = 0; i < map->GetSize(); ++i){
+				std::copy(new_map[i].begin(), new_map[i].end(), player_states[player_id].map[i].begin());	
+			}
+		}
+		//Moving data the map into player 2's state to save space
+		else{
+			for(int i = 0; i < map->GetSize(); ++i){
+				std::move(new_map[i].begin(), new_map[i].end(), player_states[player_id].map[i].begin());
+			}
+		}
+
+		//TODO: Assing gold mine locations in player states
+	}
 }
 
 std::array<int64_t, 2> StateSyncer::GetScores() { return state->GetScores(); }
@@ -59,7 +134,7 @@ Vec2D StateSyncer::FlipPosition(const Map *map, Vec2D position){
 
 void StateSyncer::AssignSoldierAttributes(
     int64_t id,
-    std::array<player_state::Soldier, MAX_NUM_SOLDIERS> &player_soldiers,
+    std::vector<player_state::Soldier> &player_soldiers,
     bool is_enemy) {
 	auto state_soldiers = state->GetSoldiers();
 	int64_t player_id = id;
@@ -113,7 +188,7 @@ void StateSyncer::AssignSoldierAttributes(
 
 void StateSyncer::AssignVillagerAttributes(
     int64_t id,
-    std::array<player_state::Villager, MAX_NUM_VILLAGERS> &player_villagers,
+    std::vector<player_state::Villager> &player_villagers,
     bool is_enemy) {
 	// Getting all state villagers
 	auto state_villagers = state->GetVillagers();
@@ -179,7 +254,7 @@ void StateSyncer::AssignVillagerAttributes(
 
 void StateSyncer::AssignFactoryAttributes(
     int64_t id,
-    std::array<player_state::Factory, MAX_NUM_FACTORIES> &player_factories,
+    std::vector<player_state::Factory> &player_factories,
     bool is_enemy) {
 	// Getting all the factories for the state
 	auto state_factories = state->GetFactories();
