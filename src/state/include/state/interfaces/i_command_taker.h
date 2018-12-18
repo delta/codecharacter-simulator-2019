@@ -69,11 +69,11 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	 *
 	 * @throw      std::exception  if the operation was not possible
 	 */
-	virtual void BuildFactory(PlayerId player_id, ActorId villager_id,
-	                          physics::Vector<int64_t> offset) = 0;
+	virtual void CreateFactory(PlayerId player_id, ActorId villager_id,
+	                           physics::Vector<int64_t> offset) = 0;
 
 	/**
-	 * Overload on BuildFactory to accept a Factory id instead of offset
+	 * Handles existing factory build
 	 *
 	 * @param[in]  player_id     player to act upon
 	 * @param[in]  villager_id   villager to build
@@ -98,7 +98,7 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	 * Command factory to stop or start factory
 	 *
 	 * @param player_id      player to act upon
-	 * @param factory_id     factory to act upop
+	 * @param factory_id     factory to act upon
 	 * @param should_stop    true to stop, false to start
 	 */
 	virtual void StopOrStartFactory(PlayerId player_id, ActorId factory_id,
