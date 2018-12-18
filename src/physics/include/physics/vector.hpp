@@ -19,6 +19,11 @@ template <typename T> class Vector {
 	Vector(T x, T y);
 
 	/**
+	 * Alias value for a null vector
+	 */
+	static Vector<T> null;
+
+	/**
 	 * Equal to operator for vectors
 	 *
 	 * @param[in]  rhs   The vector to be compared against
@@ -136,9 +141,35 @@ template <typename T> class Vector {
 	 */
 	Vector<T> ceil() const;
 
+	/**
+	 * Return a new Vector<double_t> from another Vector type
+	 *
+	 * @param vec A numeric Vector type
+	 * @return Vector<double_t>
+	 */
+	Vector<double_t> to_double() const;
+
+	/**
+	 * Return a new Vector<int64_t> from another Vector type. Floor values.
+	 *
+	 * @param vec A numeric Vector type
+	 * @return Vector<int64_t>
+	 */
+	Vector<int64_t> to_int() const;
+
+	/**
+	 * Return true if this vector has any value other than null
+	 *
+	 * @return true if value is Vector<T>::null
+	 * @return false otherwise
+	 */
+	explicit operator bool() const;
+
 	T x;
 	T y;
 };
+
+template <typename T> Vector<T> Vector<T>::null = Vector<T>{-1, -1};
 
 template <typename T> Vector<T>::Vector() : x(), y() {}
 
@@ -211,4 +242,26 @@ template <typename T> Vector<T> Vector<T>::floor() const {
 template <typename T> Vector<T> Vector<T>::ceil() const {
 	return Vector<T>(std::ceil(x), std::ceil(y));
 }
+
+template <typename T> Vector<double_t> Vector<T>::to_double() const {
+	return Vector<double_t>(static_cast<double_t>(x), static_cast<double_t>(y));
+}
+
+template <typename T> Vector<int64_t> Vector<T>::to_int() const {
+	return Vector<int64_t>(static_cast<int64_t>(x), static_cast<int64_t>(y));
+}
+
+template <typename T> Vector<T>::operator bool() const {
+	if (*this == Vector<T>::null) {
+		return false;
+	}
+	return true;
+}
+
 } // namespace physics
+
+// Aliases for easy use
+using Vec2D = physics::Vector<int64_t>;
+using DoubleVec2D = physics::Vector<double_t>;
+using SmallVec2D = physics::Vector<int32_t>;
+using TinyVec2D = physics::Vector<uint8_t>;

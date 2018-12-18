@@ -58,3 +58,13 @@ TEST(VectorTest, FloorTest) {
 	Vector<double> ans = {3, 4};
 	ASSERT_EQ(a.floor(), ans);
 }
+
+TEST(VectorTest, BoolCastTest) {
+	Vector<double> nullval1 = {-1, -1};
+	Vector<double> nullval2 = Vector<double>::null;
+	Vector<double> notnullval = {4.0, 7.0};
+
+	ASSERT_FALSE(nullval1);
+	ASSERT_FALSE(nullval2);
+	ASSERT_TRUE(notnullval);
+}
