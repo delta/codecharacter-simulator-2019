@@ -7,14 +7,12 @@
 
 #include "physics/vector.hpp"
 
-using Vec2D = physics::Vector<int64_t>;
-
 namespace state {
 
 class IPathPlanner {
   public:
 	/**
-	 * @brief Get the Next Position to move to, given the current position, the
+	 * Get the Next Position to move to, given the current position, the
 	 * destination, and movement speed
 	 *
 	 * @param source Current position

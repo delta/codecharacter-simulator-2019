@@ -1,6 +1,6 @@
 /**
  * @file path_planner.h
- * Declares the PathPlanner class
+ * Declares the PathPlanner class, and helper utilities
  */
 
 #pragma once
