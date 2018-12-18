@@ -153,9 +153,6 @@ void CommandGiver::RunCommands(
 			           player_state::FactoryProduction::SOLDIER) {
 				SetFactoryProduction(static_cast<PlayerId>(player_id),
 				                     factory.id, ActorType::SOLDIER);
-			//If villager is building an existing factory
-			else if(build_factory){
-				BuildFactory(static_cast<PlayerId>(player_id), villager.id, villager.target_factory_id);
 			}
 		}
 	}
