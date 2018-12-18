@@ -3,8 +3,8 @@
  * Defines the CommandGiver class
  */
 
-#include <algorithm>
 #include "state/command_giver.h"
+#include <algorithm>
 
 using Vec2D = physics::Vector<int64_t>;
 
