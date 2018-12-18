@@ -13,8 +13,8 @@ Map::Map(std::vector<std::vector<TerrainType>> map, size_t map_size,
          size_t element_size)
     : map(map), map_size(map_size), element_size(element_size) {}
 
-size_t Map::GetSize() { return map_size; }
-size_t Map::GetElementSize() { return element_size; }
+size_t Map::GetSize() const { return map_size; }
+size_t Map::GetElementSize() const { return element_size; }
 
 TerrainType Map::GetTerrainTypeByOffset(int64_t x, int64_t y) {
 	return map[x][y];

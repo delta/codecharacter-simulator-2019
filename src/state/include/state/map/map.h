@@ -46,14 +46,14 @@ class Map {
 	 *
 	 * @return Width of the map in grid elements
 	 */
-	size_t GetSize();
+	size_t GetSize() const;
 
 	/**
 	 * Get the size of one element of the map
 	 *
 	 * @return Size of one map element
 	 */
-	size_t GetElementSize();
+	size_t GetElementSize() const;
 
 	/**
 	 * Get the Terrain type of an element at a particular grid offset
