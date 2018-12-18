@@ -23,43 +23,43 @@ class STATE_EXPORT CommandGiver {
 	ICommandTaker *state;
 
 	/**
-	 * @see ICommandTaker#AttackActor
+	 * Helper method that validates input and calls AttackActor
 	 */
 	void AttackActor(PlayerId player_id, ActorId unit_id,
 	                 ActorId enemy_actor_id);
 
 	/**
-	 * @see ICommandTaker#BuildFactory
+	 * Helper method that validates input and calls BuildFactory
 	 */
 	void CreateFactory(PlayerId player_id, ActorId villager_id,
 	                   physics::Vector<int64_t> offset);
 
 	/**
-	 * @see ICommandTaker#BuildFactory
+	 * Helper method that validates input and calls BuildFactory
 	 */
 	void BuildFactory(PlayerId player_id, ActorId villager_id,
 	                  ActorId factory_id);
 
 	/**
-	 * @see ICommandTaker#MoveUnit
+	 * Helper method that validates input and calls MoveUnit
 	 */
 	void MoveUnit(PlayerId player_id, ActorId actor_id,
 	              physics::Vector<int64_t> position);
 
 	/**
-	 * @see ICommandTaker#SetFactoryProduction
+	 * Helper method that validates input and calls SetFactoryProduction
 	 */
 	void SetFactoryProduction(PlayerId player_id, ActorId actor_id,
 	                          ActorType actor_type);
 
 	/**
-	 * @see ICommandTaker#StopOrStartFactory
+	 * Helper method that validates input and calls StopOrStartFactory
 	 */
 	void StopOrStartFactory(PlayerId player_id, ActorId factory_id,
 	                        bool should_stop);
 
 	/**
-	 * @see ICommandTaker#MineLocation
+	 * Helper method that validates input and calls MineLocation
 	 */
 	void MineLocation(PlayerId player_id, ActorId villager_id,
 	                  physics::Vector<int64_t> mine_location);
