@@ -191,7 +191,7 @@ const std::array<std::vector<Factory *>, 2> State::GetFactories() {
 
 const Map *State::GetMap() { return map.get(); }
 
-const std::array<int64_t, 2> State::GetMoney() {
+const std::array<int64_t, 2> State::GetGold() {
 	auto gold = std::array<int64_t, 2>{};
 
 	gold[0] = gold_manager->GetBalance(PlayerId::PLAYER1);
@@ -271,3 +271,4 @@ void State::Update() {
 }
 
 } // namespace state
+

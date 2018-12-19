@@ -28,3 +28,4 @@ TerrainType Map::GetTerrainTypeByPosition(int64_t x, int64_t y) const {
 }
 
 } // namespace state
+
