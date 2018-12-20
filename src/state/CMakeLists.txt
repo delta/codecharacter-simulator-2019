@@ -36,6 +36,7 @@ set(SOURCE_FILES
 	src/actor/factory_states/factory_dead_state.cpp
 	src/path_planner/path_planner.cpp
 	src/path_planner/path_graph.cpp
+	src/path_planner/path_cache.cpp
 )
 
 set(INCLUDE_PATH include)

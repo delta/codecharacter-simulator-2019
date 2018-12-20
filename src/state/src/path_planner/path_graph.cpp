@@ -22,6 +22,9 @@ PathGraph::PathGraph(Matrix<bool> graph) : graph(graph), size(graph.size()) {
 			open_list[i][j].pos = Vec2D{i, j};
 		}
 	}
+
+	// Compute paths for all nodes
+	GeneratePathCache();
 }
 
 void PathGraph::InitOpenList(Vec2D start_offset) {
@@ -86,25 +89,32 @@ Vec2D PathGraph::GetNextNode(Vec2D source, Vec2D destination) {
 	// If source or destination are invalid locations (water)...
 	if (not graph[source.x][source.y] ||
 	    not graph[destination.x][destination.y]) {
-		return Vec2D::null;
+		return {};
 	}
 
 	// If the source and destination are the same...
 	if (source == destination) {
-		return source;
+		return {};
 	}
 
-	auto path = GetPath(source, destination);
+	auto destination_matrix = GetAt(path_cache, source);
+	auto next_node = GetAt(destination_matrix, destination);
 
-	// If there's a valid path to the destination...
-	if (not path.empty()) {
-		return path[0];
-	} else {
-		return Vec2D::null;
-	}
+	return next_node;
 }
 
 std::vector<Vec2D> PathGraph::GetPath(Vec2D start_offset, Vec2D target_offset) {
+	// If source or destination are invalid locations (water)...
+	if (not graph[start_offset.x][start_offset.y] ||
+	    not graph[target_offset.x][target_offset.y]) {
+		return {};
+	}
+
+	// If the source and destination are the same...
+	if (start_offset == target_offset) {
+		return {};
+	}
+
 	// Clear the Open List and init the start location
 	InitOpenList(start_offset);
 
@@ -119,12 +129,14 @@ std::vector<Vec2D> PathGraph::GetPath(Vec2D start_offset, Vec2D target_offset) {
 		if (current_offset == target_offset) {
 			auto result = std::vector<Vec2D>{};
 			auto result_node = current_node;
+
 			// Traceback through the nodes' parents to get the complete path
 			while (result_node && result_node.parent != Vec2D::null) {
 				result.push_back(result_node.pos);
 				result_node = GetAt(open_list, result_node.parent);
 			}
-			std::reverse(result.begin(), result.end());
+
+			// Note: Path is reversed
 			return result;
 		}
 
