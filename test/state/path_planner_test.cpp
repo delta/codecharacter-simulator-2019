@@ -115,5 +115,5 @@ TEST_F(PathPlannerTest, HeavyMapTest) {
 		}
 		count++;
 	}
-	EXPECT_EQ(count, 1529);
+	EXPECT_EQ(count, 1533);
 }

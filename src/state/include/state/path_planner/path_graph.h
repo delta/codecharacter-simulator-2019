@@ -39,6 +39,30 @@ class PathGraph {
 	std::vector<Vec2D> GetPath(Vec2D start_offset, Vec2D target_offset);
 
 	/**
+	 * Precomputed paths from all nodes to all other nodes
+	 */
+	Matrix<Matrix<Vec2D>> path_cache;
+
+	/**
+	 * Booleans to set whether the path between two nodes has been computed yet
+	 */
+	Matrix<Matrix<bool>> is_path_computed;
+
+	/**
+	 * Run precomputation for all node paths
+	 */
+	void GeneratePathCache();
+
+	/**
+	 * Adds all possible paths from given path to node cache
+	 *
+	 * @param path List of nodes
+	 * @param start index
+	 * @param end index
+	 */
+	void AddPathToCache(std::vector<Vec2D> &path, size_t start, size_t end);
+
+	/**
 	 * Gets the next node from the open list
 	 *
 	 * @param[inout] offset Vec2D passed by reference to return next node
