@@ -31,12 +31,29 @@ class FactoryTest : public Test {
 	int64_t villager_frequency = 5;
 	int64_t soldier_frequency = 10;
 
+	void ProduceUnitImpl(PlayerId player_id, ActorType actor_type,
+	                     Vec2D position) {
+		if (actor_type == ActorType::VILLAGER) {
+			// Create and add the new villager
+			auto new_villager = std::make_unique<Villager>();
+			villager_list.push_back(std::move(new_villager));
+
+		} else if (actor_type == ActorType::SOLDIER) {
+			// Create and add the new soldier
+			auto new_soldier = std::make_unique<Soldier>();
+			soldier_list.push_back(std::move(new_soldier));
+
+		} else {
+			throw std::logic_error("Invalid actor_type passed");
+		}
+	}
+
   public:
 	std::unique_ptr<Villager> MakeTestVillager() {
-		return std::move(std::make_unique<Villager>(
+		return std::make_unique<Villager>(
 		    2, PlayerId::PLAYER2, ActorType::VILLAGER, 100, 100,
 		    physics::Vector<int64_t>(15, 15), gold_manager.get(), 10, 10, 10,
-		    10, 10, 10));
+		    10, 10, 10);
 	}
 
 	FactoryTest() {
@@ -65,12 +82,16 @@ class FactoryTest : public Test {
 		villager_list = std::vector<std::unique_ptr<Villager>>{};
 		soldier_list = std::vector<std::unique_ptr<Soldier>>{};
 
+		using namespace std::placeholders;
+		auto unit_production_callback =
+		    std::bind(&FactoryTest::ProduceUnitImpl, this, _1, _2, _3);
+
 		// We always initialize a factory with 1 HP
 		this->factory = std::make_unique<Factory>(
 		    2, PlayerId::PLAYER2, ActorType::FACTORY_VILLAGER, 1, 100,
 		    physics::Vector<int64_t>(15, 15), gold_manager.get(), 0, 100,
 		    ActorType::VILLAGER, villager_frequency, soldier_frequency,
-		    Villager{}, Soldier{}, villager_list, soldier_list);
+		    unit_production_callback);
 	}
 };
 
