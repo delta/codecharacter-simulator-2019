@@ -4,6 +4,7 @@ project(state)
 set(SOURCE_FILES
 	src/state.cpp
 	src/state_syncer.cpp
+	src/state_helpers.cpp
 	src/command_giver.cpp
 	src/actor/actor.cpp
 	src/actor/unit.cpp
