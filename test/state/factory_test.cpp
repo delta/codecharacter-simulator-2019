@@ -33,8 +33,6 @@ class FactoryTest : public Test {
 
 	void ProduceUnitImpl(PlayerId player_id, ActorType actor_type,
 	                     Vec2D position) {
-		auto player_id_index = static_cast<int>(player_id);
-
 		if (actor_type == ActorType::VILLAGER) {
 			// Create and add the new villager
 			auto new_villager = std::make_unique<Villager>();
