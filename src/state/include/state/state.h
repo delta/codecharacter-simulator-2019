@@ -16,7 +16,9 @@
 #include "state/map/map.h"
 #include "state/utilities.h"
 
+#include <array>
 #include <memory>
+#include <vector>
 
 namespace state {
 
@@ -47,6 +49,74 @@ class STATE_EXPORT State : public ICommandTaker {
 	 */
 	std::array<std::vector<std::unique_ptr<Factory>>, 2> factories;
 
+	/**
+	 * Model villager that is used to create new villager clones
+	 */
+	Villager model_villager;
+
+	/**
+	 * Model soldier that is used to create new soldier clones
+	 */
+	Soldier model_soldier;
+
+	/**
+	 * Model factory that is used to create new factory clones
+	 */
+	Factory model_factory;
+
+	/**
+	 * Get pointer to Actor by ActorId
+	 *
+	 * @param player_id PlayerId
+	 * @param actor_id ActorId
+	 * @return Actor*
+	 */
+	Actor *FindActorById(PlayerId player_id, ActorId actor_id);
+
+	/**
+	 * Get pointer to Factory given map offset
+	 *
+	 * @param player_id
+	 * @param offset
+	 * @return Factory*
+	 */
+	Factory *FindFactoryByOffset(PlayerId player_id, Vec2D offset);
+
+	/**
+	 * Create a new factory at the given offset
+	 *
+	 * @param p_player_id
+	 * @param offset
+	 * @return std::unique_ptr<Factory>
+	 */
+	std::unique_ptr<Factory> FactoryBuilder(PlayerId p_player_id, Vec2D offset);
+
+	/**
+	 * Create a new villager at the given position
+	 *
+	 * @param p_player_id
+	 * @param position
+	 * @return std::unique_ptr<Villager>
+	 */
+	std::unique_ptr<Villager> VillagerBuilder(PlayerId p_player_id,
+	                                          Vec2D position);
+
+	/**
+	 * Create a new soldier at the given position
+	 *
+	 * @param p_player_id
+	 * @param position
+	 * @return std::unique_ptr<Soldier>
+	 */
+	std::unique_ptr<Soldier> SoldierBuilder(PlayerId p_player_id,
+	                                        Vec2D position);
+
+	/**
+	 * Function to create a unit. This function is accessible by every factory,
+	 * and is used for producing a new unit.
+	 */
+	void ProduceUnit(PlayerId player_id, ActorType actor_type, Vec2D position);
+
   public:
 	/**
 	 * Constructor
@@ -54,19 +124,21 @@ class STATE_EXPORT State : public ICommandTaker {
 	State(std::unique_ptr<Map> map, std::unique_ptr<GoldManager> gold_manager,
 	      std::array<std::vector<std::unique_ptr<Soldier>>, 2> soldiers,
 	      std::array<std::vector<std::unique_ptr<Villager>>, 2> villagers,
-	      std::array<std::vector<std::unique_ptr<Factory>>, 2> factories);
+	      std::array<std::vector<std::unique_ptr<Factory>>, 2> factories,
+	      Villager model_villager, Soldier model_soldier,
+	      Factory model_factory);
 
 	/**
 	 * @see ICommandTaker#MoveUnit
 	 */
 	void MoveUnit(PlayerId player_id, ActorId actor_id,
-	              physics::Vector<int64_t> position) override;
+	              Vec2D position) override;
 
 	/**
 	 * @see ICommandTaker#MineLocation
 	 */
 	void MineLocation(PlayerId player_id, ActorId villager_id,
-	                  physics::Vector<int64_t> mine_location) override;
+	                  Vec2D mine_location) override;
 
 	/**
 	 * @see ICommandTaker#AttackActor
@@ -78,7 +150,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	 * @see ICommandTaker#CreateFactory
 	 */
 	void CreateFactory(PlayerId player_id, ActorId villager_id,
-	                   physics::Vector<int64_t> offset) override;
+	                   Vec2D offset) override;
 
 	/**
 	 * @see ICommandTaker#BuildFactory
