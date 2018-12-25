@@ -131,6 +131,13 @@ class STATE_EXPORT Villager : public Unit {
 	physics::Vector<int64_t> GetMineTarget();
 
 	/**
+	 * get the Mine Range
+	 *
+	 * @return mine_range
+	 */
+	int64_t GetMineRange();
+
+	/**
 	 * @brief Set the Mine Target
 	 *
 	 * @param mine_target Target position to set
