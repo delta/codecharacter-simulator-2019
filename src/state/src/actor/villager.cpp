@@ -78,6 +78,8 @@ physics::Vector<int64_t> Villager::GetMineTarget() {
 	return this->mine_target;
 }
 
+int64_t Villager::GetMineRange() { return mine_range; }
+
 void Villager::ClearMineTarget() { this->mine_target_set = false; }
 
 bool Villager::IsMineTargetSet() { return this->mine_target_set; }
