@@ -115,13 +115,6 @@ class STATE_EXPORT Actor : public IUpdatable {
 	int64_t GetHp();
 
 	/**
-	 * Set the actor's position
-	 *
-	 * @param[in]  Actor's new position
-	 */
-	void SetPosition(physics::Vector<int64_t> position);
-
-	/**
 	 * Get the unit's GoldManager Pointer
 	 *
 	 * @return     gold_manager  Unit's GoldManager Pointer

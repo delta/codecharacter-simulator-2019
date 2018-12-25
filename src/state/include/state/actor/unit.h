@@ -183,6 +183,13 @@ class STATE_EXPORT Unit : public Actor {
 	bool IsAttackTargetSet();
 
 	/**
+	 * Set the actor's position
+	 *
+	 * @param[in]  Actor's new position
+	 */
+	void SetPosition(physics::Vector<int64_t> position);
+
+	/**
 	 * Method to give the move command to this soldier
 	 *
 	 * @param[in]     destination    The destination to go to
