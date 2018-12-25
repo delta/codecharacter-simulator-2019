@@ -24,8 +24,6 @@ using UnitProductionCallback =
     std::function<void(state::PlayerId, state::ActorType, Vec2D)>;
 
 /**
-using UnitProductionCallback =
-    std::function<void(state::PlayerId, state::ActorType, Vec2D)>;
  * Factory class represents one game factory
  */
 class STATE_EXPORT Factory : public Actor {
