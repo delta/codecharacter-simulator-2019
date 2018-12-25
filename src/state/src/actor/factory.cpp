@@ -88,13 +88,4 @@ void Factory::Update() {
 	}
 }
 
-Factory Factory::Clone() {
-	auto new_factory = Factory(
-	    id, player_id, actor_type, hp, max_hp, position, gold_manager,
-	    construction_complete, construction_total, production_state,
-	    villager_frequency, soldier_frequency, unit_production_callback);
-
-	return new_factory;
-}
-
 } // namespace state

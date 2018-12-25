@@ -88,13 +88,6 @@ class STATE_EXPORT Factory : public Actor {
 	        UnitProductionCallback unit_production_callback);
 
 	/**
-	 * Creates a clone of this Factory
-	 *
-	 * @return Factory new_factory
-	 */
-	Factory Clone();
-
-	/**
 	 * Calls the callback with the current parameters, to produce a unit
 	 */
 	void ProduceUnit();
