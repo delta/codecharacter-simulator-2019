@@ -37,6 +37,10 @@ ActorType Actor::GetActorType() { return actor_type; }
 
 GoldManager *Actor::GetGoldManager() { return gold_manager; }
 
+void Actor::SetPosition(physics::Vector<int64_t> position) {
+	this->position = position;
+}
+
 int64_t Actor::GetHp() { return hp; }
 
 int64_t Actor::GetMaxHp() { return max_hp; }

@@ -72,10 +72,6 @@ bool Unit::IsAttackTargetSet() {
 	return attack_target == nullptr ? false : true;
 }
 
-void Unit::SetPosition(physics::Vector<int64_t> position) {
-	this->position = position;
-}
-
 void Unit::Move(physics::Vector<int64_t> destination) {
 	this->destination = destination;
 	this->is_destination_set = true;

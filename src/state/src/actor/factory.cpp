@@ -10,24 +10,30 @@
 
 namespace state {
 
+Factory::Factory() {}
+
 Factory::Factory(ActorId id, PlayerId player_id, ActorType actor_type,
                  int64_t hp, int64_t max_hp, physics::Vector<int64_t> position,
                  GoldManager *gold_manager, int64_t construction_complete,
                  int64_t construction_total, ActorType production_state,
                  int64_t villager_frequency, int64_t soldier_frequency,
-                 Villager model_villager, Soldier model_soldier,
-                 std::vector<std::unique_ptr<Villager>> &villager_list,
-                 std::vector<std::unique_ptr<Soldier>> &soldier_list)
+                 UnitProductionCallback unit_production_callback)
     : Actor(id, player_id, actor_type, hp, max_hp, position, gold_manager),
       construction_complete(construction_complete),
       construction_total(construction_total),
       production_state(production_state), stopped(false),
       villager_frequency(villager_frequency),
       soldier_frequency(soldier_frequency),
-      model_villager(std::move(model_villager)),
-      model_soldier(std::move(model_soldier)), villager_list(villager_list),
-      soldier_list(soldier_list),
-      state(std::make_unique<FactoryUnbuiltState>(this)) {}
+      state(std::make_unique<FactoryUnbuiltState>(this)),
+      unit_production_callback(unit_production_callback) {}
+
+void Factory::ProduceUnit() {
+	unit_production_callback(player_id, production_state, position);
+}
+
+void Factory::SetUnitProductionCallback(UnitProductionCallback callback) {
+	this->unit_production_callback = callback;
+}
 
 void Factory::IncrementConstructionCompletion(int64_t value) {
 	construction_complete =
@@ -59,22 +65,10 @@ int64_t Factory::GetVillagerFrequency() { return this->villager_frequency; }
 
 int64_t Factory::GetSoldierFrequency() { return this->soldier_frequency; }
 
-Villager &Factory::GetModelVillager() { return model_villager; }
-
-Soldier &Factory::GetModelSoldier() { return model_soldier; }
-
 ActorType Factory::GetProductionState() { return production_state; }
 
 void Factory::SetProductionState(ActorType production_state) {
 	this->production_state = production_state;
-}
-
-std::vector<std::unique_ptr<Soldier>> &Factory::GetSoldierList() {
-	return soldier_list;
-}
-
-std::vector<std::unique_ptr<Villager>> &Factory::GetVillagerList() {
-	return villager_list;
 }
 
 FactoryStateName Factory::GetState() { return state->GetName(); }
@@ -92,6 +86,15 @@ void Factory::Update() {
 		state->Enter();
 		new_state = state->Update();
 	}
+}
+
+Factory Factory::Clone() {
+	auto new_factory = Factory(
+	    id, player_id, actor_type, hp, max_hp, position, gold_manager,
+	    construction_complete, construction_total, production_state,
+	    villager_frequency, soldier_frequency, unit_production_callback);
+
+	return new_factory;
 }
 
 } // namespace state

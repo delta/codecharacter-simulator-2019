@@ -10,6 +10,7 @@
 #include "state/state_export.h"
 #include "state/utilities.h"
 
+#include <functional>
 #include <vector>
 
 #pragma once
@@ -17,6 +18,14 @@
 namespace state {
 
 /**
+ * Define the type for the function to call, in order to create a new unit
+ */
+using UnitProductionCallback =
+    std::function<void(state::PlayerId, state::ActorType, Vec2D)>;
+
+/**
+using UnitProductionCallback =
+    std::function<void(state::PlayerId, state::ActorType, Vec2D)>;
  * Factory class represents one game factory
  */
 class STATE_EXPORT Factory : public Actor {
@@ -63,24 +72,10 @@ class STATE_EXPORT Factory : public Actor {
 	int64_t soldier_frequency;
 
 	/**
-	 * Villager instance to clone when creating new villagers
+	 * Callback to call to create a new unit in this factory. Will be passed in
+	 * through the state.
 	 */
-	Villager model_villager;
-
-	/**
-	 * Soldier instance to clone when creating new soldiers
-	 */
-	Soldier model_soldier;
-
-	/**
-	 * Reference to list of villagers in main state
-	 */
-	std::vector<std::unique_ptr<Villager>> &villager_list;
-
-	/**
-	 * Reference to list of soldiers in main sate
-	 */
-	std::vector<std::unique_ptr<Soldier>> &soldier_list;
+	UnitProductionCallback unit_production_callback;
 
   public:
 	Factory();
@@ -90,9 +85,24 @@ class STATE_EXPORT Factory : public Actor {
 	        GoldManager *gold_manager, int64_t construction_complete,
 	        int64_t construction_total, ActorType production_state,
 	        int64_t villager_frequency, int64_t soldier_frequency,
-	        Villager model_villager, Soldier model_soldier,
-	        std::vector<std::unique_ptr<Villager>> &villager_list,
-	        std::vector<std::unique_ptr<Soldier>> &soldier_list);
+	        UnitProductionCallback unit_production_callback);
+
+	/**
+	 * Creates a clone of this Factory
+	 *
+	 * @return Factory new_factory
+	 */
+	Factory Clone();
+
+	/**
+	 * Calls the callback with the current parameters, to produce a unit
+	 */
+	void ProduceUnit();
+
+	/**
+	 * Used to set the callback for unit production
+	 */
+	void SetUnitProductionCallback(UnitProductionCallback callback);
 
 	/**
 	 * Put some effort into construction
@@ -177,34 +187,6 @@ class STATE_EXPORT Factory : public Actor {
 	 * @return int64_t
 	 */
 	int64_t GetSoldierFrequency();
-
-	/**
-	 * Get the Model Villager object
-	 *
-	 * @return Villager&
-	 */
-	Villager &GetModelVillager();
-
-	/**
-	 * Get the Model Soldier object
-	 *
-	 * @return Villager&
-	 */
-	Soldier &GetModelSoldier();
-
-	/**
-	 * Get the Soldier List
-	 *
-	 * @return soldier list
-	 */
-	std::vector<std::unique_ptr<Soldier>> &GetSoldierList();
-
-	/**
-	 * Get the Villager List
-	 *
-	 * @return villager list
-	 */
-	std::vector<std::unique_ptr<Villager>> &GetVillagerList();
 
 	/**
 	 * Get the name of the current state

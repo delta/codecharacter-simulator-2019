@@ -45,14 +45,8 @@ std::unique_ptr<IActorState> FactoryProductionState::Update() {
 			return nullptr;
 		}
 
-		// Make a villager
-		auto new_villager =
-		    std::make_unique<Villager>(std::move(factory->GetModelVillager()));
-		new_villager->SetPosition(factory->GetPosition());
-
-		factory->GetVillagerList().push_back(std::move(new_villager));
-
-		// Reset
+		// Make a villager and reset production
+		factory->ProduceUnit();
 		current_production_tick = 0;
 
 	} else {
@@ -62,14 +56,8 @@ std::unique_ptr<IActorState> FactoryProductionState::Update() {
 			return nullptr;
 		}
 
-		// Make a soldier
-		auto new_soldier =
-		    std::make_unique<Soldier>(std::move(factory->GetModelSoldier()));
-		new_soldier->SetPosition(factory->GetPosition());
-
-		factory->GetSoldierList().push_back(std::move(new_soldier));
-
-		// Reset
+		// Make a soldier and reset production
+		factory->ProduceUnit();
 		current_production_tick = 0;
 	}
 

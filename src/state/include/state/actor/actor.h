@@ -112,6 +112,14 @@ class STATE_EXPORT Actor : public IUpdatable {
 	 *
 	 * @return     Actor HP
 	 */
+	int64_t GetHp();
+
+	/**
+	 * Set the actor's position
+	 *
+	 * @param[in]  Actor's new position
+	 */
+	void SetPosition(physics::Vector<int64_t> position);
 
 	/**
 	 * Get the unit's GoldManager Pointer
@@ -119,8 +127,6 @@ class STATE_EXPORT Actor : public IUpdatable {
 	 * @return     gold_manager  Unit's GoldManager Pointer
 	 */
 	GoldManager *GetGoldManager();
-
-	int64_t GetHp();
 
 	/**
 	 * Get the maximum hp of the actor

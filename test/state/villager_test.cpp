@@ -149,8 +149,7 @@ TEST_F(VillagerTest, BuildFactory) {
 	auto target_factory = std::make_unique<Factory>(
 	    2, PlayerId::PLAYER1, ActorType::FACTORY_VILLAGER, 100, 100,
 	    physics::Vector<int64_t>(10, 10), gold_manager.get(), 0, 100,
-	    ActorType::VILLAGER, 5, 5, Villager{}, Soldier{}, villager_list,
-	    soldier_list);
+	    ActorType::VILLAGER, 5, 5, UnitProductionCallback{});
 
 	this->villager->Build(target_factory.get());
 
