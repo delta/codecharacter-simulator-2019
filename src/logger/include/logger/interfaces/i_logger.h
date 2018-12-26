@@ -22,11 +22,9 @@ class LOGGER_EXPORT ILogger {
 	virtual ~ILogger(){};
 
 	/**
-	 * Takes a pointer to the main state, and logs all information
-	 *
-	 * @param[in]   state   Pointer to state
+	 * Logs all information from main state
 	 */
-	virtual void LogState(state::ICommandTaker *state) = 0;
+	virtual void LogState() = 0;
 
 	/**
 	 * Takes a player and corresponding instruction count, and logs it in the
