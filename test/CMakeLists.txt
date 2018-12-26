@@ -9,11 +9,14 @@ set(SOURCE_FILES
 	state/villager_test.cpp
 	state/factory_test.cpp
 	state/path_planner_test.cpp
+	logger/logger_test.cpp
 )
 
 add_executable(tests ${SOURCE_FILES})
 
-target_link_libraries(tests physics state gtest gmock)
+include_directories(.)
+
+target_link_libraries(tests physics state logger gtest gmock)
 
 install(TARGETS tests
 	DESTINATION bin
