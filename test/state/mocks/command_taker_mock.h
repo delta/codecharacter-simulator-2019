@@ -17,7 +17,7 @@ class CommandTakerMock : public ICommandTaker {
 	MOCK_METHOD3(CreateFactory,
 	             void(PlayerId player_id, ActorId actor_id, Vec2D offset));
 	MOCK_METHOD3(BuildFactory, void(PlayerId player_id, ActorId actor_id,
-	                                ActorId factory_id)); 
+	                                ActorId factory_id));
 	MOCK_METHOD3(SetFactoryProduction,
 	             void(PlayerId player_id, ActorId factory_id,
 	                  ActorType production_type));
@@ -33,5 +33,7 @@ class CommandTakerMock : public ICommandTaker {
 	MOCK_METHOD0(GetSoldiers, const std::array<std::vector<Soldier *>, 2>());
 	MOCK_METHOD0(GetVillagers, const std::array<std::vector<Villager *>, 2>());
 	MOCK_METHOD0(GetFactories, const std::array<std::vector<Factory *>, 2>());
-	MOCK_METHOD3(StopOrStartFactory, void(PlayerId player_id, ActorId factory_id, bool should_stop));
+	MOCK_METHOD3(StopOrStartFactory,
+	             void(PlayerId player_id, ActorId factory_id,
+	                  bool should_stop));
 };

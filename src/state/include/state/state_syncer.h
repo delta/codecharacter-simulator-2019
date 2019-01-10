@@ -62,6 +62,11 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 	    int64_t id, std::vector<player_state::Factory> &player_factories,
 	    bool is_enemy);
 
+	/**
+	 * Returns the same id if is_enemy is false, else returns the opposite id
+	 */
+	int64_t GetPlayerId(int id, bool is_enemy, int64_t player_id);
+
   public:
 	StateSyncer(ICommandGiver *command_giver, ICommandTaker *state);
 
