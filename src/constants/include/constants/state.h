@@ -9,13 +9,13 @@
 #include <cstdint>
 
 // Maximum number of soldiers per player
-const size_t MAX_NUM_SOLDIERS = 100;
+const size_t MAX_NUM_SOLDIERS = 30;
 
 // Maximum number of villagers per player
-const size_t MAX_NUM_VILLAGERS = 100;
+const size_t MAX_NUM_VILLAGERS = 30;
 
 // Maximum number of factories per player
-const size_t MAX_NUM_FACTORIES = 50;
+const size_t MAX_NUM_FACTORIES = 20;
 
 // Size of the map in grid elements
 const size_t MAP_SIZE = 50;
@@ -28,3 +28,6 @@ const int64_t VILLAGER_MAX_HP = 80;
 
 // Max Starting HP for Factory
 const int64_t FACTORY_MAX_HP = 3000;
+
+// Total number of units on the map
+constexpr size_t TOTAL_MAP_TILES = MAP_SIZE * MAP_SIZE;
