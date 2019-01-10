@@ -2,8 +2,10 @@
 
 #include "gmock/gmock.h"
 #include "state/interfaces/i_command_giver.h"
+#include "state/interfaces/i_command_taker.h"
 
-class CommandGiverMock : public state::ICommandGiver {
+using namespace state;
+class CommandGiverMock : public ICommandGiver {
   public:
 	MOCK_METHOD2(RunCommands,
 	             void(ICommandTaker *state,

@@ -94,7 +94,7 @@ void Logger::LogState() {
 	auto soldiers = state->GetSoldiers();
 	auto villagers = state->GetVillagers();
 	auto factories = state->GetFactories();
-	auto money = state->GetMoney();
+	auto money = state->GetGold();
 
 	// Things set only during the first turn.
 	if (turn_count == 1) {

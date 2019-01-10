@@ -17,16 +17,21 @@ class CommandTakerMock : public ICommandTaker {
 	MOCK_METHOD3(CreateFactory,
 	             void(PlayerId player_id, ActorId actor_id, Vec2D offset));
 	MOCK_METHOD3(BuildFactory, void(PlayerId player_id, ActorId actor_id,
-	                                ActorType production_type));
+	                                ActorId factory_id)); 
 	MOCK_METHOD3(SetFactoryProduction,
 	             void(PlayerId player_id, ActorId factory_id,
 	                  ActorType production_type));
 	MOCK_METHOD3(StopOrStartProduction,
 	             void(PlayerId player_id, ActorId factory_id,
 	                  bool should_stop));
-	MOCK_METHOD0(GetAllSoldiers, std::array<std::vector<Soldier *>, 2>());
-	MOCK_METHOD0(GetAllVillagers, std::array<std::vector<Villager *>, 2>());
-	MOCK_METHOD0(GetGold, std::array<int64_t, 2>());
+	MOCK_METHOD0(GetGold, const std::array<int64_t, 2>());
 	MOCK_METHOD0(GetMap, Map *());
-	MOCK_METHOD0(GetScores, std : array<int64_t, 2>());
+	MOCK_METHOD0(GetScores, const std::array<int64_t, 2>());
+	MOCK_METHOD3(AttackActor, void(PlayerId player_id, ActorId unit_id,
+	                               ActorId enemy_actor_id));
+	MOCK_METHOD0(Update, void());
+	MOCK_METHOD0(GetSoldiers, const std::array<std::vector<Soldier *>, 2>());
+	MOCK_METHOD0(GetVillagers, const std::array<std::vector<Villager *>, 2>());
+	MOCK_METHOD0(GetFactories, const std::array<std::vector<Factory *>, 2>());
+	MOCK_METHOD3(StopOrStartFactory, void(PlayerId player_id, ActorId factory_id, bool should_stop));
 };
