@@ -54,6 +54,14 @@ class PathGraph {
 	void GeneratePathCache();
 
 	/**
+	 * For a given node, computes all paths from that node by running a BFS, and
+	 * updates paths in the path cache
+	 *
+	 * @param node Node to compute paths from
+	 */
+	void ComputeAllPathsFromNode(Vec2D node);
+
+	/**
 	 * Adds all possible paths from given path to node cache
 	 *
 	 * @param path List of nodes

@@ -96,9 +96,8 @@ Vec2D PathGraph::GetNextNode(Vec2D source, Vec2D destination) {
 	if (source == destination) {
 		return {};
 	}
-
-	auto destination_matrix = GetAt(path_cache, source);
-	auto next_node = GetAt(destination_matrix, destination);
+	auto source_matrix = GetAt(path_cache, destination);
+	auto next_node = GetAt(source_matrix, source);
 
 	return next_node;
 }
