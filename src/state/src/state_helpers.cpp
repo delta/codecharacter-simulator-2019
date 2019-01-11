@@ -54,7 +54,7 @@ std::unique_ptr<Villager> State::VillagerBuilder(PlayerId p_player_id,
 	auto new_villager = std::make_unique<Villager>(
 	    Actor::GetNextActorId(), p_player_id, model_villager.GetActorType(),
 	    model_villager.GetHp(), model_villager.GetMaxHp(), position,
-	    gold_manager.get(), model_villager.GetSpeed(),
+	    gold_manager.get(), path_planner.get(), model_villager.GetSpeed(),
 	    model_villager.GetAttackRange(), model_villager.GetAttackDamage(),
 	    model_villager.GetBuildEffort(), model_villager.GetBuildRange(),
 	    model_villager.GetMineRange());
@@ -67,7 +67,7 @@ std::unique_ptr<Soldier> State::SoldierBuilder(PlayerId p_player_id,
 	auto new_soldier = std::make_unique<Soldier>(
 	    Actor::GetNextActorId(), p_player_id, model_villager.GetActorType(),
 	    model_villager.GetHp(), model_villager.GetMaxHp(), position,
-	    gold_manager.get(), model_villager.GetSpeed(),
+	    gold_manager.get(), path_planner.get(), model_villager.GetSpeed(),
 	    model_villager.GetAttackRange(), model_villager.GetAttackDamage());
 
 	return new_soldier;

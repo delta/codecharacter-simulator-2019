@@ -6,6 +6,7 @@
 #include "state/actor/unit.h"
 #include "physics/vector.hpp"
 #include "state/actor/actor.h"
+#include "state/path_planner/path_planner.h"
 
 namespace state {
 
@@ -15,13 +16,14 @@ Unit::Unit() {
 
 Unit::Unit(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
            int64_t max_hp, physics::Vector<int64_t> position,
-           GoldManager *gold_manager, int64_t speed, int64_t attack_range,
-           int64_t attack_damage)
+           GoldManager *gold_manager, PathPlanner *path_planner, int64_t speed,
+           int64_t attack_range, int64_t attack_damage)
     : Actor(id, player_id, actor_type, hp, max_hp, position, gold_manager),
       speed(speed), attack_range(attack_range), attack_damage(attack_damage),
-      attack_target(nullptr), destination(physics::Vector<int64_t>(0, 0)),
-      is_destination_set(false), new_position(physics::Vector<int64_t>(0, 0)),
-      is_new_position_set(false), damage_incurred(0) {}
+      path_planner(path_planner), attack_target(nullptr),
+      destination(physics::Vector<int64_t>(0, 0)), is_destination_set(false),
+      new_position(physics::Vector<int64_t>(0, 0)), is_new_position_set(false),
+      damage_incurred(0) {}
 
 int64_t Unit::GetSpeed() { return speed; }
 
@@ -30,6 +32,8 @@ int64_t Unit::GetAttackRange() { return attack_range; }
 int64_t Unit::GetAttackDamage() { return attack_damage; }
 
 Actor *Unit::GetAttackTarget() { return attack_target; }
+
+PathPlanner *Unit::GetPathPlanner() { return path_planner; }
 
 void Unit::SetAttackTarget(Actor *attack_target) {
 	this->attack_target = attack_target;

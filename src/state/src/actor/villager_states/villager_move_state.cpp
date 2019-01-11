@@ -48,7 +48,15 @@ std::unique_ptr<IActorState> VillagerMoveState::Update() {
 		return std::make_unique<VillagerIdleState>(villager);
 	}
 
-	// TODO: Move to next position of the villager
+	auto path_planner = villager->GetPathPlanner();
+	auto current_position = villager->GetPosition();
+	auto destination = villager->GetDestination();
+	auto speed = villager->GetSpeed();
+
+	auto next_position =
+	    path_planner->GetNextPosition(current_position, destination, speed);
+
+	villager->SetNewPosition(next_position);
 
 	return nullptr;
 }

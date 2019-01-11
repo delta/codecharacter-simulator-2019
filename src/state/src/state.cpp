@@ -11,6 +11,7 @@ namespace state {
 
 State::State(std::unique_ptr<Map> map,
              std::unique_ptr<GoldManager> gold_manager,
+             std::unique_ptr<PathPlanner> path_planner,
              std::array<std::vector<std::unique_ptr<Soldier>>, 2> soldiers,
              std::array<std::vector<std::unique_ptr<Villager>>, 2> villagers,
              std::array<std::vector<std::unique_ptr<Factory>>, 2> factories,
@@ -19,6 +20,7 @@ State::State(std::unique_ptr<Map> map,
     : villagers(std::move(villagers)), soldiers(std::move(soldiers)),
       factories(std::move(factories)), map(std::move(map)),
       gold_manager(std::move(gold_manager)),
+      path_planner(std::move(path_planner)),
       model_villager(std::move(model_villager)),
       model_soldier(std::move(model_soldier)),
       model_factory(std::move(model_factory)) {}

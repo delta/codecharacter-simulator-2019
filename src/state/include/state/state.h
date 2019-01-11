@@ -14,6 +14,7 @@
 #include "state/interfaces/i_command_taker.h"
 #include "state/interfaces/i_updatable.h"
 #include "state/map/map.h"
+#include "state/path_planner/path_planner.h"
 #include "state/utilities.h"
 
 #include <array>
@@ -33,6 +34,11 @@ class STATE_EXPORT State : public ICommandTaker {
 	 * Gold Manager instance to maintain player gold
 	 */
 	std::unique_ptr<GoldManager> gold_manager;
+
+	/**
+	 * Path Planner instance
+	 */
+	std::unique_ptr<PathPlanner> path_planner;
 
 	/**
 	 * List of soldiers, indexed by player
@@ -122,6 +128,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	 * Constructor
 	 */
 	State(std::unique_ptr<Map> map, std::unique_ptr<GoldManager> gold_manager,
+	      std::unique_ptr<PathPlanner> path_planner,
 	      std::array<std::vector<std::unique_ptr<Soldier>>, 2> soldiers,
 	      std::array<std::vector<std::unique_ptr<Villager>>, 2> villagers,
 	      std::array<std::vector<std::unique_ptr<Factory>>, 2> factories,

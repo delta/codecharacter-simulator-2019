@@ -41,7 +41,15 @@ std::unique_ptr<IActorState> SoldierPursuitState::Update() {
 		return std::make_unique<SoldierAttackState>(soldier);
 	}
 
-	// TODO: Set position of soldier to next position
+	auto path_planner = soldier->GetPathPlanner();
+	auto current_position = soldier->GetPosition();
+	auto destination = soldier->GetAttackTarget()->GetPosition();
+	auto speed = soldier->GetSpeed();
+
+	auto next_position =
+	    path_planner->GetNextPosition(current_position, destination, speed);
+
+	soldier->SetNewPosition(next_position);
 
 	return nullptr;
 }

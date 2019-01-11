@@ -7,6 +7,7 @@
 
 #include "physics/vector.hpp"
 #include "state/actor/actor.h"
+#include "state/path_planner/path_planner.h"
 #include "state/state_export.h"
 #include "state/utilities.h"
 #include <cstdint>
@@ -69,13 +70,18 @@ class STATE_EXPORT Unit : public Actor {
 	 */
 	int64_t damage_incurred;
 
+	/**
+	 * Path Planner instance to perform transactions
+	 */
+	PathPlanner *path_planner;
+
   public:
 	Unit();
 
 	Unit(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
 	     int64_t max_hp, physics::Vector<int64_t> position,
-	     GoldManager *gold_manager, int64_t speed, int64_t attack_range,
-	     int64_t attack_damage);
+	     GoldManager *gold_manager, PathPlanner *path_planner, int64_t speed,
+	     int64_t attack_range, int64_t attack_damage);
 
 	virtual ~Unit() {}
 
@@ -108,10 +114,18 @@ class STATE_EXPORT Unit : public Actor {
 	Actor *GetAttackTarget();
 
 	/**
+	 * Get the unit's PathPlanner Pointer
+	 *
+	 * @return     path_planner  Unit's PathPlanner Pointer
+	 */
+	PathPlanner *GetPathPlanner();
+
+	/**
 	 * Set the soldier's attack target
 	 *
 	 * @param[in]  attack_target  Soldier's Attack Target
 	 */
+
 	void SetAttackTarget(Actor *attack_target);
 
 	/**
