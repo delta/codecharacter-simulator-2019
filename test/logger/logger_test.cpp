@@ -23,6 +23,7 @@ class LoggerTest : public testing::Test {
 	std::unique_ptr<Logger> logger;
 
 	std::unique_ptr<GoldManager> gold_manager;
+	std::unique_ptr<PathPlanner> path_planner;
 	std::array<int64_t, 2> player_gold;
 	int64_t max_gold;
 
@@ -61,14 +62,16 @@ TEST_F(LoggerTest, WriteReadTest) {
 	Actor::SetActorIdIncrement(0);
 
 	// Creating one soldier for each player
-	auto *soldier = new Soldier(
-	    Actor::GetNextActorId(), state::PlayerId::PLAYER1,
-	    state::ActorType::SOLDIER, SOLDIER_MAX_HP, SOLDIER_MAX_HP,
-	    physics::Vector<int64_t>(1, 1), gold_manager.get(), 10, 10, 10);
-	auto *soldier2 = new Soldier(
-	    Actor::GetNextActorId(), state::PlayerId::PLAYER2,
-	    state::ActorType::SOLDIER, SOLDIER_MAX_HP, SOLDIER_MAX_HP,
-	    physics::Vector<int64_t>(2, 2), gold_manager.get(), 10, 10, 10);
+	auto *soldier =
+	    new Soldier(Actor::GetNextActorId(), state::PlayerId::PLAYER1,
+	                state::ActorType::SOLDIER, SOLDIER_MAX_HP, SOLDIER_MAX_HP,
+	                physics::Vector<int64_t>(1, 1), gold_manager.get(),
+	                path_planner.get(), 10, 10, 10);
+	auto *soldier2 =
+	    new Soldier(Actor::GetNextActorId(), state::PlayerId::PLAYER2,
+	                state::ActorType::SOLDIER, SOLDIER_MAX_HP, SOLDIER_MAX_HP,
+	                physics::Vector<int64_t>(2, 2), gold_manager.get(),
+	                path_planner.get(), 10, 10, 10);
 
 	std::array<vector<Soldier *>, 2> soldiers;
 	vector<Soldier *> player_soldiers;
@@ -82,11 +85,11 @@ TEST_F(LoggerTest, WriteReadTest) {
 	auto *villager = new Villager(
 	    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::VILLAGER,
 	    VILLAGER_MAX_HP, VILLAGER_MAX_HP, physics::Vector<int64_t>(1, 2),
-	    gold_manager.get(), 10, 10, 10, 10, 10, 10);
+	    gold_manager.get(), path_planner.get(), 10, 10, 10, 10, 10, 10);
 	auto *villager2 = new Villager(
 	    Actor::GetNextActorId(), PlayerId::PLAYER2, ActorType::VILLAGER,
 	    VILLAGER_MAX_HP, VILLAGER_MAX_HP, physics::Vector<int64_t>(2, 3),
-	    gold_manager.get(), 10, 10, 10, 10, 10, 10);
+	    gold_manager.get(), path_planner.get(), 10, 10, 10, 10, 10, 10);
 
 	std::array<vector<Villager *>, 2> villagers;
 	vector<Villager *> player_villagers;

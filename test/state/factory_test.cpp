@@ -23,6 +23,7 @@ class FactoryTest : public Test {
 	Villager model_villager;
 
 	unique_ptr<GoldManager> gold_manager;
+	unique_ptr<PathPlanner> path_planner;
 	unique_ptr<Factory> factory;
 
 	std::vector<std::unique_ptr<Villager>> villager_list;
@@ -52,21 +53,23 @@ class FactoryTest : public Test {
 	std::unique_ptr<Villager> MakeTestVillager() {
 		return std::make_unique<Villager>(
 		    2, PlayerId::PLAYER2, ActorType::VILLAGER, 100, 100,
-		    physics::Vector<int64_t>(15, 15), gold_manager.get(), 10, 10, 10,
-		    10, 10, 10);
+		    physics::Vector<int64_t>(15, 15), gold_manager.get(),
+		    path_planner.get(), 10, 10, 10, 10, 10, 10);
 	}
 
 	FactoryTest() {
 
 		player_gold[0] = player_gold[1] = 5000;
 
-		model_villager = Villager(2, PlayerId::PLAYER2, ActorType::VILLAGER,
-		                          100, 100, physics::Vector<int64_t>(15, 15),
-		                          gold_manager.get(), 10, 10, 10, 10, 10, 10);
+		model_villager =
+		    Villager(2, PlayerId::PLAYER2, ActorType::VILLAGER, 100, 100,
+		             physics::Vector<int64_t>(15, 15), gold_manager.get(),
+		             path_planner.get(), 10, 10, 10, 10, 10, 10);
 
-		model_soldier = Soldier(1, PlayerId::PLAYER1, ActorType::SOLDIER, 100,
-		                        100, physics::Vector<int64_t>(10, 10),
-		                        gold_manager.get(), 10, 10, 10);
+		model_soldier =
+		    Soldier(1, PlayerId::PLAYER1, ActorType::SOLDIER, 100, 100,
+		            physics::Vector<int64_t>(10, 10), gold_manager.get(),
+		            path_planner.get(), 10, 10, 10);
 
 		this->max_gold = 10000;
 		this->soldier_kill_reward_gold = SOLDIER_KILL_REWARD_AMOUNT;

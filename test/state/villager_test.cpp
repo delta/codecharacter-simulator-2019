@@ -11,8 +11,16 @@ using namespace state;
 using namespace physics;
 using namespace testing;
 
+const auto L = TerrainType::LAND;
+const auto W = TerrainType::WATER;
+const auto G = TerrainType::GOLD_MINE;
+
 class VillagerTest : public Test {
   protected:
+	int64_t map_size = 5;
+	int64_t element_size = 10;
+	unique_ptr<Map> map;
+
 	array<int64_t, 2> player_gold;
 	int64_t soldier_kill_reward_gold;
 	int64_t villager_kill_reward_gold;
@@ -20,17 +28,27 @@ class VillagerTest : public Test {
 	int64_t max_gold;
 
 	unique_ptr<GoldManager> gold_manager;
+	unique_ptr<PathPlanner> path_planner;
 	unique_ptr<Villager> villager;
 
   public:
 	std::unique_ptr<Villager> MakeTestVillager() {
 		return std::move(std::make_unique<Villager>(
 		    2, PlayerId::PLAYER2, ActorType::VILLAGER, 100, 100,
-		    physics::Vector<int64_t>(15, 15), gold_manager.get(), 10, 10, 10,
-		    10, 10, 10));
+		    physics::Vector<int64_t>(15, 15), gold_manager.get(),
+		    path_planner.get(), 10, 10, 10, 10, 10, 10));
 	}
 
 	VillagerTest() {
+		auto map_matrix = vector<vector<TerrainType>>{{
+		    {L, L, L, L, L},
+		    {L, L, L, L, L},
+		    {G, G, G, G, G},
+		    {W, W, W, W, W},
+		    {W, W, W, W, W},
+		}};
+
+		map = make_unique<Map>(map_matrix, map_size, element_size);
 		for (int i = 0; i < (int)PlayerId::PLAYER_COUNT; ++i) {
 			player_gold[i] = 5000; // Start balance
 		}
@@ -46,10 +64,12 @@ class VillagerTest : public Test {
 		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
 		    MINING_REWARD);
 
-		this->villager =
-		    make_unique<Villager>(1, PlayerId::PLAYER1, ActorType::VILLAGER,
-		                          100, 100, physics::Vector<int64_t>(10, 10),
-		                          gold_manager.get(), 10, 10, 10, 10, 10, 10);
+		this->path_planner = make_unique<PathPlanner>(map.get());
+
+		this->villager = make_unique<Villager>(
+		    1, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
+		    physics::Vector<int64_t>(10, 10), gold_manager.get(),
+		    path_planner.get(), 10, 10, 10, 10, 10, 10);
 	}
 };
 
@@ -64,6 +84,19 @@ TEST_F(VillagerTest, TransitionToAttackState) {
 	target_villager->LateUpdate();
 
 	ASSERT_EQ(this->villager->GetState(), VillagerStateName::ATTACK);
+}
+
+TEST_F(VillagerTest, MoveToDestination) {
+	this->villager->SetDestination(physics::Vector<int64_t>(15, 15));
+
+	this->villager->Update();
+	while (this->villager->GetState() != VillagerStateName::IDLE) {
+		this->villager->LateUpdate();
+		this->villager->Update();
+	}
+	this->villager->LateUpdate();
+
+	ASSERT_EQ(this->villager->GetPosition(), physics::Vector<int64_t>(15, 15));
 }
 
 TEST_F(VillagerTest, TransitionToMineState) {
@@ -107,6 +140,17 @@ TEST_F(VillagerTest, TransitionToDeadState) {
 	}
 
 	ASSERT_EQ(target_villager->GetState(), VillagerStateName::DEAD);
+}
+
+TEST_F(VillagerTest, MoveToMine) {
+	this->villager->SetMineTarget(physics::Vector<int64_t>(25, 30));
+
+	while (this->villager->GetState() != VillagerStateName::MINE) {
+		this->villager->Update();
+		this->villager->LateUpdate();
+	}
+
+	ASSERT_EQ(this->villager->IsMineTargetInRange(), true);
 }
 
 TEST_F(VillagerTest, VillagerKillReward) {

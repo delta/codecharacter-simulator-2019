@@ -37,7 +37,15 @@ std::unique_ptr<IActorState> SoldierMoveState::Update() {
 		return std::make_unique<SoldierIdleState>(soldier);
 	}
 
-	// TODO: Move to next position of the soldier
+	auto path_planner = soldier->GetPathPlanner();
+	auto current_position = soldier->GetPosition();
+	auto destination = soldier->GetDestination();
+	auto speed = soldier->GetSpeed();
+
+	auto next_position =
+	    path_planner->GetNextPosition(current_position, destination, speed);
+
+	soldier->SetNewPosition(next_position);
 
 	return nullptr;
 }

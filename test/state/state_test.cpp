@@ -31,6 +31,7 @@ class StateTest : public Test {
 	std::vector<std::unique_ptr<Soldier>> temp_soldier_list;
 
 	unique_ptr<GoldManager> gold_manager;
+	unique_ptr<PathPlanner> path_planner;
 	Villager model_villager;
 	Soldier model_soldier;
 	Factory model_factory;
@@ -68,14 +69,17 @@ class StateTest : public Test {
 		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
 		    MINING_REWARD);
 
+		this->path_planner = make_unique<PathPlanner>(map.get());
+
 		this->model_villager =
 		    Villager(1, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		             physics::Vector<int64_t>(10, 10), gold_manager.get(), 10,
-		             10, 10, 10, 10, 10);
+		             physics::Vector<int64_t>(10, 10), gold_manager.get(),
+		             path_planner.get(), 10, 10, 10, 10, 10, 10);
 
-		this->model_soldier = Soldier(
-		    2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
-		    physics::Vector<int64_t>(10, 10), gold_manager.get(), 10, 10, 10);
+		this->model_soldier =
+		    Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
+		            physics::Vector<int64_t>(10, 10), gold_manager.get(),
+		            path_planner.get(), 10, 10, 10);
 
 		int64_t villager_frequency = 5;
 		int64_t soldier_frequency = 10;
@@ -91,26 +95,27 @@ class StateTest : public Test {
 		factories = {};
 
 		// Player1 has 2 villagers say..
-		villagers[0].push_back(
-		    make_unique<Villager>(1, PlayerId::PLAYER1, ActorType::VILLAGER,
-		                          100, 100, physics::Vector<int64_t>(10, 10),
-		                          gold_manager.get(), 10, 10, 10, 10, 10, 10));
-		villagers[0].push_back(
-		    make_unique<Villager>(3, PlayerId::PLAYER1, ActorType::VILLAGER,
-		                          100, 100, physics::Vector<int64_t>(10, 10),
-		                          gold_manager.get(), 10, 10, 10, 10, 10, 10));
+		villagers[0].push_back(make_unique<Villager>(
+		    1, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
+		    physics::Vector<int64_t>(10, 10), gold_manager.get(),
+		    path_planner.get(), 10, 10, 10, 10, 10, 10));
+		villagers[0].push_back(make_unique<Villager>(
+		    3, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
+		    physics::Vector<int64_t>(10, 10), gold_manager.get(),
+		    path_planner.get(), 10, 10, 10, 10, 10, 10));
 
 		// Player2 has 1 soldier, say..
 		soldiers[1].push_back(make_unique<Soldier>(
 		    2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
-		    physics::Vector<int64_t>(10, 10), gold_manager.get(), 10, 10, 10));
+		    physics::Vector<int64_t>(10, 10), gold_manager.get(),
+		    path_planner.get(), 10, 10, 10));
 
 		Actor::SetActorIdIncrement(4);
 
 		this->state = make_unique<State>(
-		    move(map), move(gold_manager), move(soldiers), move(villagers),
-		    move(factories), move(model_villager), move(model_soldier),
-		    move(model_factory));
+		    move(map), move(gold_manager), move(path_planner), move(soldiers),
+		    move(villagers), move(factories), move(model_villager),
+		    move(model_soldier), move(model_factory));
 	}
 };
 
