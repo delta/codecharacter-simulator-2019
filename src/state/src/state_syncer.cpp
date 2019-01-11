@@ -101,7 +101,6 @@ void StateSyncer::UpdatePlayerStates(
 		                        false);
 		AssignFactoryAttributes(enemy_id,
 		                        player_states[player_id].enemy_factories, true);
-
 		// Assigning the gold for each player
 		player_states[player_id].gold = state_money[player_id];
 
@@ -168,8 +167,7 @@ void StateSyncer::AssignSoldierAttributes(
 	int64_t player_id = id;
 	const auto *map = state->GetMap();
 	std::vector<player_state::Soldier> new_soldiers;
-
-	for (int i = 0; i < state_soldiers.size(); ++i) {
+	for (int i = 0; i < state_soldiers[player_id].size(); ++i) {
 		// Reassinging id to all the soliders
 		player_state::Soldier new_soldier;
 		new_soldier.id = state_soldiers[id][i]->GetActorId();
@@ -212,8 +210,10 @@ void StateSyncer::AssignSoldierAttributes(
 	}
 
 	// Moving new_soldiers into player_soldiers
-	std::move(new_soldiers.begin(), new_soldiers.end(),
-	          player_soldiers.begin());
+	player_soldiers.clear();
+	for(auto soldier : new_soldiers){
+		player_soldiers.push_back(soldier);
+	}
 }
 
 void StateSyncer::AssignVillagerAttributes(
@@ -278,8 +278,10 @@ void StateSyncer::AssignVillagerAttributes(
 	}
 
 	// Moving new_villagers into player_villagers
-	std::move(new_villagers.begin(), new_villagers.end(),
-	          player_villagers.begin());
+	player_villagers.clear();
+	for(auto villager : new_villagers){
+		player_villagers.push_back(villager);
+	}
 }
 
 void StateSyncer::AssignFactoryAttributes(
@@ -304,7 +306,6 @@ void StateSyncer::AssignFactoryAttributes(
 		new_factory._suicide = false;
 		new_factory.production_state =
 		    player_state::FactoryProduction::VILLAGER;
-
 		// Checking if the state is dead
 		auto factory_state = state_factories[id][i]->GetState();
 
@@ -335,10 +336,10 @@ void StateSyncer::AssignFactoryAttributes(
 
 		// Assigning the position
 		if (static_cast<PlayerId>(player_id) == PlayerId::PLAYER1) {
-			player_factories[i].position =
+			new_factory.position =
 			    state_factories[id][i]->GetPosition();
 		} else {
-			player_factories[i].position =
+			new_factory.position =
 			    FlipPosition(map, state_factories[id][i]->GetPosition());
 		}
 
@@ -347,8 +348,10 @@ void StateSyncer::AssignFactoryAttributes(
 	}
 
 	// Moving new_factories into player_factories
-	std::move(new_factories.begin(), new_factories.end(),
-	          player_factories.begin());
+	player_factories.clear();
+	for(auto factory: new_factories){
+		player_factories.push_back(factory);
+	}
 }
 
 } // namespace state

@@ -177,7 +177,7 @@ TEST_F(LoggerTest, WriteReadTest) {
 	// Set money expectations
 	std::array<int64_t, 2> money1 = {400, 500};
 	std::array<int64_t, 2> money2 = {300, 600};
-	EXPECT_CALL(*state, GetMoney())
+	EXPECT_CALL(*state, GetGold())
 	    .WillOnce(Return(money1))
 	    .WillRepeatedly(Return(money2));
 
