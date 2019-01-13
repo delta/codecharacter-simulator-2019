@@ -44,13 +44,13 @@ std::unique_ptr<IActorState> VillagerMoveState::Update() {
 	}
 
 	// Check if destination has been reached
-	if (villager->GetPosition() == villager->GetDestination()) {
+	if (villager->GetPosition() == villager->GetDestination().to_double()) {
 		return std::make_unique<VillagerIdleState>(villager);
 	}
 
 	auto path_planner = villager->GetPathPlanner();
 	auto current_position = villager->GetPosition();
-	auto destination = villager->GetDestination();
+	auto destination = villager->GetDestination().to_double();
 	auto speed = villager->GetSpeed();
 
 	auto next_position =

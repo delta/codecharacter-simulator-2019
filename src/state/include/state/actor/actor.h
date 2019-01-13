@@ -53,7 +53,7 @@ class STATE_EXPORT Actor : public IUpdatable {
 	/**
 	 * Actor position
 	 */
-	physics::Vector<int64_t> position;
+	DoubleVec2D position;
 
 	/**
 	 * Gold manager instance to perform transactions
@@ -64,8 +64,7 @@ class STATE_EXPORT Actor : public IUpdatable {
 	Actor();
 
 	Actor(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
-	      int64_t max_hp, physics::Vector<int64_t> position,
-	      GoldManager *gold_manager);
+	      int64_t max_hp, DoubleVec2D position, GoldManager *gold_manager);
 
 	virtual ~Actor() {}
 
@@ -162,6 +161,6 @@ class STATE_EXPORT Actor : public IUpdatable {
 	 *
 	 * @return     Actor Position
 	 */
-	physics::Vector<int64_t> GetPosition();
+	DoubleVec2D GetPosition();
 };
 } // namespace state

@@ -40,19 +40,19 @@ TEST_F(PathPlannerTest, LightMapTest) {
 	InitPathPlanner(map_matrix, ELEMENT_SIZE);
 	auto map_size = map_matrix.size();
 	auto target =
-	    Vec2D(map_size * ELEMENT_SIZE - 1, map_size * ELEMENT_SIZE - 1);
+	    DoubleVec2D(map_size * ELEMENT_SIZE - 1, map_size * ELEMENT_SIZE - 1);
 	int count = 0;
 
-	auto pos = Vec2D{0, 0};
+	auto pos = DoubleVec2D{0, 0};
 	while (pos != target) {
 		pos = path_planner->GetNextPosition(pos, target, 5);
-		if (pos == Vec2D::null) {
+		if (pos == DoubleVec2D::null) {
 			throw std::logic_error("Cannot reach destination!");
 			break;
 		}
 		count++;
 	}
-	EXPECT_EQ(count, 24);
+	EXPECT_EQ(count, 22);
 }
 
 TEST_F(PathPlannerTest, HeavyMapTest) {
@@ -103,17 +103,17 @@ TEST_F(PathPlannerTest, HeavyMapTest) {
 	InitPathPlanner(map_matrix, ELEMENT_SIZE);
 	auto map_size = map_matrix.size();
 	auto target =
-	    Vec2D(map_size * ELEMENT_SIZE - 1, map_size * ELEMENT_SIZE - 1);
+	    DoubleVec2D(map_size * ELEMENT_SIZE - 1, map_size * ELEMENT_SIZE - 1);
 	int count = 0;
 
-	auto pos = Vec2D{0, 0};
+	auto pos = DoubleVec2D{0, 0};
 	while (pos != target) {
 		pos = path_planner->GetNextPosition(pos, target, 5);
-		if (pos == Vec2D::null) {
+		if (pos == DoubleVec2D::null) {
 			throw std::logic_error("Cannot reach destination!");
 			break;
 		}
 		count++;
 	}
-	EXPECT_EQ(count, 1533);
+	EXPECT_EQ(count, 1244);
 }

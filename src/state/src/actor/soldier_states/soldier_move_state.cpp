@@ -33,13 +33,13 @@ std::unique_ptr<IActorState> SoldierMoveState::Update() {
 	}
 
 	// Check if destination has been reached
-	if (soldier->GetPosition() == soldier->GetDestination()) {
+	if (soldier->GetPosition() == soldier->GetDestination().to_double()) {
 		return std::make_unique<SoldierIdleState>(soldier);
 	}
 
 	auto path_planner = soldier->GetPathPlanner();
 	auto current_position = soldier->GetPosition();
-	auto destination = soldier->GetDestination();
+	auto destination = soldier->GetDestination().to_double();
 	auto speed = soldier->GetSpeed();
 
 	auto next_position =

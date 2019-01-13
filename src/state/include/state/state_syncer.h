@@ -30,8 +30,7 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 	 * Flips an induvidual position to know it's equivalent position that player
 	 * 2 will have
 	 */
-	physics::Vector<int64_t> FlipPosition(const Map *map,
-	                                      physics::Vector<int64_t> position);
+	DoubleVec2D FlipPosition(const Map *map, DoubleVec2D position);
 
 	/**
 	 * Assiging the soldiers' attribues to default values

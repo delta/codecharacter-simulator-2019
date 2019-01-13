@@ -17,18 +17,17 @@ Villager::Villager() {
 	// Init none
 }
 Villager::Villager(ActorId id, PlayerId player_id, ActorType actor_type,
-                   int64_t hp, int64_t max_hp,
-                   physics::Vector<int64_t> position, GoldManager *gold_manager,
-                   PathPlanner *path_planner, int64_t speed,
-                   int64_t attack_range, int64_t attack_damage,
+                   int64_t hp, int64_t max_hp, DoubleVec2D position,
+                   GoldManager *gold_manager, PathPlanner *path_planner,
+                   int64_t speed, int64_t attack_range, int64_t attack_damage,
                    int64_t build_effort, int64_t build_range,
                    int64_t mine_range)
     : Unit(id, player_id, actor_type, hp, max_hp, position, gold_manager,
            path_planner, speed, attack_range, attack_damage),
       state(std::make_unique<VillagerIdleState>(this)),
       build_range(build_range), build_effort(build_effort),
-      build_target(nullptr), mine_target(physics::Vector<int64_t>{}),
-      mine_target_set(false), mine_range(mine_range) {}
+      build_target(nullptr), mine_target(Vec2D{}), mine_target_set(false),
+      mine_range(mine_range) {}
 
 VillagerStateName Villager::GetState() { return state->GetName(); }
 
@@ -62,16 +61,14 @@ void Villager::Build(Factory *build_target) {
 	this->is_destination_set = false;
 }
 
-void Villager::Mine(physics::Vector<int64_t> mine_target) {
-	this->SetMineTarget(mine_target);
-}
+void Villager::Mine(Vec2D mine_target) { this->SetMineTarget(mine_target); }
 
-void Villager::SetMineTarget(physics::Vector<int64_t> mine_target) {
+void Villager::SetMineTarget(Vec2D mine_target) {
 	this->mine_target = mine_target;
 	this->mine_target_set = true;
 }
 
-physics::Vector<int64_t> Villager::GetMineTarget() {
+Vec2D Villager::GetMineTarget() {
 	if (!IsMineTargetSet()) {
 		throw std::logic_error("No Mine target set!");
 	}
@@ -90,7 +87,7 @@ bool Villager::IsMineTargetInRange() {
 		throw std::logic_error("No Mine target set!");
 	}
 
-	return this->position.distance(mine_target) <= mine_range;
+	return this->position.distance(mine_target.to_double()) <= mine_range;
 }
 
 void Villager::LateUpdate() {

@@ -13,7 +13,7 @@ namespace state {
 Factory::Factory() {}
 
 Factory::Factory(ActorId id, PlayerId player_id, ActorType actor_type,
-                 int64_t hp, int64_t max_hp, physics::Vector<int64_t> position,
+                 int64_t hp, int64_t max_hp, DoubleVec2D position,
                  GoldManager *gold_manager, int64_t construction_complete,
                  int64_t construction_total, ActorType production_state,
                  int64_t villager_frequency, int64_t soldier_frequency,

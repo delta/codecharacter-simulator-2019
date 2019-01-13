@@ -54,7 +54,7 @@ std::unique_ptr<IActorState> VillagerMoveToMineState::Update() {
 
 	auto path_planner = villager->GetPathPlanner();
 	auto current_position = villager->GetPosition();
-	auto destination = villager->GetMineTarget();
+	auto destination = villager->GetMineTarget().to_double();
 	auto speed = villager->GetSpeed();
 
 	auto next_position =

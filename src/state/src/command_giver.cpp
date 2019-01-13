@@ -6,8 +6,6 @@
 #include "state/command_giver.h"
 #include <algorithm>
 
-using Vec2D = physics::Vector<int64_t>;
-
 namespace state {
 
 CommandGiver::CommandGiver() {}
@@ -20,7 +18,7 @@ void CommandGiver::AttackActor(PlayerId player_id, ActorId unit_id,
 }
 
 void CommandGiver::CreateFactory(PlayerId player_id, ActorId villager_id,
-                                 physics::Vector<int64_t> offset) {
+                                 Vec2D offset) {
 	state->CreateFactory(player_id, villager_id, offset);
 }
 
@@ -30,7 +28,7 @@ void CommandGiver::BuildFactory(PlayerId player_id, ActorId villager_id,
 }
 
 void CommandGiver::MoveUnit(PlayerId player_id, ActorId actor_id,
-                            physics::Vector<int64_t> position) {
+                            Vec2D position) {
 	state->MoveUnit(player_id, actor_id, position);
 }
 
@@ -45,7 +43,7 @@ void CommandGiver::StopOrStartFactory(PlayerId player_id, ActorId factory_id,
 }
 
 void CommandGiver::MineLocation(PlayerId player_id, ActorId villager_id,
-                                physics::Vector<int64_t> mine_location) {
+                                Vec2D mine_location) {
 	state->MineLocation(player_id, villager_id, mine_location);
 }
 

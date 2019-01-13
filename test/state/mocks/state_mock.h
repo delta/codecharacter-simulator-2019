@@ -21,12 +21,10 @@ class StateMock : public ICommandTaker {
 	MOCK_METHOD0(GetMoney, const std::array<int64_t, 2>());
 	MOCK_METHOD0(GetMap, const Map *());
 	MOCK_METHOD0(GetScores, const std::array<int64_t, 2>());
-	MOCK_METHOD3(MoveUnit, void(PlayerId, ActorId, physics::Vector<int64_t>));
-	MOCK_METHOD3(MineLocation,
-	             void(PlayerId, ActorId, physics::Vector<int64_t>));
+	MOCK_METHOD3(MoveUnit, void(PlayerId, ActorId, Vec2D));
+	MOCK_METHOD3(MineLocation, void(PlayerId, ActorId, Vec2D));
 	MOCK_METHOD3(AttackActor, void(PlayerId, ActorId, ActorId));
-	MOCK_METHOD3(CreateFactory,
-	             void(PlayerId, ActorId, physics::Vector<int64_t>));
+	MOCK_METHOD3(CreateFactory, void(PlayerId, ActorId, Vec2D));
 	MOCK_METHOD3(BuildFactory, void(PlayerId, ActorId, ActorId));
 	MOCK_METHOD3(SetFactoryProduction, void(PlayerId, ActorId, ActorType));
 	MOCK_METHOD3(StopOrStartFactory, void(PlayerId, ActorId, bool));

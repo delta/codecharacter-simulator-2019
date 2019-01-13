@@ -5,8 +5,6 @@
 
 #include "state/state_syncer.h"
 
-using Vec2D = physics::Vector<int64_t>;
-
 namespace state {
 
 StateSyncer::StateSyncer(ICommandGiver *command_giver, ICommandTaker *state)
@@ -126,11 +124,11 @@ void StateSyncer::UpdatePlayerStates(
 
 std::array<int64_t, 2> StateSyncer::GetScores() { return state->GetScores(); }
 
-Vec2D StateSyncer::FlipPosition(const Map *map, Vec2D position) {
+DoubleVec2D StateSyncer::FlipPosition(const Map *map, DoubleVec2D position) {
 	auto map_size = map->GetSize();
 	auto map_element_size = map->GetElementSize();
-	return Vec2D(map_size * map_element_size - 1 - position.x,
-	             map_size * map_element_size - 1 - position.y);
+	return DoubleVec2D(map_size * map_element_size - 1 - position.x,
+	                   map_size * map_element_size - 1 - position.y);
 }
 
 void StateSyncer::AssignSoldierAttributes(
@@ -170,13 +168,15 @@ void StateSyncer::AssignSoldierAttributes(
 
 		// Player 1 is by default in the right orientation
 		if (PlayerId::PLAYER1 == static_cast<PlayerId>(player_id)) {
-			new_soldier.position = state_soldiers[id][i]->GetPosition();
+			new_soldier.position =
+			    state_soldiers[id][i]->GetPosition().to_int();
 		}
 		// Player 2 has a flipped orientation, so his positions need to be
 		// flipped
 		else {
 			new_soldier.position =
-			    FlipPosition(map, state_soldiers[id][i]->GetPosition());
+			    FlipPosition(map, state_soldiers[id][i]->GetPosition())
+			        .to_int();
 		}
 
 		// Adding new soldier to the vector new_soldiers
@@ -237,12 +237,14 @@ void StateSyncer::AssignVillagerAttributes(
 
 		// For player1, positions are correct
 		if (static_cast<PlayerId>(player_id) == PlayerId::PLAYER1) {
-			new_villager.position = state_villagers[id][i]->GetPosition();
+			new_villager.position =
+			    state_villagers[id][i]->GetPosition().to_int();
 		}
 		// For player 2, we must flip the position
 		else {
 			new_villager.position =
-			    FlipPosition(map, state_villagers[id][i]->GetPosition());
+			    FlipPosition(map, state_villagers[id][i]->GetPosition())
+			        .to_int();
 		}
 
 		// Pushing new_villager into new_villagers
@@ -324,10 +326,12 @@ void StateSyncer::AssignFactoryAttributes(
 
 		// Assigning the position
 		if (static_cast<PlayerId>(player_id) == PlayerId::PLAYER1) {
-			new_factory.position = state_factories[id][i]->GetPosition();
+			new_factory.position =
+			    state_factories[id][i]->GetPosition().to_int();
 		} else {
 			new_factory.position =
-			    FlipPosition(map, state_factories[id][i]->GetPosition());
+			    FlipPosition(map, state_factories[id][i]->GetPosition())
+			        .to_int();
 		}
 
 		// Pushing the factory into the new_factories vector

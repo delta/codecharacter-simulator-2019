@@ -4,7 +4,6 @@
 #include "state/interfaces/i_command_taker.h"
 
 using namespace state;
-using Vec2D = physics::Vector<int64_t>;
 
 class CommandTakerMock : public ICommandTaker {
   public:

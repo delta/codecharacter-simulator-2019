@@ -44,7 +44,7 @@ class STATE_EXPORT Unit : public Actor {
 	 * Destination that the soldier needs to navigate to
 	 * Valid only if is_destination_set is true
 	 */
-	physics::Vector<int64_t> destination;
+	Vec2D destination;
 
 	/**
 	 * true if the Soldier is currently moving to the set destination
@@ -56,7 +56,7 @@ class STATE_EXPORT Unit : public Actor {
 	 * Position where the soldier should move to, if the soldier must move
 	 * Serves as a temp for updating soldier positions
 	 */
-	physics::Vector<int64_t> new_position;
+	DoubleVec2D new_position;
 
 	/**
 	 * true if new_position is set
@@ -79,9 +79,9 @@ class STATE_EXPORT Unit : public Actor {
 	Unit();
 
 	Unit(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
-	     int64_t max_hp, physics::Vector<int64_t> position,
-	     GoldManager *gold_manager, PathPlanner *path_planner, int64_t speed,
-	     int64_t attack_range, int64_t attack_damage);
+	     int64_t max_hp, DoubleVec2D position, GoldManager *gold_manager,
+	     PathPlanner *path_planner, int64_t speed, int64_t attack_range,
+	     int64_t attack_damage);
 
 	virtual ~Unit() {}
 
@@ -140,14 +140,14 @@ class STATE_EXPORT Unit : public Actor {
 	 *
 	 * @return     Unit's Destination
 	 */
-	physics::Vector<int64_t> GetDestination();
+	Vec2D GetDestination();
 
 	/**
 	 * Set the unit's destination
 	 *
 	 * @param[in]  Unit's Destination
 	 */
-	void SetDestination(physics::Vector<int64_t> destination);
+	void SetDestination(Vec2D destination);
 
 	/**
 	 * Check if the destination parameter is set
@@ -167,14 +167,14 @@ class STATE_EXPORT Unit : public Actor {
 	 *
 	 * @return     Unit's new_position
 	 */
-	physics::Vector<int64_t> GetNewPosition();
+	DoubleVec2D GetNewPosition();
 
 	/**
 	 * Set the unit's new_position
 	 *
 	 * @param[in]  Unit's new_position
 	 */
-	void SetNewPosition(physics::Vector<int64_t> new_position);
+	void SetNewPosition(DoubleVec2D new_position);
 
 	/**
 	 * Check if the new_position parameter is set
@@ -201,14 +201,14 @@ class STATE_EXPORT Unit : public Actor {
 	 *
 	 * @param[in]  Actor's new position
 	 */
-	void SetPosition(physics::Vector<int64_t> position);
+	void SetPosition(DoubleVec2D position);
 
 	/**
 	 * Method to give the move command to this soldier
 	 *
 	 * @param[in]     destination    The destination to go to
 	 */
-	void Move(physics::Vector<int64_t> destination);
+	void Move(Vec2D destination);
 
 	/**
 	 * Method to give the attack command to this soldier
