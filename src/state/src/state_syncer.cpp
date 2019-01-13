@@ -37,7 +37,7 @@ int64_t StateSyncer::GetPlayerId(int player_id, bool is_enemy) {
 
 void StateSyncer::UpdatePlayerStates(
     std::array<player_state::State, 2> &player_states) {
-	
+
 	// Getting all information from the main state
 	auto state_soldiers = state->GetSoldiers();
 	auto state_villagers = state->GetVillagers();
