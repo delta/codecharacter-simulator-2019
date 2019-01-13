@@ -117,3 +117,52 @@ TEST_F(PathPlannerTest, HeavyMapTest) {
 	}
 	EXPECT_EQ(count, 1244);
 }
+
+TEST_F(PathPlannerTest, SymmetryTest) {
+	// The path length from source->dest and dest->source must be the same
+
+	// clang-format off
+	auto map_matrix = vector<vector<TerrainType>>{
+		{L, W, L, L, L, L},
+		{L, W, L, W, W, L},
+		{L, W, L, L, W, L},
+		{L, W, L, L, W, L},
+		{L, W, W, L, W, L},
+		{L, L, L, L, W, L}
+	};
+	// clang-format on
+	InitPathPlanner(map_matrix, ELEMENT_SIZE);
+	auto map_size = map_matrix.size();
+	auto speed = 2;
+
+	// Source -> Destination
+	auto pos = DoubleVec2D{0, 0};
+	auto target =
+	    DoubleVec2D(map_size * ELEMENT_SIZE - 1, map_size * ELEMENT_SIZE - 1);
+	int source_to_dest_count = 0;
+
+	while (pos != target) {
+		pos = path_planner->GetNextPosition(pos, target, speed);
+		if (pos == DoubleVec2D::null) {
+			throw std::logic_error("Cannot reach destination!");
+			break;
+		}
+		source_to_dest_count++;
+	}
+
+	// Destination -> Source
+	auto new_pos = target;
+	auto new_target = DoubleVec2D{0, 0};
+	int dest_to_source_count = 0;
+
+	while (new_pos != new_target) {
+		new_pos = path_planner->GetNextPosition(new_pos, new_target, speed);
+		if (new_pos == DoubleVec2D::null) {
+			throw std::logic_error("Cannot reach destination!");
+			break;
+		}
+		dest_to_source_count++;
+	}
+
+	ASSERT_EQ(source_to_dest_count, dest_to_source_count);
+}
