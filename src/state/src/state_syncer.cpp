@@ -22,16 +22,22 @@ void StateSyncer::UpdateMainState(
 	state->Update();
 }
 
-int64_t StateSyncer::GetPlayerId(int id, bool is_enemy, int64_t player_id) {
+// Note: id incicates the player's id whose units are being manipulated
+// player_id indicates the player whose state is being updated
+int64_t StateSyncer::GetPlayerId(int player_id, bool is_enemy) {
+	int64_t new_player_id;
 	if (is_enemy) {
-		player_id = (id + 1) % static_cast<int>(PlayerId::PLAYER_COUNT);
+		new_player_id =
+		    (player_id + 1) % static_cast<int64_t>(PlayerId::PLAYER_COUNT);
+	} else {
+		new_player_id = static_cast<int64_t>(player_id);
 	}
-	return player_id;
+	return new_player_id;
 }
 
 void StateSyncer::UpdatePlayerStates(
     std::array<player_state::State, 2> &player_states) {
-
+	
 	// Getting all information from the main state
 	auto state_soldiers = state->GetSoldiers();
 	auto state_villagers = state->GetVillagers();
@@ -39,24 +45,8 @@ void StateSyncer::UpdatePlayerStates(
 	auto state_money = state->GetGold();
 	auto *map = state->GetMap();
 
-	// Creating the player map
-	std::array<std::array<TerrainType, MAP_SIZE>, MAP_SIZE> player_map;
-	for (int x = 0; x < map->GetSize(); ++x) {
-		auto &map_row = player_map[x];
-		for (int y = 0; y < map->GetSize(); ++y) {
-			// Initializing the map element
-			TerrainType map_element = map->GetTerrainTypeByOffset(x, y);
-			map_row[y] = map_element;
-		}
-	}
-
-	// Iterating throught the players
+	// Iterating through the players
 	for (int64_t player_id = 0; player_id < player_states.size(); ++player_id) {
-		// Flipping the map if player 2 is playing
-		if (static_cast<PlayerId>(player_id) == PlayerId::PLAYER2) {
-			FlipMap(player_map);
-		}
-
 		// Changing map elements from type state::TerrainType to
 		// player_state::TerrainType
 		std::array<std::array<player_state::TerrainType, MAP_SIZE>, MAP_SIZE>
@@ -66,7 +56,7 @@ void StateSyncer::UpdatePlayerStates(
 		for (int i = 0; i < map->GetSize(); ++i) {
 			for (int j = 0; j < map->GetSize(); ++j) {
 				auto &new_map_element = new_map[i][j];
-				switch (player_map[i][j]) {
+				switch (map->GetTerrainTypeByOffset(i, j)) {
 				case TerrainType::LAND:
 					new_map_element = player_state::TerrainType::LAND;
 					break;
@@ -77,7 +67,13 @@ void StateSyncer::UpdatePlayerStates(
 				// state
 				case TerrainType::GOLD_MINE:
 					new_map_element = player_state::TerrainType::GOLD_MINE;
-					auto gold_mine = Vec2D(i, j);
+					Vec2D gold_mine;
+					if (static_cast<PlayerId>(player_id) != PlayerId::PLAYER1) {
+						gold_mine = Vec2D(map->GetSize() - 1 - i,
+						                  map->GetSize() - 1 - j);
+					} else {
+						gold_mine = Vec2D(i, j);
+					}
 					gold_mine_locations.push_back(gold_mine);
 					break;
 				}
@@ -85,8 +81,7 @@ void StateSyncer::UpdatePlayerStates(
 		}
 
 		// Creating the enemy id
-		int64_t enemy_id =
-		    (player_id + 1) % static_cast<int>(PlayerId::PLAYER_COUNT);
+		int64_t enemy_id = GetPlayerId(player_id, true);
 
 		// Assinging the default values and positions of the new player states
 		AssignSoldierAttributes(player_id, player_states[player_id].soldiers,
@@ -103,7 +98,6 @@ void StateSyncer::UpdatePlayerStates(
 		                        player_states[player_id].enemy_factories, true);
 		// Assigning the gold for each player
 		player_states[player_id].gold = state_money[player_id];
-
 		// Assigning the map to the player states
 		// Copying data for player 1
 		if (static_cast<PlayerId>(player_id) == PlayerId::PLAYER1) {
@@ -114,44 +108,23 @@ void StateSyncer::UpdatePlayerStates(
 		}
 		// Moving data the map into player 2's state to save space
 		else {
+			// Flipping the map
 			for (int i = 0; i < map->GetSize(); ++i) {
-				std::move(new_map[i].begin(), new_map[i].end(),
-				          player_states[player_id].map[i].begin());
+				for (int j = 0; j < map->GetSize(); ++j) {
+					player_states[player_id].map[i][j] =
+					    new_map[map->GetSize() - 1 - i][map->GetSize() - 1 - j];
+				}
 			}
 		}
-
 		// Assinging the gold mine_locations to the player state
-		if (player_id == 0) {
-			std::copy(gold_mine_locations.begin(), gold_mine_locations.end(),
-			          player_states[player_id].gold_mine_locations.begin());
-		} else {
-			std::move(gold_mine_locations.begin(), gold_mine_locations.end(),
-			          player_states[player_id].gold_mine_locations.begin());
+		for (auto gold_mine_location : gold_mine_locations) {
+			player_states[player_id].gold_mine_locations.push_back(
+			    gold_mine_location);
 		}
 	}
 }
 
 std::array<int64_t, 2> StateSyncer::GetScores() { return state->GetScores(); }
-
-void StateSyncer::FlipMap(
-    std::array<std::array<TerrainType, MAP_SIZE>, MAP_SIZE> &player_map) {
-	// Flipping the map
-	auto map_size = MAP_SIZE;
-	for (int i = 0; i < map_size / 2; ++i) {
-		for (int j = 0; j < map_size; ++j) {
-			std::swap(player_map[i][j],
-			          player_map[map_size - 1 - i][map_size - 1 - j]);
-		}
-	}
-	// If the map size is odd, flipping only the middle row
-	if (map_size % 2) {
-		int i = int(map_size / 2);
-		for (int j = 0; j < int(map_size / 2); ++j) {
-			std::swap(player_map[i][j],
-			          player_map[map_size - 1 - i][map_size - 1 - j]);
-		}
-	}
-}
 
 Vec2D StateSyncer::FlipPosition(const Map *map, Vec2D position) {
 	auto map_size = map->GetSize();
@@ -167,7 +140,8 @@ void StateSyncer::AssignSoldierAttributes(
 	int64_t player_id = id;
 	const auto *map = state->GetMap();
 	std::vector<player_state::Soldier> new_soldiers;
-	for (int i = 0; i < state_soldiers[player_id].size(); ++i) {
+
+	for (int i = 0; i < state_soldiers[id].size(); ++i) {
 		// Reassinging id to all the soliders
 		player_state::Soldier new_soldier;
 		new_soldier.id = state_soldiers[id][i]->GetActorId();
@@ -192,7 +166,7 @@ void StateSyncer::AssignSoldierAttributes(
 		}
 
 		// If is_enemy is true, then player_id is the opposite of the id
-		player_id = GetPlayerId(id, is_enemy, player_id);
+		player_id = GetPlayerId(id, is_enemy);
 
 		// Player 1 is by default in the right orientation
 		if (PlayerId::PLAYER1 == static_cast<PlayerId>(player_id)) {
@@ -211,7 +185,8 @@ void StateSyncer::AssignSoldierAttributes(
 
 	// Moving new_soldiers into player_soldiers
 	player_soldiers.clear();
-	for(auto soldier : new_soldiers){
+
+	for (auto soldier : new_soldiers) {
 		player_soldiers.push_back(soldier);
 	}
 }
@@ -221,7 +196,7 @@ void StateSyncer::AssignVillagerAttributes(
     bool is_enemy) {
 	// Getting all state villagers
 	auto state_villagers = state->GetVillagers();
-	int64_t player_id = id;
+	int64_t player_id = GetPlayerId(id, is_enemy);
 	const auto *map = state->GetMap();
 	std::vector<player_state::Villager> new_villagers;
 
@@ -260,9 +235,6 @@ void StateSyncer::AssignVillagerAttributes(
 			break;
 		}
 
-		// PlayerId is the opposite of id if is_enemy
-		player_id = GetPlayerId(id, is_enemy, player_id);
-
 		// For player1, positions are correct
 		if (static_cast<PlayerId>(player_id) == PlayerId::PLAYER1) {
 			new_villager.position = state_villagers[id][i]->GetPosition();
@@ -279,7 +251,7 @@ void StateSyncer::AssignVillagerAttributes(
 
 	// Moving new_villagers into player_villagers
 	player_villagers.clear();
-	for(auto villager : new_villagers){
+	for (auto villager : new_villagers) {
 		player_villagers.push_back(villager);
 	}
 }
@@ -289,7 +261,7 @@ void StateSyncer::AssignFactoryAttributes(
     bool is_enemy) {
 	// Getting all the factories for the state
 	auto state_factories = state->GetFactories();
-	int64_t player_id = id;
+	int64_t player_id = GetPlayerId(id, is_enemy);
 	const auto *map = state->GetMap();
 	std::vector<player_state::Factory> new_factories;
 
@@ -306,8 +278,23 @@ void StateSyncer::AssignFactoryAttributes(
 		new_factory._suicide = false;
 		new_factory.production_state =
 		    player_state::FactoryProduction::VILLAGER;
+
 		// Checking if the state is dead
 		auto factory_state = state_factories[id][i]->GetState();
+		auto factory_production_state =
+		    state_factories[id][i]->GetProductionState();
+
+		// Reassigning production state
+		switch (factory_production_state) {
+		case ActorType::SOLDIER:
+			new_factory.production_state =
+			    player_state::FactoryProduction::SOLDIER;
+			break;
+		case ActorType::VILLAGER:
+			new_factory.production_state =
+			    player_state::FactoryProduction::VILLAGER;
+			break;
+		}
 
 		// Reassinging the factory state
 		switch (factory_state) {
@@ -323,21 +310,21 @@ void StateSyncer::AssignFactoryAttributes(
 			    state_factories[id][i]->GetProductionState();
 			if (production_state == ActorType::FACTORY_SOLDIER) {
 				new_factory.state =
-				    player_state::FactoryState::VILLAGER_PRODUCTION;
+				    player_state::FactoryState::SOLDIER_PRODUCTION;
+				new_factory.production_state =
+				    player_state::FactoryProduction::SOLDIER;
 			} else {
 				new_factory.state =
-				    player_state::FactoryState::SOLDIER_PRODUCTION;
+				    player_state::FactoryState::VILLAGER_PRODUCTION;
+				new_factory.production_state =
+				    player_state::FactoryProduction::VILLAGER;
 			}
 			break;
 		}
 
-		// Switching the player if is_enemy
-		player_id = GetPlayerId(id, is_enemy, player_id);
-
 		// Assigning the position
 		if (static_cast<PlayerId>(player_id) == PlayerId::PLAYER1) {
-			new_factory.position =
-			    state_factories[id][i]->GetPosition();
+			new_factory.position = state_factories[id][i]->GetPosition();
 		} else {
 			new_factory.position =
 			    FlipPosition(map, state_factories[id][i]->GetPosition());
@@ -349,7 +336,7 @@ void StateSyncer::AssignFactoryAttributes(
 
 	// Moving new_factories into player_factories
 	player_factories.clear();
-	for(auto factory: new_factories){
+	for (auto factory : new_factories) {
 		player_factories.push_back(factory);
 	}
 }

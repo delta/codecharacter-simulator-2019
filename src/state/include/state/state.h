@@ -206,4 +206,3 @@ class STATE_EXPORT State : public ICommandTaker {
 	void Update() override;
 };
 } // namespace state
-

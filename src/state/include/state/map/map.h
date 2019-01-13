@@ -75,4 +75,3 @@ class Map {
 };
 
 } // namespace state
-

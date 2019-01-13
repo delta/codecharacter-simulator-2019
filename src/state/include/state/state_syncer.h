@@ -27,13 +27,6 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 	ICommandTaker *state;
 
 	/**
-	 * Flips map orientation to facilitate easily modification of player 2's
-	 * state
-	 */
-	void FlipMap(
-	    std::array<std::array<TerrainType, MAP_SIZE>, MAP_SIZE> &player_map);
-
-	/**
 	 * Flips an induvidual position to know it's equivalent position that player
 	 * 2 will have
 	 */
@@ -65,7 +58,7 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 	/**
 	 * Returns the same id if is_enemy is false, else returns the opposite id
 	 */
-	int64_t GetPlayerId(int id, bool is_enemy, int64_t player_id);
+	int64_t GetPlayerId(int id, bool is_enemy);
 
   public:
 	StateSyncer(ICommandGiver *command_giver, ICommandTaker *state);

@@ -57,7 +57,8 @@ class StateSyncerTest : public Test {
 		this->command_giver = make_unique<CommandGiverMock>();
 
 		// Creating a state syncer
-		this->state_syncer = make_unique<StateSyncer>(this->command_giver.get(), this->command_taker.get());
+		this->state_syncer = make_unique<StateSyncer>(
+		    this->command_giver.get(), this->command_taker.get());
 
 		// Initializing the actor id to 0
 		Actor::SetActorIdIncrement(0);
@@ -74,19 +75,28 @@ class StateSyncerTest : public Test {
 		// Creating the grid for the map
 		/*
 		Map Arrangement
-		L L L L L
-		L L L L L
-		L L L L L
-		L L L L L
-		L L L L L
+		W L L L G
+		L W L L L
+		L L W L L
+		L L L W L
+		L G L L W
 		*/
+
 		for (int i = 0; i < this->map_size; ++i) {
 			vector<TerrainType> row;
 			for (int j = 0; j < this->map_size; ++j) {
-				row.push_back(L);
+				if (i != j) {
+					row.push_back(L);
+				} else {
+					row.push_back(W);
+				}
 			}
 			this->grid.push_back(row);
 		}
+
+		// Adding the gold mines
+		this->grid[this->map_size - 1][this->map_size - 1] = M;
+		this->grid[0][1] = M;
 
 		// Assinging the map
 		this->map =
@@ -96,24 +106,34 @@ class StateSyncerTest : public Test {
 		Soldier *model_soldier1;
 		vector<Soldier *> player1_soldiers;
 		for (int soldier_index = 0; soldier_index < 10; ++soldier_index) {
-			model_soldier1 = new Soldier(
-			    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::SOLDIER,
-			    100, 100, Vec2D(0, 0), this->gold_manager.get(), 5, 5, 40);
+			model_soldier1 = new Soldier(Actor::GetNextActorId(),
+			                             PlayerId::PLAYER1, ActorType::SOLDIER,
+			                             100, 100, Vec2D(this->ele_size, 0),
+			                             this->gold_manager.get(), 5, 5, 40);
 			player1_soldiers.push_back(model_soldier1);
 		}
 
 		// Creating soldiers for player 2
 		Soldier *model_soldier2;
 		vector<Soldier *> player2_soldiers;
-		for (int soldier_index = 0; soldier_index < 10; ++soldier_index) {
+		for (int soldier_index = 0; soldier_index < 7; ++soldier_index) {
 			model_soldier2 =
 			    new Soldier(Actor::GetNextActorId(), PlayerId::PLAYER2,
 			                ActorType::SOLDIER, 100, 100,
-			                Vec2D(this->map_size * this->ele_size - 1,
+			                Vec2D((this->map_size - 1) * this->ele_size - 1,
 			                      this->map_size * this->ele_size - 1),
 			                this->gold_manager.get(), 5, 5, 40);
 			player2_soldiers.push_back(model_soldier2);
 		}
+
+		// Map of all soldiers on the map
+		/*
+		W  1S L  L  L
+		L  W  L  L  L
+		L  L  W  L  L
+		L  L  L  W  L
+		L  L  L  2S W
+		*/
 
 		// Pushing all the soldiers into state
 		this->soldiers[0] = player1_soldiers;
@@ -128,11 +148,11 @@ class StateSyncerTest : public Test {
 		Villager *model_villager1;
 		vector<Villager *> player1_villagers;
 
-		for (int i = 0; i < 10; ++i) {
-			model_villager1 =
-			    new Villager(Actor::GetNextActorId(), PlayerId::PLAYER1,
-			                 ActorType::VILLAGER, 100, 100, Vec2D(0, 0),
-			                 this->gold_manager.get(), 2, 5, 20, 5, 5, 5);
+		for (int i = 0; i < 7; ++i) {
+			model_villager1 = new Villager(
+			    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::VILLAGER,
+			    100, 100, Vec2D(0, this->ele_size * this->map_size - 1),
+			    this->gold_manager.get(), 2, 5, 20, 5, 5, 5);
 			player1_villagers.push_back(model_villager1);
 		}
 
@@ -140,18 +160,27 @@ class StateSyncerTest : public Test {
 		vector<Villager *> player2_villagers;
 
 		for (int i = 0; i < 10; ++i) {
-			model_villager2 =
-			    new Villager(Actor::GetNextActorId(), PlayerId::PLAYER2,
-			                 ActorType::VILLAGER, 100, 100,
-			                 Vec2D(this->ele_size * this->map_size - 1,
-			                       this->ele_size * this->map_size - 1),
-			                 this->gold_manager.get(), 2, 5, 20, 5, 5, 5);
+			model_villager2 = new Villager(
+			    Actor::GetNextActorId(), PlayerId::PLAYER2, ActorType::VILLAGER,
+			    100, 100, Vec2D(this->ele_size * this->map_size - 1, 0),
+			    this->gold_manager.get(), 2, 5, 20, 5, 5, 5);
 			player2_villagers.push_back(model_villager2);
 		}
 
 		// Pushing all the villagers to the state
 		this->villagers[0] = player1_villagers;
 		this->villagers[1] = player2_villagers;
+
+		// Villagers on map now
+		// Note: V stands for villager and the number stands for the player
+		// owning the factory
+		/*
+		W  L  L  L  2V
+		L  W  L  L  L
+		L  L  W  L  L
+		L  L  L  W  L
+		1V L  L  L  W
+		*/
 
 		// Initializing factories for the state
 		auto factory1_soldier = new Factory(
@@ -197,18 +226,17 @@ class StateSyncerTest : public Test {
 		// Factories on map now
 		// Note: S stands for soldier factory and V for villager factory
 		/*
-		L  L  L  2S L
-		L  L  L  L  2V
-		L  L  L  L  L
-		1V L  L  L  L
-		L  1S L  L  L
+		W  1S L  L  L
+		1V W  L  L  L
+		L  L  W  L  L
+		L  L  L  W  2V
+		L  L  L  2S W
 		*/
 	}
 };
 
 // Creating an updation test
 TEST_F(StateSyncerTest, UpdationTest) {
-	// Checking the states of the dead soldiers
 	// Adding another factory to check addition of a new factory
 	auto factories2 = this->factories;
 
@@ -224,15 +252,21 @@ TEST_F(StateSyncerTest, UpdationTest) {
 	array<vector<Factory *>, 2> factories3 = factories2;
 	factories3[0].erase(factories3[0].begin() + 2, factories3[0].end());
 
+	// Reducing player 2's gold and increasing player 1's gold
+	auto player_gold2 = this->player_gold;
+	player_gold2[1] = 4500;
+	player_gold2[0] = 5500;
+
 	// Expecting calls to the command taker
 	EXPECT_CALL(*this->command_taker, GetMap())
 	    .WillRepeatedly(Return(map.get()));
 	EXPECT_CALL(*this->command_taker, GetGold())
-	    .WillRepeatedly(Return(this->player_gold));
+	    .WillOnce(Return(this->player_gold))
+	    .WillRepeatedly(Return(player_gold2));
 	EXPECT_CALL(*this->command_taker, GetSoldiers())
 	    .WillRepeatedly(Return(soldiers));
 	EXPECT_CALL(*this->command_taker, GetVillagers())
-		.WillRepeatedly(Return(villagers));
+	    .WillRepeatedly(Return(villagers));
 	EXPECT_CALL(*this->command_taker, GetFactories())
 	    .Times(5)
 	    .WillRepeatedly(Return(factories))
@@ -242,30 +276,50 @@ TEST_F(StateSyncerTest, UpdationTest) {
 	    .WillRepeatedly(Return(factories2))
 	    .RetiresOnSaturation();
 	EXPECT_CALL(*this->command_taker, GetFactories())
-	    .Times(5)	
+	    .Times(5)
 	    .WillRepeatedly(Return(factories3))
 	    .RetiresOnSaturation();
-	
+
 	// Updating the player states
 	this->state_syncer->UpdatePlayerStates(this->player_states);
-	
+
+	// Checking if the map is assigned properly
+	const auto L = player_state::TerrainType::LAND;
+	const auto W = player_state::TerrainType::WATER;
+	const auto M = player_state::TerrainType::GOLD_MINE;
+
+	ASSERT_EQ(this->player_states[0].map[2][2], W);
+	ASSERT_EQ(this->player_states[0].map[0][2], L);
+	ASSERT_EQ(this->player_states[0].map[0][1], M);
+	ASSERT_EQ(this->player_states[1].map[3][3], W);
+	ASSERT_EQ(this->player_states[1].map[1][3], L);
+	ASSERT_EQ(this->player_states[1].map[0][0], M);
+
 	// Checking if the soldier positions are the same
-	ASSERT_EQ(this->player_states[0].soldiers[0].position, Vec2D(0, 0));
+	ASSERT_EQ(this->player_states[0].soldiers[0].position,
+	          Vec2D(this->ele_size, 0));
 	ASSERT_EQ(this->player_states[0].enemy_soldiers[0].position,
-	          Vec2D(this->ele_size * this->map_size - 1,
+	          Vec2D(this->ele_size * (this->map_size - 1) - 1,
 	                this->ele_size * this->map_size - 1));
-	ASSERT_EQ(this->player_states[1].soldiers[0].position, Vec2D(0, 0));
+	ASSERT_EQ(this->player_states[1].soldiers[0].position,
+	          Vec2D(this->ele_size, 0));
 	ASSERT_EQ(this->player_states[1].enemy_soldiers[0].position,
-	          Vec2D(this->ele_size * this->map_size - 1,
+	          Vec2D(this->ele_size * (this->map_size - 1) - 1,
 	                this->map_size * this->ele_size - 1));
 
-	// Checking the states of the dead soldiers
-	ASSERT_EQ(this->player_states[0].enemy_soldiers.size(), 10);
-	ASSERT_EQ(this->player_states[1].soldiers.size(), 10);
+	// Checking number of soldiers
+	ASSERT_EQ(this->player_states[0].soldiers.size(), 10);
+	ASSERT_EQ(this->player_states[1].soldiers.size(), 7);
 
-	// Checking for player's gold
-	ASSERT_EQ(this->player_states[0].gold, this->player_gold[0]);
-	ASSERT_EQ(this->player_states[1].gold, this->player_gold[1]);
+	// Checking if the villager positions are the same
+	ASSERT_EQ(this->player_states[0].villagers[0].position,
+	          Vec2D(0, this->map_size * this->ele_size - 1));
+	ASSERT_EQ(this->player_states[0].enemy_villagers[0].position,
+	          Vec2D(this->map_size * this->ele_size - 1, 0));
+	ASSERT_EQ(this->player_states[1].villagers[0].position,
+	          Vec2D(0, this->ele_size * this->map_size - 1));
+	ASSERT_EQ(this->player_states[1].enemy_villagers[0].position,
+	          Vec2D(this->ele_size * this->map_size - 1, 0));
 
 	// Checking the factory positions from player states
 	ASSERT_EQ(this->player_states[0].factories[0].position,
@@ -289,8 +343,22 @@ TEST_F(StateSyncerTest, UpdationTest) {
 	          Vec2D(this->ele_size * this->map_size - 1,
 	                this->ele_size * (this->map_size - 1) - 1));
 
+	// Checking if the type of production of the factories is still the same
+	ASSERT_EQ(this->player_states[0].factories[0].production_state,
+	          player_state::FactoryProduction::SOLDIER);
+	ASSERT_EQ(this->player_states[0].enemy_factories[0].production_state,
+	          player_state::FactoryProduction::SOLDIER);
+	ASSERT_EQ(this->player_states[1].factories[1].production_state,
+	          player_state::FactoryProduction::VILLAGER);
+	ASSERT_EQ(this->player_states[1].enemy_factories[1].production_state,
+	          player_state::FactoryProduction::VILLAGER);
+
 	// Updating player states again
 	this->state_syncer->UpdatePlayerStates(this->player_states);
+
+	// Checking for player's gold
+	ASSERT_EQ(this->player_states[0].gold, player_gold2[0]);
+	ASSERT_EQ(this->player_states[1].gold, player_gold2[1]);
 
 	// Now, a new factory is added at position (this->ele_size, this->ele_size)
 	// for player 1 Checking if this factory exists
@@ -299,10 +367,6 @@ TEST_F(StateSyncerTest, UpdationTest) {
 	ASSERT_EQ(this->player_states[1].enemy_factories[2].position,
 	          Vec2D(this->ele_size * (this->map_size - 1) - 1,
 	                this->ele_size * (this->map_size - 1) - 1));
-
-	// Also, the player gold of player 2 is changed
-	ASSERT_EQ(this->player_states[0].gold, this->player_gold[0]);
-	ASSERT_EQ(this->player_states[0].gold, this->player_gold[1]);
 
 	// Updating player states again
 	this->state_syncer->UpdatePlayerStates(this->player_states);

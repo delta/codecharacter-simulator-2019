@@ -212,4 +212,3 @@ struct State {
 };
 
 } // namespace player_state
-
