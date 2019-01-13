@@ -35,8 +35,8 @@ class VillagerTest : public Test {
 	std::unique_ptr<Villager> MakeTestVillager() {
 		return std::move(std::make_unique<Villager>(
 		    2, PlayerId::PLAYER2, ActorType::VILLAGER, 100, 100,
-		    physics::Vector<int64_t>(15, 15), gold_manager.get(),
-		    path_planner.get(), 10, 10, 10, 10, 10, 10));
+		    DoubleVec2D(15, 15), gold_manager.get(), path_planner.get(), 10, 10,
+		    10, 10, 10, 10));
 	}
 
 	VillagerTest() {
@@ -68,8 +68,8 @@ class VillagerTest : public Test {
 
 		this->villager = make_unique<Villager>(
 		    1, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		    physics::Vector<int64_t>(10, 10), gold_manager.get(),
-		    path_planner.get(), 10, 10, 10, 10, 10, 10);
+		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
+		    10, 10, 10, 10);
 	}
 };
 
@@ -87,7 +87,7 @@ TEST_F(VillagerTest, TransitionToAttackState) {
 }
 
 TEST_F(VillagerTest, MoveToDestination) {
-	this->villager->SetDestination(physics::Vector<int64_t>(15, 15));
+	this->villager->SetDestination(Vec2D(15, 15));
 
 	this->villager->Update();
 	while (this->villager->GetState() != VillagerStateName::IDLE) {
@@ -96,11 +96,11 @@ TEST_F(VillagerTest, MoveToDestination) {
 	}
 	this->villager->LateUpdate();
 
-	ASSERT_EQ(this->villager->GetPosition(), physics::Vector<int64_t>(15, 15));
+	ASSERT_EQ(this->villager->GetPosition(), DoubleVec2D(15, 15));
 }
 
 TEST_F(VillagerTest, TransitionToMineState) {
-	this->villager->Mine(physics::Vector<int64_t>(10, 10));
+	this->villager->Mine(Vec2D(10, 10));
 
 	this->villager->Update();
 	this->villager->LateUpdate();
@@ -143,7 +143,7 @@ TEST_F(VillagerTest, TransitionToDeadState) {
 }
 
 TEST_F(VillagerTest, MoveToMine) {
-	this->villager->SetMineTarget(physics::Vector<int64_t>(25, 30));
+	this->villager->SetMineTarget(Vec2D(25, 30));
 
 	while (this->villager->GetState() != VillagerStateName::MINE) {
 		this->villager->Update();
@@ -192,8 +192,8 @@ TEST_F(VillagerTest, BuildFactory) {
 	auto soldier_list = std::vector<std::unique_ptr<Soldier>>{};
 	auto target_factory = std::make_unique<Factory>(
 	    2, PlayerId::PLAYER1, ActorType::FACTORY_VILLAGER, 100, 100,
-	    physics::Vector<int64_t>(10, 10), gold_manager.get(), 0, 100,
-	    ActorType::VILLAGER, 5, 5, UnitProductionCallback{});
+	    DoubleVec2D(10, 10), gold_manager.get(), 0, 100, ActorType::VILLAGER, 5,
+	    5, UnitProductionCallback{});
 
 	this->villager->Build(target_factory.get());
 

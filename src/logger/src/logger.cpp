@@ -281,8 +281,8 @@ void Logger::LogState() {
 			}
 			if (soldier->IsAttackTargetSet()) {
 				auto target_pos = soldier->GetAttackTarget()->GetPosition();
-				t_soldier->set_target_x(target_pos.x);
-				t_soldier->set_target_y(target_pos.y);
+				t_soldier->set_target_x((int)target_pos.x);
+				t_soldier->set_target_y((int)target_pos.y);
 			} else {
 				t_soldier->set_target_x(-1);
 				t_soldier->set_target_y(-1);
@@ -323,8 +323,8 @@ void Logger::LogState() {
 			}
 			if (villager->IsAttackTargetSet()) {
 				auto target_pos = villager->GetAttackTarget()->GetPosition();
-				t_villager->set_target_x(target_pos.x);
-				t_villager->set_target_y(target_pos.y);
+				t_villager->set_target_x((int)target_pos.x);
+				t_villager->set_target_y((int)target_pos.y);
 			} else if (villager->IsMineTargetSet()) {
 				auto target_pos = villager->GetMineTarget();
 				t_villager->set_target_x(target_pos.x);
@@ -332,8 +332,8 @@ void Logger::LogState() {
 			} else if (villager->IsBuildTargetSet()) {
 				auto target_factory_pos =
 				    villager->GetBuildTarget()->GetPosition();
-				t_villager->set_target_x(target_factory_pos.x);
-				t_villager->set_target_y(target_factory_pos.y);
+				t_villager->set_target_x((int)target_factory_pos.x);
+				t_villager->set_target_y((int)target_factory_pos.y);
 			} else {
 				t_villager->set_target_x(-1);
 				t_villager->set_target_y(-1);

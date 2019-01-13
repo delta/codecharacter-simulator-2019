@@ -28,7 +28,8 @@ class PathPlanner : public IPathPlanner {
 	/**
 	 * @see IPathPlanner#GetNextPosition
 	 */
-	Vec2D GetNextPosition(Vec2D source, Vec2D destination, int64_t speed);
+	DoubleVec2D GetNextPosition(DoubleVec2D source, DoubleVec2D destination,
+	                            int64_t speed);
 };
 
 } // namespace state

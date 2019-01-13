@@ -13,8 +13,6 @@ const auto L = TerrainType::LAND;
 const auto W = TerrainType::WATER;
 const auto G = TerrainType::GOLD_MINE;
 
-using Vec2D = physics::Vector<int64_t>;
-
 class StateTest : public Test {
   protected:
 	int64_t map_size = 5;
@@ -73,22 +71,22 @@ class StateTest : public Test {
 
 		this->model_villager =
 		    Villager(1, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		             physics::Vector<int64_t>(10, 10), gold_manager.get(),
+		             DoubleVec2D(10, 10), gold_manager.get(),
 		             path_planner.get(), 10, 10, 10, 10, 10, 10);
 
 		this->model_soldier =
 		    Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
-		            physics::Vector<int64_t>(10, 10), gold_manager.get(),
-		            path_planner.get(), 10, 10, 10);
+		            DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(),
+		            10, 10, 10);
 
 		int64_t villager_frequency = 5;
 		int64_t soldier_frequency = 10;
 
 		this->model_factory =
 		    Factory(2, PlayerId::PLAYER2, ActorType::FACTORY_VILLAGER, 1, 100,
-		            physics::Vector<int64_t>(15, 15), gold_manager.get(), 0,
-		            100, ActorType::VILLAGER, villager_frequency,
-		            soldier_frequency, UnitProductionCallback{});
+		            DoubleVec2D(15, 15), gold_manager.get(), 0, 100,
+		            ActorType::VILLAGER, villager_frequency, soldier_frequency,
+		            UnitProductionCallback{});
 
 		soldiers = {};
 		villagers = {};
@@ -97,18 +95,18 @@ class StateTest : public Test {
 		// Player1 has 2 villagers say..
 		villagers[0].push_back(make_unique<Villager>(
 		    1, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		    physics::Vector<int64_t>(10, 10), gold_manager.get(),
-		    path_planner.get(), 10, 10, 10, 10, 10, 10));
+		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
+		    10, 10, 10, 10));
 		villagers[0].push_back(make_unique<Villager>(
 		    3, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		    physics::Vector<int64_t>(10, 10), gold_manager.get(),
-		    path_planner.get(), 10, 10, 10, 10, 10, 10));
+		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
+		    10, 10, 10, 10));
 
 		// Player2 has 1 soldier, say..
-		soldiers[1].push_back(make_unique<Soldier>(
-		    2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
-		    physics::Vector<int64_t>(10, 10), gold_manager.get(),
-		    path_planner.get(), 10, 10, 10));
+		soldiers[1].push_back(
+		    make_unique<Soldier>(2, PlayerId::PLAYER2, ActorType::SOLDIER, 100,
+		                         100, DoubleVec2D(10, 10), gold_manager.get(),
+		                         path_planner.get(), 10, 10, 10));
 
 		Actor::SetActorIdIncrement(4);
 

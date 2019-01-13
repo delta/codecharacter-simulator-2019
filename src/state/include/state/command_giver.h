@@ -31,8 +31,7 @@ class STATE_EXPORT CommandGiver {
 	/**
 	 * Helper method that validates input and calls BuildFactory
 	 */
-	void CreateFactory(PlayerId player_id, ActorId villager_id,
-	                   physics::Vector<int64_t> offset);
+	void CreateFactory(PlayerId player_id, ActorId villager_id, Vec2D offset);
 
 	/**
 	 * Helper method that validates input and calls BuildFactory
@@ -43,8 +42,7 @@ class STATE_EXPORT CommandGiver {
 	/**
 	 * Helper method that validates input and calls MoveUnit
 	 */
-	void MoveUnit(PlayerId player_id, ActorId actor_id,
-	              physics::Vector<int64_t> position);
+	void MoveUnit(PlayerId player_id, ActorId actor_id, Vec2D position);
 
 	/**
 	 * Helper method that validates input and calls SetFactoryProduction
@@ -62,7 +60,7 @@ class STATE_EXPORT CommandGiver {
 	 * Helper method that validates input and calls MineLocation
 	 */
 	void MineLocation(PlayerId player_id, ActorId villager_id,
-	                  physics::Vector<int64_t> mine_location);
+	                  Vec2D mine_location);
 
   public:
 	CommandGiver();

@@ -36,7 +36,7 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	 * @throw      std::exception  if the operation was not possible
 	 */
 	virtual void MoveUnit(PlayerId player_id, ActorId actor_id,
-	                      physics::Vector<int64_t> position) = 0;
+	                      Vec2D position) = 0;
 
 	/**
 	 * Command villgaer to mine a mine
@@ -46,7 +46,7 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	 * @param mine_location  Vector indicating mine location
 	 */
 	virtual void MineLocation(PlayerId player_id, ActorId villager_id,
-	                          physics::Vector<int64_t> mine_location) = 0;
+	                          Vec2D mine_location) = 0;
 
 	/**
 	 * Handles attack on actor
@@ -70,7 +70,7 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	 * @throw      std::exception  if the operation was not possible
 	 */
 	virtual void CreateFactory(PlayerId player_id, ActorId villager_id,
-	                           physics::Vector<int64_t> offset) = 0;
+	                           Vec2D offset) = 0;
 
 	/**
 	 *

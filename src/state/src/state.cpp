@@ -40,7 +40,7 @@ inline PlayerId GetEnemyPlayerId(PlayerId player_id) {
 }
 
 void State::ProduceUnit(PlayerId player_id, ActorType actor_type,
-                        Vec2D position) {
+                        DoubleVec2D position) {
 	auto player_id_index = static_cast<int>(player_id);
 
 	if (actor_type == ActorType::VILLAGER) {
@@ -66,8 +66,7 @@ void State::ProduceUnit(PlayerId player_id, ActorType actor_type,
 	}
 }
 
-void State::MoveUnit(PlayerId player_id, ActorId actor_id,
-                     physics::Vector<int64_t> position) {
+void State::MoveUnit(PlayerId player_id, ActorId actor_id, Vec2D position) {
 	auto actor = FindActorById(player_id, actor_id);
 	auto actor_as_unit = static_cast<Unit *>(actor);
 
@@ -75,7 +74,7 @@ void State::MoveUnit(PlayerId player_id, ActorId actor_id,
 }
 
 void State::MineLocation(PlayerId player_id, ActorId villager_id,
-                         physics::Vector<int64_t> mine_location) {
+                         Vec2D mine_location) {
 	auto actor = FindActorById(player_id, villager_id);
 	auto actor_as_villager = static_cast<Villager *>(actor);
 
@@ -94,7 +93,7 @@ void State::AttackActor(PlayerId player_id, ActorId unit_id,
 }
 
 void State::CreateFactory(PlayerId p_player_id, ActorId villager_id,
-                          physics::Vector<int64_t> offset) {
+                          Vec2D offset) {
 	auto player_id = static_cast<int64_t>(p_player_id);
 	auto factory = FindFactoryByOffset(p_player_id, offset);
 

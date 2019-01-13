@@ -105,7 +105,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	 * @return std::unique_ptr<Villager>
 	 */
 	std::unique_ptr<Villager> VillagerBuilder(PlayerId p_player_id,
-	                                          Vec2D position);
+	                                          DoubleVec2D position);
 
 	/**
 	 * Create a new soldier at the given position
@@ -115,13 +115,14 @@ class STATE_EXPORT State : public ICommandTaker {
 	 * @return std::unique_ptr<Soldier>
 	 */
 	std::unique_ptr<Soldier> SoldierBuilder(PlayerId p_player_id,
-	                                        Vec2D position);
+	                                        DoubleVec2D position);
 
 	/**
 	 * Function to create a unit. This function is accessible by every factory,
 	 * and is used for producing a new unit.
 	 */
-	void ProduceUnit(PlayerId player_id, ActorType actor_type, Vec2D position);
+	void ProduceUnit(PlayerId player_id, ActorType actor_type,
+	                 DoubleVec2D position);
 
   public:
 	/**
