@@ -200,7 +200,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	/**
 	 * @see ICommandTaker#GetMoney
 	 */
-	const std::array<int64_t, 2> GetMoney() override;
+	const std::array<int64_t, 2> GetGold() override;
 
 	/**
 	 * @see ICommandTaker#GetScores

@@ -26,6 +26,40 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 	 */
 	ICommandTaker *state;
 
+	/**
+	 * Flips an induvidual position to know it's equivalent position that player
+	 * 2 will have
+	 */
+	physics::Vector<int64_t> FlipPosition(const Map *map,
+	                                      physics::Vector<int64_t> position);
+
+	/**
+	 * Assiging the soldiers' attribues to default values
+	 */
+	void AssignVillagerAttributes(
+	    int64_t id, std::vector<player_state::Villager> &player_villagers,
+	    bool is_enemy);
+
+	/**
+	 * Assiging the villagers' attribues to default values
+	 */
+	void
+	AssignSoldierAttributes(int64_t id,
+	                        std::vector<player_state::Soldier> &player_soldiers,
+	                        bool is_enemy);
+
+	/**
+	 * Assiging the factories' attribues to default values
+	 */
+	void AssignFactoryAttributes(
+	    int64_t id, std::vector<player_state::Factory> &player_factories,
+	    bool is_enemy);
+
+	/**
+	 * Returns the same id if is_enemy is false, else returns the opposite id
+	 */
+	int64_t GetPlayerId(int id, bool is_enemy);
+
   public:
 	StateSyncer(ICommandGiver *command_giver, ICommandTaker *state);
 

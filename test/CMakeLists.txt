@@ -11,6 +11,7 @@ set(SOURCE_FILES
 	state/state_test.cpp
 	state/path_planner_test.cpp
 	logger/logger_test.cpp
+	state/state_syncer_test.cpp
 )
 
 add_executable(tests ${SOURCE_FILES})

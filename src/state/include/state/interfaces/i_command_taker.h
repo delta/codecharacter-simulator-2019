@@ -73,7 +73,6 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	                           physics::Vector<int64_t> offset) = 0;
 
 	/**
-	 * Handles existing factory build
 	 *
 	 * @param[in]  player_id     player to act upon
 	 * @param[in]  villager_id   villager to build
@@ -137,7 +136,7 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	 *
 	 * @return money
 	 */
-	virtual const std::array<int64_t, 2> GetMoney() = 0;
+	virtual const std::array<int64_t, 2> GetGold() = 0;
 
 	/**
 	 * Get game scores from state
