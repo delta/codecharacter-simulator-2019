@@ -86,6 +86,10 @@ class PathGraph {
 	 */
 	void InitOpenList(Vec2D start_offset);
 
+	std::vector<Vec2D> SmoothenPath(const std::vector<Vec2D> &path);
+
+	bool Walkable(Vec2D source, Vec2D destination);
+
 	/**
 	 * Matrix of entries, comprising the open list. This info is used to pick
 	 * the next best node in the A* algorithm.
@@ -102,9 +106,14 @@ class PathGraph {
 	 */
 	size_t size;
 
+	/**
+	 * Size of each element
+	 */
+	size_t element_size;
+
   public:
 	PathGraph();
-	PathGraph(Matrix<bool> graph);
+	PathGraph(Matrix<bool> graph, size_t element_size);
 
 	/**
 	 * Get the next offset to move to, given the current offset

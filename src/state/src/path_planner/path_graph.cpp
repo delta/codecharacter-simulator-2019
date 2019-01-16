@@ -11,71 +11,27 @@ namespace state {
 
 PathGraph::PathGraph() {}
 
-PathGraph::PathGraph(Matrix<bool> graph) : graph(graph), size(graph.size()) {
-	open_list = InitMatrix(OpenListEntry{Vec2D::null, 0, 0, Vec2D::null, false,
-	                                     Vec2D::null, Vec2D::null, false},
-	                       size);
-
-	// Init open_list.pos elems with respective positions
-	for (int i = 0; i < size; ++i) {
-		for (int j = 0; j < size; ++j) {
-			open_list[i][j].pos = Vec2D{i, j};
-		}
-	}
+PathGraph::PathGraph(Matrix<bool> graph, size_t element_size)
+    : graph(graph), size(graph.size()), element_size(element_size) {
 
 	// Compute paths for all nodes
 	GeneratePathCache();
 }
 
-void PathGraph::InitOpenList(Vec2D start_offset) {
-	// Unset all entries
-	for (auto &row : open_list) {
-		for (auto &open_list_entry : row) {
-			open_list_entry.is_set = false;
-		}
+template <typename T> inline void printVector(const std::vector<T> &vec) {
+	using std::cout;
+	using std::endl;
+	for (const auto &elem : vec) {
+		cout << elem << endl;
 	}
-
-	// Initialize head element
-	open_list_head = start_offset;
-	GetAt(open_list, open_list_head) =
-	    OpenListEntry{open_list_head, 0,           0,           Vec2D::null,
-	                  false,          Vec2D::null, Vec2D::null, true};
+	cout << endl;
 }
 
-bool PathGraph::GetNextSmallestNodeFromOpenList(Vec2D &offset) {
-	// Get head node
-	auto current_node = GetAt(open_list, open_list_head);
-	auto found_an_unvisited_node = false;
-
-	auto min_offset = Vec2D::null;
-	auto min_cost = INT64_MAX;
-
-	// Traverse the linked list of open list entries to find the smallest cost
-	while (true) {
-		if (current_node && not current_node.is_closed) {
-			found_an_unvisited_node = true;
-			if (current_node.total_cost < min_cost) {
-				min_cost = current_node.total_cost;
-				min_offset = current_node.pos;
-			}
-		}
-
-		// If we've reached the end of the list...
-		if (not current_node || current_node.next == Vec2D::null) {
-			break;
-		}
-
-		// Increment node pointer
-		current_node = GetAt(open_list, current_node.next);
-	}
-
-	// If we found an unvisited node, return it through &offset
-	if (found_an_unvisited_node) {
-		offset = min_offset;
-		return true;
-	}
-
-	return false;
+inline DoubleVec2D GetTileCenter(Vec2D offset, int64_t element_size) {
+	auto position = DoubleVec2D{};
+	position.x = offset.x * element_size + (element_size / 2);
+	position.y = offset.y * element_size + (element_size / 2);
+	return position;
 }
 
 Vec2D PathGraph::GetNextNode(Vec2D source, Vec2D destination) {
@@ -96,109 +52,20 @@ Vec2D PathGraph::GetNextNode(Vec2D source, Vec2D destination) {
 	if (source == destination) {
 		return {};
 	}
+
+	// Build the path
 	auto source_matrix = GetAt(path_cache, destination);
 	auto next_node = GetAt(source_matrix, source);
 
-	return next_node;
-}
-
-std::vector<Vec2D> PathGraph::GetPath(Vec2D start_offset, Vec2D target_offset) {
-	// If source or destination are invalid locations (water)...
-	if (not graph[start_offset.x][start_offset.y] ||
-	    not graph[target_offset.x][target_offset.y]) {
-		return {};
+	auto path = std::vector<Vec2D>{source, next_node};
+	while (next_node != destination) {
+		next_node = GetAt(source_matrix, next_node);
+		path.push_back(next_node);
 	}
 
-	// If the source and destination are the same...
-	if (start_offset == target_offset) {
-		return {};
-	}
+	auto smoothed_path = SmoothenPath(path);
 
-	// Clear the Open List and init the start location
-	InitOpenList(start_offset);
-
-	// InOut param to pass, that will hold the next node to process
-	auto current_offset = Vec2D::null;
-
-	while (GetNextSmallestNodeFromOpenList(current_offset)) {
-		// current_offset always holds the offset of the lowest weight node
-		auto &current_node = GetAt(open_list, current_offset);
-
-		// If target it found, stop and get the full path
-		if (current_offset == target_offset) {
-			auto result = std::vector<Vec2D>{};
-			auto result_node = current_node;
-
-			// Traceback through the nodes' parents to get the complete path
-			while (result_node && result_node.parent != Vec2D::null) {
-				result.push_back(result_node.pos);
-				result_node = GetAt(open_list, result_node.parent);
-			}
-
-			// Note: Path is reversed
-			return result;
-		}
-
-		// For each neighbour of the current node...
-		for (auto &neighbour_pos : GetNeighbours(current_node.pos)) {
-			auto &neighbour = GetAt(open_list, neighbour_pos);
-
-			// If we've already seen this node before, and it has been closed...
-			if (neighbour && neighbour.is_closed) {
-				continue;
-			}
-
-			// Find path cost and and total cost (path cost + heuristic cost)
-			auto path_cost =
-			    current_node.cost + neighbour_pos.distance(current_node.pos);
-			auto total_cost = path_cost + neighbour_pos.distance(target_offset);
-
-			if (not neighbour) {
-				// Set properties of this node
-				neighbour.cost = path_cost;
-				neighbour.total_cost = total_cost;
-				neighbour.parent = current_node.pos;
-				neighbour.is_closed = false;
-				neighbour.is_set = true;
-
-				// Add this node to top of the open list
-				auto &head = GetAt(open_list, open_list_head);
-				head.prev = neighbour.pos;
-				neighbour.next = open_list_head;
-				neighbour.prev = Vec2D::null;
-				open_list_head = neighbour.pos;
-			} else {
-				// If we've already found a lower cost in our open list...
-				if (neighbour.total_cost < total_cost) {
-					continue;
-				} else {
-					// Update this node with the better cost
-					neighbour.cost = path_cost;
-					neighbour.total_cost = total_cost;
-					neighbour.parent = current_node.pos;
-					neighbour.is_closed = false;
-					neighbour.is_set = true;
-				}
-			}
-		}
-
-		// Close the current node and remove it from the open_list
-		if (open_list_head == current_node.pos) {
-			open_list_head = current_node.next;
-		}
-		if (current_node.prev) {
-			GetAt(open_list, current_node.prev).next = current_node.next;
-		}
-		if (current_node.next) {
-			GetAt(open_list, current_node.next).prev = current_node.prev;
-		}
-		current_node.next = Vec2D::null;
-		current_node.prev = Vec2D::null;
-		current_node.is_closed = true;
-	}
-
-	// No valid path exists
-	return std::vector<Vec2D>{};
+	return smoothed_path.at(1);
 }
 
 std::vector<Vec2D> PathGraph::GetNeighbours(Vec2D offset) {
@@ -221,6 +88,73 @@ std::vector<Vec2D> PathGraph::GetNeighbours(Vec2D offset) {
 	}
 
 	return neighbours;
+}
+
+std::vector<Vec2D> PathGraph::SmoothenPath(const std::vector<Vec2D> &path) {
+	if (path.size() == 1 || path.size() == 2) {
+		return path;
+	}
+
+	// The source node is always a concrete part of the path
+	// Take that as the first smoothened node
+	auto smoothed_path = std::vector<Vec2D>{path.at(0)};
+
+	auto current_elem = path.at(0);
+	auto prev_elem = Vec2D::null;
+
+	// For each element (except the dest) in the path after the source...
+	for (int i = 1; i < path.size() - 1; ++i) {
+
+		// Set the previous element and get the new current element
+		prev_elem = current_elem;
+		current_elem = path.at(i);
+
+		// If there's no straight path (i.e. walkable) between the last node in
+		// the smoothed path and the current node, then the previously checked
+		// node is a necessary waypoint in the smoothed path
+		if (not Walkable(smoothed_path.back(), current_elem)) {
+			smoothed_path.push_back(prev_elem);
+		}
+	}
+
+	// The destination will always be part of the smoothed path
+	smoothed_path.push_back(path.back());
+
+	return smoothed_path;
+}
+
+bool PathGraph::Walkable(Vec2D source_int, Vec2D destination_int) {
+	// Take the source and destination as the tile centers
+	auto source = GetTileCenter(source_int, element_size);
+	auto destination = GetTileCenter(destination_int, element_size);
+
+	// Find the direction vector, and the unit direction vector
+	auto direction = destination - source;
+	auto unit_direction = direction / direction.magnitude();
+
+	// Set a sampling size, with which we step along the path to test for water
+	auto sample_size = element_size / 5;
+	auto sample_point = source;
+
+	while (true) {
+		if (sample_point.distance(destination) < sample_size) {
+			// We're at the destination. Everything is clear.
+			break;
+		}
+
+		// Take another step towards the destination
+		sample_point = sample_point + (unit_direction * sample_size);
+
+		// If we are on water, this path is not walkable. Else, continue...
+		auto sample_offset = (sample_point / element_size).to_int();
+		auto is_land = graph[sample_offset.x][sample_offset.y];
+		if (not is_land) {
+			// The path is not clear!
+			return false;
+		}
+	}
+
+	return true;
 }
 
 } // namespace state

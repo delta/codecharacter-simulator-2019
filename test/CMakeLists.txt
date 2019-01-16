@@ -3,15 +3,15 @@ project(tests)
 
 set(SOURCE_FILES
 	test_main.cpp
-	physics/vector_test.cpp
-	state/map_test.cpp
-	state/soldier_test.cpp
-	state/villager_test.cpp
-	state/factory_test.cpp
-	state/state_test.cpp
+	# physics/vector_test.cpp
+	# state/map_test.cpp
+	# state/soldier_test.cpp
+	# state/villager_test.cpp
+	# state/factory_test.cpp
+	# state/state_test.cpp
 	state/path_planner_test.cpp
-	logger/logger_test.cpp
-	state/state_syncer_test.cpp
+	# logger/logger_test.cpp
+	# state/state_syncer_test.cpp
 )
 
 add_executable(tests ${SOURCE_FILES})

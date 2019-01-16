@@ -13,6 +13,7 @@ namespace state {
 
 PathPlanner::PathPlanner(Map *map) : map(map) {
 	auto map_size = map->GetSize();
+	auto element_size = map->GetElementSize();
 
 	// Create a map copy with bools. Land => true, Water => false
 	auto map_graph = Matrix<bool>{};
@@ -32,7 +33,7 @@ PathPlanner::PathPlanner(Map *map) : map(map) {
 		}
 	}
 
-	path_graph = PathGraph(map_graph);
+	path_graph = PathGraph(map_graph, element_size);
 }
 
 DoubleVec2D PathPlanner::GetNextPosition(DoubleVec2D source,
