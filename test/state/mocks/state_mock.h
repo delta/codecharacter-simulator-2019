@@ -30,4 +30,5 @@ class StateMock : public ICommandTaker {
 	MOCK_METHOD3(StopOrStartFactory, void(PlayerId, ActorId, bool));
 	MOCK_METHOD0(Update, void());
 	MOCK_METHOD0(GetGold, const std::array<int64_t, 2>());
+	MOCK_METHOD2(FindActorById, Actor *(PlayerId player_id, ActorId actor_id));
 };

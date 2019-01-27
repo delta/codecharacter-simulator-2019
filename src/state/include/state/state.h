@@ -71,15 +71,6 @@ class STATE_EXPORT State : public ICommandTaker {
 	Factory model_factory;
 
 	/**
-	 * Get pointer to Actor by ActorId
-	 *
-	 * @param player_id PlayerId
-	 * @param actor_id ActorId
-	 * @return Actor*
-	 */
-	Actor *FindActorById(PlayerId player_id, ActorId actor_id);
-
-	/**
 	 * Get pointer to Factory given map offset
 	 *
 	 * @param player_id
@@ -141,6 +132,15 @@ class STATE_EXPORT State : public ICommandTaker {
 	 */
 	void MoveUnit(PlayerId player_id, ActorId actor_id,
 	              Vec2D position) override;
+
+	/**
+	 * Get pointer to Actor by ActorId
+	 *
+	 * @param player_id PlayerId
+	 * @param actor_id ActorId
+	 * @return Actor*
+	 */
+	Actor *FindActorById(PlayerId player_id, ActorId actor_id) override;
 
 	/**
 	 * @see ICommandTaker#MineLocation

@@ -144,5 +144,14 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	 * @return scores
 	 */
 	virtual const std::array<int64_t, 2> GetScores() = 0;
+
+	/**
+	 * Get pointer to Actor by ActorId
+	 *
+	 * @param player_id PlayerId
+	 * @param actor_id ActorId
+	 * @return Actor*
+	 */
+	virtual Actor *FindActorById(PlayerId player_id, ActorId actor_id) = 0;
 };
 } // namespace state

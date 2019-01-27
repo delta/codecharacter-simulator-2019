@@ -35,4 +35,5 @@ class CommandTakerMock : public ICommandTaker {
 	MOCK_METHOD3(StopOrStartFactory,
 	             void(PlayerId player_id, ActorId factory_id,
 	                  bool should_stop));
+	MOCK_METHOD2(FindActorById, Actor *(PlayerId player_id, ActorId actor_id));
 };
