@@ -19,12 +19,12 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 	/**
 	 * Command giver instance that makes calls to update game state
 	 */
-	ICommandGiver *command_giver;
+	std::unique_ptr<ICommandGiver> command_giver;
 
 	/**
 	 * State instance, to give commands to
 	 */
-	ICommandTaker *state;
+	std::unique_ptr<ICommandTaker> state;
 
 	/**
 	 * Flips an induvidual position to know it's equivalent position that player
@@ -60,7 +60,8 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 	int64_t GetPlayerId(int id, bool is_enemy);
 
   public:
-	StateSyncer(ICommandGiver *command_giver, ICommandTaker *state);
+	StateSyncer(std::unique_ptr<ICommandGiver> command_giver,
+	            std::unique_ptr<ICommandTaker> state);
 
 	/**
 	 * @see IStateSyncer#UpdateMainState

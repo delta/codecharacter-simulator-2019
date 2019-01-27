@@ -26,8 +26,7 @@ class STATE_EXPORT ICommandGiver {
 	 * @param[in] player_states Player state from which we get commands to run
 	 */
 	virtual void
-	RunCommands(ICommandTaker *state,
-	            const std::array<player_state::State, 2> &player_states) = 0;
+	RunCommands(const std::array<player_state::State, 2> &player_states) = 0;
 };
 
 } // namespace state

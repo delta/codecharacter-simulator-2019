@@ -77,7 +77,7 @@ void ManageActorExpectations(array<vector<Soldier *>, 2> soldiers,
 	EXPECT_CALL(*command_taker, GetSoldiers).WillOnce(Return(soldiers));
 	EXPECT_CALL(*command_taker, GetVillagers).WillOnce(Return(villagers));
 	EXPECT_CALL(*command_taker, GetFactories).WillOnce(Return(factories));
-	command_giver->RunCommands(command_taker, player_states);
+	command_giver->RunCommands(player_states);
 
 	if (actor_type == ActorType::SOLDIER) {
 		// Resetting the player state soldier
@@ -740,7 +740,6 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->command_taker.get(), this->player_states,
 	                        this->command_giver.get(), ActorType::SOLDIER);
-	std::cerr << "Here\n";
 	// Villagers attack all targets
 	EXPECT_CALL(*this->command_taker, FindActorById)
 	    .WillOnce(Return(state_soldier1[0]))
@@ -778,7 +777,6 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->command_taker.get(), this->player_states,
 	                        this->command_giver.get(), ActorType::VILLAGER);
-	std::cerr << "Here\n";
 
 	// Villagers creating and building factories
 	EXPECT_CALL(*this->command_taker,
