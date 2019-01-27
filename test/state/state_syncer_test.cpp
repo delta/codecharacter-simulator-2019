@@ -33,10 +33,10 @@ class StateSyncerTest : public Test {
 	unique_ptr<StateSyncer> state_syncer;
 
 	// Creating a command giver
-	unique_ptr<CommandGiverMock> command_giver;
+	CommandGiverMock *command_giver;
 
 	// Creating a command taker
-	unique_ptr<CommandTakerMock> command_taker;
+	CommandTakerMock *command_taker;
 
 	// Creating player states
 	array<player_state::State, 2> player_states;
@@ -53,12 +53,15 @@ class StateSyncerTest : public Test {
 		player_states[1] = player_state2;
 
 		// Creating a mock command giver and taker
-		this->command_taker = make_unique<CommandTakerMock>();
-		this->command_giver = make_unique<CommandGiverMock>();
+		auto command_taker = make_unique<CommandTakerMock>();
+		auto command_giver = make_unique<CommandGiverMock>();
+
+		this->command_taker = command_taker.get();
+		this->command_giver = command_giver.get();
 
 		// Creating a state syncer
-		this->state_syncer = make_unique<StateSyncer>(
-		    this->command_giver.get(), this->command_taker.get());
+		this->state_syncer =
+		    make_unique<StateSyncer>(move(command_giver), move(command_taker));
 
 		// Initializing the actor id to 0
 		Actor::SetActorIdIncrement(0);

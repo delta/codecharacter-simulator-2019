@@ -7,14 +7,15 @@
 
 namespace state {
 
-StateSyncer::StateSyncer(ICommandGiver *command_giver, ICommandTaker *state)
-    : command_giver(command_giver), state(state) {}
+StateSyncer::StateSyncer(std::unique_ptr<ICommandGiver> command_giver,
+                         std::unique_ptr<ICommandTaker> state)
+    : command_giver(std::move(command_giver)), state(std::move(state)) {}
 
 void StateSyncer::UpdateMainState(
     const std::array<player_state::State, 2> &player_states) {
 
 	// Call the CommandGiver
-	command_giver->RunCommands(this->state, player_states);
+	command_giver->RunCommands(player_states);
 
 	// Update main state
 	state->Update();

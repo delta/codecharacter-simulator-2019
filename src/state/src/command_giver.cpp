@@ -44,8 +44,7 @@ bool CommandGiver::IsDeadTarget(int64_t player_id, int64_t enemy_actor_id,
 	int64_t enemy_id =
 	    (player_id + 1) % static_cast<int>(PlayerId::PLAYER_COUNT);
 	bool is_dead_target =
-	    (this->state
-	         ->FindActorById(static_cast<PlayerId>(enemy_id), enemy_actor_id)
+	    (state->FindActorById(static_cast<PlayerId>(enemy_id), enemy_actor_id)
 	         ->GetHp() == 0);
 	return is_dead_target;
 }
@@ -128,7 +127,6 @@ void CommandGiver::MineLocation(PlayerId player_id, ActorId villager_id,
 }
 
 void CommandGiver::RunCommands(
-    ICommandTaker *state,
     const std::array<player_state::State, 2> &player_states) {
 
 	// Getting all the soldiers, factory and villagers
@@ -516,6 +514,7 @@ void CommandGiver::RunCommands(
 				                 "Dead factory cannot act");
 				return;
 			}
+
 			// Starting or stopping factory production
 			StopOrStartFactory(Player_id, factory.id, factory.stopped);
 
