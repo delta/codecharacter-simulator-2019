@@ -16,7 +16,7 @@ using namespace state;
 
 class LoggerMock : public ILogger {
   public:
-	MOCK_METHOD1(LogState, void(ICommandTaker *));
+	MOCK_METHOD0(LogState, void());
 	MOCK_METHOD2(LogInstructionCount, void(PlayerId, int64_t));
 	MOCK_METHOD3(LogError, void(PlayerId, ErrorType, string));
 	MOCK_METHOD0(LogFinalGameParams, void());
