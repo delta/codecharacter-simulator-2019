@@ -48,14 +48,24 @@ enum class ErrorType {
 	NO_ACTION_BY_DEAD_VILLAGER,
 
 	/**
-	 * Trying to move a soldier to an invalid position
+	 * Trying to command a dead factory
 	 */
-	INVALID_POSITION,
+	NO_ACTION_BY_DEAD_FACTORY,
 
 	/**
-	 * Trying to attack one's own factory
+	 * Trying to move a soldier / villager to an invalid position
 	 */
-	NO_ATTACK_SELF_FACTORY,
+	INVALID_MOVE_POSITION,
+
+	/**
+	 * Trying to make a villager mine at an invalid location
+	 */
+	INVALID_MINE_POSITION,
+
+	/**
+	 * Trying to make a villager build factory at an invalid location
+	 */
+	INVALID_BUILD_POSITION,
 
 	/**
 	 * Trying to attack one's own soldier
@@ -63,19 +73,29 @@ enum class ErrorType {
 	NO_ATTACK_SELF_SOLDIER,
 
 	/**
-	 * Trying to attack a dead soldier
-	 */
-	NO_ATTACK_DEAD_SOLDIER,
-
-	/**
 	 * Trying to attack one's own villager
 	 */
 	NO_ATTACK_SELF_VILLAGER,
 
 	/**
+	 * Trying to attack one's own factory
+	 */
+	NO_ATTACK_SELF_FACTORY,
+
+	/**
+	 * Trying to attack a dead soldier
+	 */
+	NO_ATTACK_DEAD_SOLDIER,
+
+	/**
 	 * Trying to attack a dead villager
 	 */
 	NO_ATTACK_DEAD_VILLAGER,
+
+	/**
+	 * Trying to attack a dead villager
+	 */
+	NO_BUILD_FACTORY_THAT_DOSENT_EXIST,
 
 	/**
 	 * Trying to build or upgrade with insufficient money
@@ -90,20 +110,55 @@ enum class ErrorType {
 	/**
 	 * Trying to attack factory that will be razed in same turn by opponent
 	 */
-	NO_ATTACK_RAZED_FACTORY
+	NO_ATTACK_RAZED_FACTORY,
+
+	/**
+	 * Trying to build factory on water
+	 */
+	NO_BUILD_FACTORY_ON_WATER,
+
+	/**
+	 * Trying to build factory on gold mine
+	 */
+	NO_BUILD_FACTORY_ON_GOLD_MINE,
+
+	/**
+	 * Invalid value for attack target actor id
+	 */
+	INVALID_TARGET_ID,
+
+	/**
+	 * Trying to build a factory in a position that is already occupied
+	 */
+	POSITION_OCCUPIED
 };
 
 /**
  * Provides an easy way to get the string representation of the above enum
  */
 const std::vector<std::string> ErrorTypeName = {
-    "NO_MULTIPLE_SOLDIER_TASKS", "NO_MULTIPLE_VILLAGER_TASKS",
-    "NO_MULTIPLE_FACTORY_TASKS", "NO_ALTER_ACTOR_ID",
-    "NO_ACTION_BY_DEAD_SOLDIER", "NO_ACTION_BY_DEAD_VILLAGER",
-    "INVALID_POSITION",          "NO_ATTACK_SELF_FACTORY",
-    "NO_ATTACK_SELF_SOLDIER",    "NO_ATTACK_SELF_VILLAGER",
-    "NO_ATTACK_DEAD_VILLAGER",   "NO_ATTACK_DEAD_SOLDIER",
-    "INSUFFICIENT_FUNDS",        "NO_MORE_FACTORIES",
-    "NO_ATTACK_RAZED_FACTORY"};
+    "NO_MULTIPLE_SOLDIER_TASKS",
+    "NO_MULTIPLE_VILLAGER_TASKS",
+    "NO_MULTIPLE_FACTORY_TASKS",
+    "NO_ALTER_ACTOR_ID",
+    "NO_ACTION_BY_DEAD_SOLDIER",
+    "NO_ACTION_BY_DEAD_VILLAGER",
+    "NO_ACTION_BY_DEAD_FACTORY",
+    "INVALID_MOVE_POSITION",
+    "INVALID_MINE_POSITION",
+    "INVALID_BUILD_POSITION",
+    "NO_ATTACK_SELF_SOLDIER",
+    "NO_ATTACK_SELF_VILLAGER",
+    "NO_ATTACK_SELF_FACTORY",
+    "NO_ATTACK_DEAD_SOLDIER",
+    "NO_ATTACK_DEAD_VILLAGER",
+    "NO_BUILD_FACTORY_THAT_DOSENT_EXIST",
+    "INSUFFICIENT_FUNDS",
+    "NO_MORE_FACTORIES",
+    "NO_ATTACK_RAZED_FACTORY",
+    "NO_BUILD_FACTORY_ON_WATER",
+    "NO_BUILD_FACTORY_ON_GOLD_MINE",
+    "INVALID_TARGET_ID",
+    "POSITION_OCCUPIED"};
 
 } // namespace logger

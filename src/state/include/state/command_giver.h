@@ -5,8 +5,11 @@
 
 #pragma once
 
+#include "logger/error_type.h"
+#include "logger/interfaces/i_logger.h"
 #include "state/interfaces/i_command_giver.h"
 #include "state/interfaces/i_command_taker.h"
+#include "state/map/map.h"
 #include "state/state_export.h"
 #include "state/utilities.h"
 
@@ -23,10 +26,21 @@ class STATE_EXPORT CommandGiver {
 	ICommandTaker *state;
 
 	/**
+	 * Instance of logger to log user errors
+	 */
+	logger::ILogger *logger;
+
+	/**
 	 * Helper method that validates input and calls AttackActor
 	 */
 	void AttackActor(PlayerId player_id, ActorId unit_id,
 	                 ActorId enemy_actor_id);
+	/**
+	 * Helper method that validates whether the actor who the unit is attacking
+	 * is an enemy actor or not
+	 */
+	bool IsValidTarget(int64_t player_id, int64_t enemy_actor_id,
+	                   ActorType &target_type, bool &found);
 
 	/**
 	 * Helper method that validates input and calls BuildFactory
@@ -62,10 +76,33 @@ class STATE_EXPORT CommandGiver {
 	void MineLocation(PlayerId player_id, ActorId villager_id,
 	                  Vec2D mine_location);
 
+	/**
+	 * Helper function to check whether the position is valid
+	 */
+	bool IsValidPosition(Vec2D position) const;
+
+	/**
+	 * Helper function to check whether the position is valid
+	 */
+	bool IsValidOffset(Vec2D position) const;
+
+	/**
+	 * Helper function to check whether the target actor to attack is dead
+	 */
+	bool IsDeadTarget(int64_t player_id, int64_t enemy_actor_id,
+	                  ActorType &enemy_type);
+
+	/**
+	 * Helper function to check whether a position already has a factory in it's
+	 * position
+	 */
+	bool IsOccupied(Vec2D offset,
+	                std::array<std::vector<Factory *>, 2> state_factories);
+
   public:
 	CommandGiver();
 
-	CommandGiver(ICommandTaker *state);
+	CommandGiver(ICommandTaker *state, logger::ILogger *logger);
 
 	/**
 	 * @see ICommandGiver#RunCommands

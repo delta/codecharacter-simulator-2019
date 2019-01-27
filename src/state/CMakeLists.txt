@@ -45,7 +45,7 @@ set(EXPORTS_DIR ${CMAKE_BINARY_DIR}/exports)
 set(EXPORTS_FILE_PATH ${EXPORTS_DIR}/state/state_export.h)
 
 add_library(state STATIC ${SOURCE_FILES})
-target_link_libraries(state physics constants)
+target_link_libraries(state physics constants logger)
 
 generate_export_header(state EXPORT_FILE_NAME ${EXPORTS_FILE_PATH})
 
