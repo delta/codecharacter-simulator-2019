@@ -10,8 +10,9 @@ set(SOURCE_FILES
 	state/factory_test.cpp
 	state/state_test.cpp
 	state/path_planner_test.cpp
-	logger/logger_test.cpp
 	state/state_syncer_test.cpp
+	state/command_giver_test.cpp
+	logger/logger_test.cpp
 )
 
 add_executable(tests ${SOURCE_FILES})
