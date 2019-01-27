@@ -289,6 +289,12 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	EXPECT_CALL(*this->command_taker, GetGold)
 	    .WillRepeatedly(Return(this->player_gold));
 
+	// Factory calls will occur every turn, so suppress them here
+	// TODO: Manually filter for factory updates in CommandGiver instead of
+	// unconditionally updating their state at every turn
+	EXPECT_CALL(*this->command_taker, SetFactoryProduction).Times(20);
+	EXPECT_CALL(*this->command_taker, StopOrStartFactory).Times(20);
+
 	// Creating state soldier
 	auto state_soldier1 = CreateStateSoldier(
 	    0, 100, this->gold_manager.get(), this->path_planner.get(),
