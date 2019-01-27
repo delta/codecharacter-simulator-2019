@@ -114,6 +114,8 @@ struct _Actor {
 	int64_t id;
 	Vec2D position;
 	int64_t hp;
+
+	_Actor() : id(0), position(Vec2D{0, 0}), hp(100) {}
 };
 
 struct _Unit : _Actor {
@@ -127,10 +129,14 @@ struct _Unit : _Actor {
 
 	// Attack with actor object
 	void attack(_Actor &p_target) { target = p_target.id; }
+
+	_Unit() : _Actor(), destination(Vec2D::null), target(-1) {}
 };
 
 struct Soldier : _Unit {
 	SoldierState state;
+
+	Soldier() : _Unit() {}
 };
 
 struct Villager : _Unit {
@@ -154,6 +160,11 @@ struct Villager : _Unit {
 
 	// Mine at a particular location
 	void mine(Vec2D p_mine_target) { mine_target = p_mine_target; }
+
+	Villager()
+	    : _Unit(), target_factory_id(-1), mine_target(Vec2D::null),
+	      build_position(Vec2D::null),
+	      build_factory_type(FactoryProduction::VILLAGER) {}
 };
 
 struct Factory : _Actor {
@@ -186,6 +197,10 @@ struct Factory : _Actor {
 
 	// Self destruct
 	void suicide() { _suicide = true; }
+
+	Factory()
+	    : _Actor(), build_percent(0), built(false), stopped(false),
+	      production_state(FactoryProduction::VILLAGER) {}
 };
 
 enum class TerrainType { LAND, WATER, GOLD_MINE };
