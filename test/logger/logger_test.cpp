@@ -187,10 +187,14 @@ TEST_F(LoggerTest, WriteReadTest) {
 	logger->LogInstructionCount(PlayerId::PLAYER2, inst_counts[1]);
 
 	// Log some errors for the first turn
-	logger->LogError(PlayerId::PLAYER1, ErrorType::INVALID_POSITION, "Error 1");
-	logger->LogError(PlayerId::PLAYER1, ErrorType::INVALID_POSITION, "Error 2");
-	logger->LogError(PlayerId::PLAYER2, ErrorType::INVALID_POSITION, "Error 3");
-	logger->LogError(PlayerId::PLAYER2, ErrorType::INVALID_POSITION, "Error 4");
+	logger->LogError(PlayerId::PLAYER1, ErrorType::INVALID_MOVE_POSITION,
+	                 "Error 1");
+	logger->LogError(PlayerId::PLAYER1, ErrorType::INVALID_MOVE_POSITION,
+	                 "Error 2");
+	logger->LogError(PlayerId::PLAYER2, ErrorType::INVALID_MOVE_POSITION,
+	                 "Error 3");
+	logger->LogError(PlayerId::PLAYER2, ErrorType::INVALID_MOVE_POSITION,
+	                 "Error 4");
 
 	// Run 3 turns
 	logger->LogState();
@@ -261,13 +265,13 @@ TEST_F(LoggerTest, WriteReadTest) {
 	// Check if the mapping got set and the message string matches
 	auto error_map = *game->mutable_error_map();
 	ASSERT_EQ(error_map[game->states(0).player_errors(0).errors(0)],
-	          "INVALID_POSITION: Error 1");
+	          "INVALID_MOVE_POSITION: Error 1");
 	ASSERT_EQ(error_map[game->states(0).player_errors(0).errors(1)],
-	          "INVALID_POSITION: Error 2");
+	          "INVALID_MOVE_POSITION: Error 2");
 	ASSERT_EQ(error_map[game->states(0).player_errors(1).errors(0)],
-	          "INVALID_POSITION: Error 3");
+	          "INVALID_MOVE_POSITION: Error 3");
 	ASSERT_EQ(error_map[game->states(0).player_errors(1).errors(1)],
-	          "INVALID_POSITION: Error 4");
+	          "INVALID_MOVE_POSITION: Error 4");
 
 	// Check if both factories are there in the first turn
 	ASSERT_EQ(game->states(0).factories(0).id(), factory->GetActorId());
