@@ -40,14 +40,14 @@ const std::vector<PlayerResult> MainDriver::Start() {
 		this->shared_buffers[cur_player_id]->instruction_counter = 0;
 	}
 
-	// Convert transfer states to players states and store them
-	for (int i = 0; i < 2; ++i) {
-		player_states[i] =
-		    transfer_state::ConvertToPlayerState(*(this->transfer_states[i]));
-	}
-
 	// Initialize player states with contents of main state
 	this->state_syncer->UpdatePlayerStates(player_states);
+
+	// Convert current player states to transfer states
+	for (int i = 0; i < 2; ++i) {
+		*(this->transfer_states[i]) =
+		    transfer_state::ConvertToTransferState(this->player_states[i]);
+	}
 
 	// Start a timer. Game is invalid if it does not complete within the timer
 	// limit
