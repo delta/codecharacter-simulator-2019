@@ -18,7 +18,7 @@ namespace state {
 /**
  * CommandGiver class to call command taker methods
  */
-class STATE_EXPORT CommandGiver {
+class STATE_EXPORT CommandGiver : public ICommandGiver {
   private:
 	/**
 	 * Instance of overall state that player can't modify
