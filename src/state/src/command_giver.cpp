@@ -43,9 +43,12 @@ bool CommandGiver::IsDeadTarget(int64_t player_id, int64_t enemy_actor_id,
                                 ActorType &enemy_type) {
 	int64_t enemy_id =
 	    (player_id + 1) % static_cast<int>(PlayerId::PLAYER_COUNT);
-	bool is_dead_target =
-	    (state->FindActorById(static_cast<PlayerId>(enemy_id), enemy_actor_id)
-	         ->GetHp() == 0);
+	auto actor =
+	    state->FindActorById(static_cast<PlayerId>(enemy_id), enemy_actor_id);
+	bool is_dead_target = (actor->GetHp() == 0);
+	if (is_dead_target) {
+		enemy_type = actor->GetActorType();
+	}
 	return is_dead_target;
 }
 
@@ -191,6 +194,7 @@ void CommandGiver::RunCommands(
 								    "Soldier is attacking his own villager");
 								return;
 							case ActorType::FACTORY_SOLDIER:
+							case ActorType::FACTORY_VILLAGER:
 								logger->LogError(
 								    Player_Id,
 								    logger::ErrorType::NO_ATTACK_SELF_FACTORY,
@@ -204,13 +208,12 @@ void CommandGiver::RunCommands(
 							return;
 						}
 					}
-
 					// If the target is valid, then checking if the enemy has HP
 					// or the target is dead
 					ActorType enemy_type;
 					bool is_dead =
 					    IsDeadTarget(player_id, soldier.target, enemy_type);
-					if (is_dead == true) {
+					if (is_dead) {
 						switch (enemy_type) {
 						case ActorType::SOLDIER:
 							logger->LogError(
@@ -225,6 +228,7 @@ void CommandGiver::RunCommands(
 							    "Soldier is attacking a dead villager");
 							return;
 						case ActorType::FACTORY_SOLDIER:
+						case ActorType::FACTORY_VILLAGER:
 							logger->LogError(
 							    Player_Id,
 							    logger::ErrorType::NO_ATTACK_RAZED_FACTORY,
@@ -420,6 +424,7 @@ void CommandGiver::RunCommands(
 							    "Villager is attacking his own villager");
 							return;
 						case ActorType::FACTORY_SOLDIER:
+						case ActorType::FACTORY_VILLAGER:
 							logger->LogError(
 							    Player_id,
 							    logger::ErrorType::NO_ATTACK_SELF_FACTORY,
@@ -453,6 +458,7 @@ void CommandGiver::RunCommands(
 						    "Villager is attacking a dead villager");
 						return;
 					case ActorType::FACTORY_SOLDIER:
+					case ActorType::FACTORY_VILLAGER:
 						logger->LogError(
 						    Player_id,
 						    logger::ErrorType::NO_ATTACK_RAZED_FACTORY,

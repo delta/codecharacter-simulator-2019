@@ -51,17 +51,18 @@ vector<Factory *> CreateStateFactory(int64_t actor_id, int hp,
                                      GoldManager *gold_manager,
                                      PathPlanner *path_planner,
                                      DoubleVec2D position,
-                                     ActorType production_type) {
+                                     ActorType actor_type) {
 	vector<Factory *> factories;
 	ActorType actor;
-	if (production_type == ActorType::FACTORY_SOLDIER) {
+	if (actor_type == ActorType::FACTORY_SOLDIER) {
 		actor = ActorType::SOLDIER;
 	} else {
 		actor = ActorType::VILLAGER;
 	}
-	auto factory = new Factory(actor_id, PlayerId::PLAYER1, production_type, hp,
-	                           500, position, gold_manager, 100, 100, actor, 5,
-	                           5, UnitProductionCallback{});
+	auto factory = new Factory(actor_id, PlayerId::PLAYER1, actor_type, hp, 500,
+	                           position, gold_manager, 100, 100, actor, 5, 5,
+	                           UnitProductionCallback{});
+	auto type = factory->GetActorType();
 	factories.push_back(factory);
 	return factories;
 }
@@ -279,6 +280,12 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
 	                                    ErrorType::NO_ATTACK_DEAD_SOLDIER, _))
 	    .Times(1);
+	EXPECT_CALL(*this->logger,
+	            LogError(PlayerId::PLAYER1,
+	                     logger::ErrorType::NO_ATTACK_DEAD_VILLAGER, _));
+	EXPECT_CALL(*this->logger,
+	            LogError(PlayerId::PLAYER1,
+	                     logger::ErrorType::NO_ATTACK_RAZED_FACTORY, _));
 	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
 	                                    ErrorType::INVALID_MOVE_POSITION, _))
 	    .Times(1);
@@ -335,7 +342,7 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	auto state_factory1 = CreateStateFactory(
 	    4, 500, this->gold_manager.get(), this->path_planner.get(),
 	    DoubleVec2D(this->ele_size, this->ele_size),
-	    ActorType::FACTORY_SOLDIER);
+	    ActorType::FACTORY_VILLAGER);
 	auto state_factory2 = CreateStateFactory(
 	    5, 100, this->gold_manager.get(), this->path_planner.get(),
 	    DoubleVec2D(this->ele_size, this->ele_size),
@@ -346,10 +353,10 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	// Creating a dead factory
 	auto dead_factory1 = CreateStateFactory(
 	    4, 0, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(1, 1), ActorType::SOLDIER);
-	auto dead_factoty2 = CreateStateFactory(
+	    DoubleVec2D(1, 1), ActorType::FACTORY_SOLDIER);
+	auto dead_factory2 = CreateStateFactory(
 	    5, 0, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(1, 1), ActorType::SOLDIER);
+	    DoubleVec2D(1, 1), ActorType::FACTORY_VILLAGER);
 
 	// Making soldiers attack each other and move at the same time
 	this->player_states[0].soldiers[0].target =
@@ -424,15 +431,32 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	                        this->command_taker.get(), this->player_states,
 	                        this->command_giver.get(), ActorType::SOLDIER);
 
-	// Assigning player 2's soldier as dead
-	state_soldiers[1] = dead_soldier2;
-
 	// Soldier trying to attack a dead soldier
 	EXPECT_CALL(*this->command_taker, FindActorById)
-	    .WillOnce(Return(state_soldiers[1][0]))
-	    .WillOnce(Return(state_soldiers[1][0]));
+	    .WillOnce(Return(dead_soldier2[0]))
+	    .WillOnce(Return(dead_soldier2[0]));
 	this->player_states[0].soldiers[0].target =
 	    this->player_states[0].enemy_soldiers[0].id;
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->command_taker.get(), this->player_states,
+	                        this->command_giver.get(), ActorType::SOLDIER);
+
+	// Soldier trying to attack a dead villager
+	EXPECT_CALL(*this->command_taker, FindActorById)
+	    .WillOnce(Return(dead_villager2[0]))
+	    .WillOnce(Return(dead_villager2[0]));
+	this->player_states[0].soldiers[0].target =
+	    this->player_states[0].enemy_villagers[0].id;
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->command_taker.get(), this->player_states,
+	                        this->command_giver.get(), ActorType::SOLDIER);
+
+	// Soldier trying to attack a dead factory
+	EXPECT_CALL(*this->command_taker, FindActorById)
+	    .WillOnce(Return(dead_factory2[0]))
+	    .WillOnce(Return(dead_factory2[0]));
+	this->player_states[0].soldiers[0].target =
+	    this->player_states[0].enemy_factories[0].id;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->command_taker.get(), this->player_states,
 	                        this->command_giver.get(), ActorType::SOLDIER);
@@ -459,6 +483,15 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	state_soldiers = {state_soldier1, state_soldier2};
 
 	// Villager errors
+	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
+	                                    ErrorType::NO_ATTACK_DEAD_SOLDIER, _))
+	    .Times(1);
+	EXPECT_CALL(*this->logger,
+	            LogError(PlayerId::PLAYER1,
+	                     logger::ErrorType::NO_ATTACK_DEAD_VILLAGER, _));
+	EXPECT_CALL(*this->logger,
+	            LogError(PlayerId::PLAYER1,
+	                     logger::ErrorType::NO_ATTACK_RAZED_FACTORY, _));
 	EXPECT_CALL(*this->logger,
 	            LogError(PlayerId::PLAYER1, ErrorType::NO_ALTER_ACTOR_ID, _))
 	    .Times(3);
@@ -482,6 +515,36 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	            LogError(PlayerId::PLAYER1,
 	                     logger::ErrorType::NO_BUILD_FACTORY_THAT_DOSENT_EXIST,
 	                     _));
+
+	// Villager trying to attack dead soldier
+	EXPECT_CALL(*this->command_taker, FindActorById)
+	    .WillOnce(Return(dead_soldier2[0]))
+	    .WillOnce(Return(dead_soldier2[0]));
+	this->player_states[0].villagers[0].target =
+	    this->player_states[0].enemy_soldiers[0].id;
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->command_taker.get(), this->player_states,
+	                        this->command_giver.get(), ActorType::SOLDIER);
+
+	// Villager trying to attack dead villager
+	EXPECT_CALL(*this->command_taker, FindActorById)
+	    .WillOnce(Return(dead_villager2[0]))
+	    .WillOnce(Return(dead_villager2[0]));
+	this->player_states[0].villagers[0].target =
+	    this->player_states[0].enemy_villagers[0].id;
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->command_taker.get(), this->player_states,
+	                        this->command_giver.get(), ActorType::SOLDIER);
+
+	// Villager trying to attack dead factory
+	EXPECT_CALL(*this->command_taker, FindActorById)
+	    .WillOnce(Return(dead_factory2[0]))
+	    .WillOnce(Return(dead_factory2[0]));
+	this->player_states[0].soldiers[0].target =
+	    this->player_states[0].enemy_factories[0].id;
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->command_taker.get(), this->player_states,
+	                        this->command_giver.get(), ActorType::SOLDIER);
 
 	// Villager changing it's id and attacks soldiers
 	this->player_states[0].villagers[0].id =
