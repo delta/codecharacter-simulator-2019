@@ -99,12 +99,12 @@ TEST_F(LoggerTest, WriteReadTest) {
 
 	// Creating one factory for each player
 	auto *factory = new Factory(Actor::GetNextActorId(), PlayerId::PLAYER1,
-	                            ActorType::FACTORY_VILLAGER, 1, FACTORY_MAX_HP,
+	                            ActorType::FACTORY, 1, FACTORY_MAX_HP,
 	                            DoubleVec2D(1, 1), gold_manager.get(), 0, 100,
 	                            ActorType::VILLAGER, villager_frequency,
 	                            soldier_frequency, UnitProductionCallback());
 	auto *factory2 = new Factory(Actor::GetNextActorId(), PlayerId::PLAYER2,
-	                             ActorType::FACTORY_VILLAGER, 1, FACTORY_MAX_HP,
+	                             ActorType::FACTORY, 1, FACTORY_MAX_HP,
 	                             DoubleVec2D(3, 3), gold_manager.get(), 0, 100,
 	                             ActorType::VILLAGER, villager_frequency,
 	                             soldier_frequency, UnitProductionCallback());
@@ -119,12 +119,12 @@ TEST_F(LoggerTest, WriteReadTest) {
 
 	// Two new factories for Player1
 	auto *factory3 = new Factory(Actor::GetNextActorId(), PlayerId::PLAYER1,
-	                             ActorType::FACTORY_VILLAGER, 1, FACTORY_MAX_HP,
+	                             ActorType::FACTORY, 1, FACTORY_MAX_HP,
 	                             DoubleVec2D(1, 2), gold_manager.get(), 0, 100,
 	                             ActorType::VILLAGER, villager_frequency,
 	                             soldier_frequency, UnitProductionCallback());
 	auto *factory4 = new Factory(Actor::GetNextActorId(), PlayerId::PLAYER1,
-	                             ActorType::FACTORY_VILLAGER, 1, FACTORY_MAX_HP,
+	                             ActorType::FACTORY, 1, FACTORY_MAX_HP,
 	                             DoubleVec2D(3, 4), gold_manager.get(), 0, 100,
 	                             ActorType::VILLAGER, villager_frequency,
 	                             soldier_frequency, UnitProductionCallback());
@@ -149,7 +149,7 @@ TEST_F(LoggerTest, WriteReadTest) {
 	// SIMULTANEOUS FACTORY BUILD AND DESTROY CASE
 	// Make another copy, destroy both player1 factories and add a new factory
 	auto *factory5 = new Factory(Actor::GetNextActorId(), PlayerId::PLAYER1,
-	                             ActorType::FACTORY_VILLAGER, 1, FACTORY_MAX_HP,
+	                             ActorType::FACTORY, 1, FACTORY_MAX_HP,
 	                             DoubleVec2D(1, 4), gold_manager.get(), 0, 100,
 	                             ActorType::VILLAGER, villager_frequency,
 	                             soldier_frequency, UnitProductionCallback());

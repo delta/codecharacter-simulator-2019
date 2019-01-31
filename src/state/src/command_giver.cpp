@@ -193,8 +193,8 @@ void CommandGiver::RunCommands(
 								    logger::ErrorType::NO_ATTACK_SELF_VILLAGER,
 								    "Soldier is attacking his own villager");
 								return;
-							case ActorType::FACTORY_SOLDIER:
-							case ActorType::FACTORY_VILLAGER:
+							case ActorType::FACTORY:
+
 								logger->LogError(
 								    Player_Id,
 								    logger::ErrorType::NO_ATTACK_SELF_FACTORY,
@@ -227,8 +227,7 @@ void CommandGiver::RunCommands(
 							    logger::ErrorType::NO_ATTACK_DEAD_VILLAGER,
 							    "Soldier is attacking a dead villager");
 							return;
-						case ActorType::FACTORY_SOLDIER:
-						case ActorType::FACTORY_VILLAGER:
+						case ActorType::FACTORY:
 							logger->LogError(
 							    Player_Id,
 							    logger::ErrorType::NO_ATTACK_RAZED_FACTORY,
@@ -423,8 +422,7 @@ void CommandGiver::RunCommands(
 							    logger::ErrorType::NO_ATTACK_SELF_VILLAGER,
 							    "Villager is attacking his own villager");
 							return;
-						case ActorType::FACTORY_SOLDIER:
-						case ActorType::FACTORY_VILLAGER:
+						case ActorType::FACTORY:
 							logger->LogError(
 							    Player_id,
 							    logger::ErrorType::NO_ATTACK_SELF_FACTORY,
@@ -457,8 +455,7 @@ void CommandGiver::RunCommands(
 						    logger::ErrorType::NO_ATTACK_DEAD_VILLAGER,
 						    "Villager is attacking a dead villager");
 						return;
-					case ActorType::FACTORY_SOLDIER:
-					case ActorType::FACTORY_VILLAGER:
+					case ActorType::FACTORY:
 						logger->LogError(
 						    Player_id,
 						    logger::ErrorType::NO_ATTACK_RAZED_FACTORY,

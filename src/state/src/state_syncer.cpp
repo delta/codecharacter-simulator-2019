@@ -320,7 +320,7 @@ void StateSyncer::AssignFactoryAttributes(
 			// Finding whether the factory produces
 			auto production_state =
 			    state_factories[id][i]->GetProductionState();
-			if (production_state == ActorType::FACTORY_SOLDIER) {
+			if (production_state == ActorType::SOLDIER) {
 				new_factory.state =
 				    player_state::FactoryState::SOLDIER_PRODUCTION;
 				new_factory.production_state =

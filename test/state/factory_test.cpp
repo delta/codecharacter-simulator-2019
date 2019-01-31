@@ -90,7 +90,7 @@ class FactoryTest : public Test {
 
 		// We always initialize a factory with 1 HP
 		this->factory = std::make_unique<Factory>(
-		    2, PlayerId::PLAYER2, ActorType::FACTORY_VILLAGER, 1, 100,
+		    2, PlayerId::PLAYER2, ActorType::FACTORY, 1, 100,
 		    DoubleVec2D(15, 15), gold_manager.get(), 0, 100,
 		    ActorType::VILLAGER, villager_frequency, soldier_frequency,
 		    unit_production_callback);
