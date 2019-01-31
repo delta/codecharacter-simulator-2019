@@ -54,14 +54,9 @@ vector<Factory *> CreateStateFactory(int64_t actor_id, int hp,
                                      ActorType actor_type) {
 	vector<Factory *> factories;
 	ActorType actor;
-	if (actor_type == ActorType::FACTORY_SOLDIER) {
-		actor = ActorType::SOLDIER;
-	} else {
-		actor = ActorType::VILLAGER;
-	}
-	auto factory = new Factory(actor_id, PlayerId::PLAYER1, actor_type, hp, 500,
-	                           position, gold_manager, 100, 100, actor, 5, 5,
-	                           UnitProductionCallback{});
+	auto factory = new Factory(actor_id, PlayerId::PLAYER1, ActorType::FACTORY,
+	                           hp, 500, position, gold_manager, 100, 100,
+	                           actor_type, 5, 5, UnitProductionCallback{});
 	auto type = factory->GetActorType();
 	factories.push_back(factory);
 	return factories;
@@ -341,22 +336,20 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	// Creating state factories
 	auto state_factory1 = CreateStateFactory(
 	    4, 500, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(this->ele_size, this->ele_size),
-	    ActorType::FACTORY_VILLAGER);
+	    DoubleVec2D(this->ele_size, this->ele_size), ActorType::VILLAGER);
 	auto state_factory2 = CreateStateFactory(
 	    5, 100, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(this->ele_size, this->ele_size),
-	    ActorType::FACTORY_SOLDIER);
+	    DoubleVec2D(this->ele_size, this->ele_size), ActorType::SOLDIER);
 	array<vector<Factory *>, 2> state_factories = {state_factory1,
 	                                               state_factory2};
 
 	// Creating a dead factory
 	auto dead_factory1 = CreateStateFactory(
 	    4, 0, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(1, 1), ActorType::FACTORY_SOLDIER);
+	    DoubleVec2D(1, 1), ActorType::SOLDIER);
 	auto dead_factory2 = CreateStateFactory(
 	    5, 0, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(1, 1), ActorType::FACTORY_VILLAGER);
+	    DoubleVec2D(1, 1), ActorType::VILLAGER);
 
 	// Making soldiers attack each other and move at the same time
 	this->player_states[0].soldiers[0].target =
@@ -742,23 +735,20 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	this->player_states[0].factories[0].id += 1;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(),
-	                        ActorType::FACTORY_SOLDIER);
+	                        this->command_giver.get(), ActorType::FACTORY);
 
 	// Making a dead factory try and produce soldiers
 	state_factories[0] = dead_factory1;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(),
-	                        ActorType::FACTORY_SOLDIER);
+	                        this->command_giver.get(), ActorType::FACTORY);
 
 	// Creating 50 soldiers to trigger maximum limit on number of soldiers
 	vector<Factory *> state_max_factories;
 	for (int i = 0; i < MAX_NUM_FACTORIES; ++i) {
 		auto new_factory = CreateStateFactory(
 		    4, 500, this->gold_manager.get(), this->path_planner.get(),
-		    DoubleVec2D(this->ele_size, this->ele_size),
-		    ActorType::FACTORY_SOLDIER);
+		    DoubleVec2D(this->ele_size, this->ele_size), ActorType::FACTORY);
 		state_max_factories.push_back(new_factory[0]);
 	}
 	state_factories[0] = state_max_factories;

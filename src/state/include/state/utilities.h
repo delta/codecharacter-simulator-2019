@@ -17,7 +17,7 @@ typedef int64_t ActorId;
 /**
  * Enum for the different actor unit types
  */
-enum class ActorType { SOLDIER, VILLAGER, FACTORY_SOLDIER, FACTORY_VILLAGER };
+enum class ActorType { SOLDIER, VILLAGER, FACTORY };
 
 /**
  * Enum for the different types of terrain on the map

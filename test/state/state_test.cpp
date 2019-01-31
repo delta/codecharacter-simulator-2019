@@ -83,7 +83,7 @@ class StateTest : public Test {
 		int64_t soldier_frequency = 10;
 
 		this->model_factory =
-		    Factory(2, PlayerId::PLAYER2, ActorType::FACTORY_VILLAGER, 1, 100,
+		    Factory(2, PlayerId::PLAYER2, ActorType::FACTORY, 1, 100,
 		            DoubleVec2D(15, 15), gold_manager.get(), 0, 100,
 		            ActorType::VILLAGER, villager_frequency, soldier_frequency,
 		            UnitProductionCallback{});

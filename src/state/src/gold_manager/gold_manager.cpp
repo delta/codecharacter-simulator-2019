@@ -84,8 +84,7 @@ void GoldManager::RewardKill(Actor *enemy_actor) {
 }
 
 int64_t GoldManager::GetCreateUnitCost(ActorType unit_type) {
-	if (unit_type == ActorType::FACTORY_SOLDIER ||
-	    unit_type == ActorType::FACTORY_VILLAGER) {
+	if (unit_type == ActorType::FACTORY) {
 		return factory_cost;
 	} else if (unit_type == ActorType::VILLAGER) {
 		return villager_cost;
