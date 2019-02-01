@@ -22,7 +22,7 @@ class STATE_EXPORT SoldierAttackState : public SoldierState {
 	 *
 	 * Clear destination
 	 */
-	void Enter();
+	void Enter() override;
 
 	/**
 	 * Performs state transitions
@@ -40,6 +40,6 @@ class STATE_EXPORT SoldierAttackState : public SoldierState {
 	/**
 	 * Called before the Soldier switches to another state
 	 */
-	void Exit();
+	void Exit() override;
 };
 } // namespace state

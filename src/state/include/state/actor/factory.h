@@ -29,11 +29,6 @@ using UnitProductionCallback =
 class STATE_EXPORT Factory : public Actor {
   protected:
 	/**
-	 * Controls logic for factory's current state
-	 */
-	std::unique_ptr<FactoryState> state;
-
-	/**
 	 * Number of points of effort spent on contruction so far
 	 */
 	int64_t construction_complete;
@@ -54,12 +49,6 @@ class STATE_EXPORT Factory : public Actor {
 	bool stopped;
 
 	/**
-	 * Amount of damage the factory incurred in the current turn
-	 * Applied to hp at the end of the turn
-	 */
-	int64_t damage_incurred;
-
-	/**
 	 * Number of turns after which a villager is produced
 	 */
 	int64_t villager_frequency;
@@ -70,10 +59,21 @@ class STATE_EXPORT Factory : public Actor {
 	int64_t soldier_frequency;
 
 	/**
+	 * Controls logic for factory's current state
+	 */
+	std::unique_ptr<FactoryState> state;
+
+	/**
 	 * Callback to call to create a new unit in this factory. Will be passed in
 	 * through the state.
 	 */
 	UnitProductionCallback unit_production_callback;
+
+	/**
+	 * Amount of damage the factory incurred in the current turn
+	 * Applied to hp at the end of the turn
+	 */
+	int64_t damage_incurred;
 
   public:
 	Factory();
@@ -199,7 +199,7 @@ class STATE_EXPORT Factory : public Actor {
 	/**
 	 * Update function of the Factory
 	 */
-	void Update();
+	void Update() override;
 };
 
 } // namespace state

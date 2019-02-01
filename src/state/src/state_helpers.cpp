@@ -24,8 +24,6 @@ inline Vec2D GetTilePositionFromOffset(Vec2D offset, int64_t element_size) {
 
 std::unique_ptr<Factory> State::FactoryBuilder(PlayerId p_player_id,
                                                Vec2D offset) {
-	auto player_id = static_cast<int64_t>(p_player_id);
-
 	// Convert the given offset into a position centered at that offset
 	auto position =
 	    GetTilePositionFromOffset(offset, map->GetElementSize()).to_double();

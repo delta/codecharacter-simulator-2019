@@ -33,10 +33,10 @@ class VillagerTest : public Test {
 
   public:
 	std::unique_ptr<Villager> MakeTestVillager() {
-		return std::move(std::make_unique<Villager>(
+		return std::make_unique<Villager>(
 		    2, PlayerId::PLAYER2, ActorType::VILLAGER, 100, 100,
 		    DoubleVec2D(15, 15), gold_manager.get(), path_planner.get(), 10, 10,
-		    10, 10, 10, 10));
+		    10, 10, 10, 10);
 	}
 
 	VillagerTest() {
@@ -125,9 +125,6 @@ TEST_F(VillagerTest, DecreaseHpOnAttack) {
 }
 
 TEST_F(VillagerTest, TransitionToDeadState) {
-	int64_t initial_hp = 100;
-	int64_t attack_damage = 10;
-
 	auto target_villager = MakeTestVillager();
 
 	this->villager->Attack(target_villager.get());

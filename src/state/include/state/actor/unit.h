@@ -35,6 +35,11 @@ class STATE_EXPORT Unit : public Actor {
 	int64_t attack_damage;
 
 	/**
+	 * Path Planner instance to perform transactions
+	 */
+	PathPlanner *path_planner;
+
+	/**
 	 * Actor that this soldier targets to attack
 	 * nullptr if unset
 	 */
@@ -69,11 +74,6 @@ class STATE_EXPORT Unit : public Actor {
 	 * Applied to hp at the end of the turn
 	 */
 	int64_t damage_incurred;
-
-	/**
-	 * Path Planner instance to perform transactions
-	 */
-	PathPlanner *path_planner;
 
   public:
 	Unit();
@@ -239,6 +239,6 @@ class STATE_EXPORT Unit : public Actor {
 	/**
 	 * Late Update function of the soldier
 	 */
-	virtual void Update() = 0;
+	virtual void Update() override = 0;
 };
 } // namespace state

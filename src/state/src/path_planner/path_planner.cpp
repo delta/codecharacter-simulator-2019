@@ -38,7 +38,6 @@ PathPlanner::PathPlanner(Map *map) : map(map) {
 DoubleVec2D PathPlanner::GetNextPosition(DoubleVec2D source,
                                          DoubleVec2D destination,
                                          int64_t speed) {
-	auto map_size = map->GetSize();
 	auto element_size = map->GetElementSize();
 
 	// Final position to move to, end result

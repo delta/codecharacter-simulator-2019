@@ -35,16 +35,6 @@ class STATE_EXPORT GoldManager {
 	int64_t max_gold;
 
 	/**
-	 * Reward amount for a successful factory kill
-	 */
-	int64_t factory_kill_reward_amount;
-
-	/**
-	 * Penalty amount for a suicide of a factory
-	 */
-	int64_t factory_suicide_penalty_amount;
-
-	/**
 	 * Reward amount for a successful soldier kill
 	 */
 	int64_t soldier_kill_reward_amount;
@@ -53,6 +43,16 @@ class STATE_EXPORT GoldManager {
 	 * Reward amount for a successful soldier kill
 	 */
 	int64_t villager_kill_reward_amount;
+
+	/**
+	 * Reward amount for a successful factory kill
+	 */
+	int64_t factory_kill_reward_amount;
+
+	/**
+	 * Penalty amount for a suicide of a factory
+	 */
+	int64_t factory_suicide_penalty_amount;
 
 	/**
 	 * Amount of gold to create a villager

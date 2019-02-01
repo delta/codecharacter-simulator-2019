@@ -210,7 +210,7 @@ std::vector<Vec2D> PathGraph::GetNeighbours(Vec2D offset) {
 
 	// For each of the 4 positions around the current offset...
 	for (const auto &rel_offset : rel_offsets) {
-		auto current_offset = offset + rel_offset;
+		current_offset = offset + rel_offset;
 
 		// If the location is within bounds and a valid location...
 		if (current_offset.x >= 0 && current_offset.x < size &&
