@@ -63,6 +63,8 @@ std::unique_ptr<IActorState> VillagerPursuitState::Update() {
 	auto next_position =
 	    path_planner->GetNextPosition(current_position, destination, speed);
 
+	villager->SetNewPosition(next_position);
+
 	return nullptr;
 }
 
