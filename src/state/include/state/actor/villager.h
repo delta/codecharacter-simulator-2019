@@ -23,21 +23,21 @@ class STATE_EXPORT Villager : public Unit {
 	 */
 	std::unique_ptr<VillagerState> state;
 
-	/*
-	 * Factory which the villager needs to build
-	 * nullptr if unset
+	/**
+	 * Distance in units around the villager where factories can be built
 	 */
-	Factory *build_target;
+	int64_t build_range;
 
 	/**
 	 * Amount of effort by the villager on the factory in single turn
 	 */
 	int64_t build_effort;
 
-	/**
-	 * Distance in units around the villager where factories can be built
+	/*
+	 * Factory which the villager needs to build
+	 * nullptr if unset
 	 */
-	int64_t build_range;
+	Factory *build_target;
 
 	/**
 	 * Location of mine to mine gold at

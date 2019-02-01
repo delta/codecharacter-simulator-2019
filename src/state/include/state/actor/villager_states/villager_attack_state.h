@@ -22,7 +22,7 @@ class STATE_EXPORT VillagerAttackState : public VillagerState {
 	 *
 	 * Clear destination
 	 */
-	void Enter();
+	void Enter() override;
 
 	/**
 	 * Performs state transitions
@@ -42,6 +42,6 @@ class STATE_EXPORT VillagerAttackState : public VillagerState {
 	/**
 	 * Called before the villager switches to another state
 	 */
-	void Exit();
+	void Exit() override;
 };
 } // namespace state

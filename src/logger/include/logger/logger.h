@@ -42,6 +42,11 @@ struct FactoryLogEntry {
 class LOGGER_EXPORT Logger : public ILogger {
   private:
 	/**
+	 * State instance to get game information
+	 */
+	state::ICommandTaker *state;
+
+	/**
 	 * Number of turns since the start of the game
 	 */
 	int64_t turn_count;
@@ -61,21 +66,6 @@ class LOGGER_EXPORT Logger : public ILogger {
 	 * with the remaininig state data, every turn
 	 */
 	std::vector<int64_t> instruction_counts;
-
-	/**
-	 * Holds maximum Hp of soldier
-	 */
-	int64_t soldier_max_hp;
-
-	/**
-	 * Holds maximum Hp of villager
-	 */
-	int64_t villager_max_hp;
-
-	/**
-	 * Holds maximum Hp of factory
-	 */
-	int64_t factory_max_hp;
 
 	/**
 	 * Map holding mapping of error strings to error codes
@@ -103,9 +93,19 @@ class LOGGER_EXPORT Logger : public ILogger {
 	int64_t player_instruction_limit_game;
 
 	/**
-	 * State instance to get game information
+	 * Holds maximum Hp of soldier
 	 */
-	state::ICommandTaker *state;
+	int64_t soldier_max_hp;
+
+	/**
+	 * Holds maximum Hp of villager
+	 */
+	int64_t villager_max_hp;
+
+	/**
+	 * Holds maximum Hp of factory
+	 */
+	int64_t factory_max_hp;
 
   public:
 	/**

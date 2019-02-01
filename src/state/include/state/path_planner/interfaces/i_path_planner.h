@@ -11,6 +11,8 @@ namespace state {
 
 class IPathPlanner {
   public:
+	virtual ~IPathPlanner() {}
+
 	/**
 	 * Get the Next Position to move to, given the current position, the
 	 * destination, and movement speed

@@ -162,6 +162,8 @@ void StateSyncer::AssignSoldierAttributes(
 		case SoldierStateName::ATTACK:
 			new_soldier.state = player_state::SoldierState::ATTACK;
 			break;
+		case SoldierStateName::DEAD:
+			break;
 		}
 
 		// If is_enemy is true, then player_id is the opposite of the id
@@ -234,6 +236,11 @@ void StateSyncer::AssignVillagerAttributes(
 		case VillagerStateName::BUILD:
 			new_villager.state = player_state::VillagerState::BUILD;
 			break;
+		case VillagerStateName::MINE:
+			new_villager.state = player_state::VillagerState::MINE;
+			break;
+		case VillagerStateName::DEAD:
+			break;
 		}
 
 		// For player1, positions are correct
@@ -301,6 +308,8 @@ void StateSyncer::AssignFactoryAttributes(
 
 		// Reassinging the factory state
 		switch (factory_state) {
+		case FactoryStateName::DEAD:
+			break;
 		case FactoryStateName::UNBUILT:
 			new_factory.state = player_state::FactoryState::UNBUILT;
 			break;

@@ -157,7 +157,6 @@ TEST_F(SoldierTest, SoldierKillReward) {
 TEST_F(SoldierTest, PursuitAndKill) {
 	int64_t initial_hp = 100;
 	int64_t attack_damage = 10;
-	int64_t initial_gold = player_gold[0];
 
 	auto *target_soldier =
 	    new Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, initial_hp, 100,
