@@ -11,7 +11,6 @@ using namespace state;
 using namespace logger;
 
 const auto TEST_MAP_SIZE = size_t{5};
-const auto ELEMENT_SIZE = size_t{10};
 
 const auto L = TerrainType::LAND;
 const auto W = TerrainType::WATER;

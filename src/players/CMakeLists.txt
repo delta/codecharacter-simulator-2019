@@ -12,7 +12,7 @@ if((NOT BUILD_PROJECT STREQUAL "all") AND (NOT BUILD_PROJECT STREQUAL "no_tests"
 	include(${CMAKE_INSTALL_PREFIX}/lib/constants_config.cmake)
 	include(${CMAKE_INSTALL_PREFIX}/lib/player_wrapper_config.cmake)
 	include(${CMAKE_INSTALL_PREFIX}/lib/state_config.cmake)
-	#include(${CMAKE_INSTALL_PREFIX}/lib/logger_config.cmake)
+	include(${CMAKE_INSTALL_PREFIX}/lib/logger_config.cmake)
 	include(${CMAKE_INSTALL_PREFIX}/lib/drivers_config.cmake)
 endif()
 

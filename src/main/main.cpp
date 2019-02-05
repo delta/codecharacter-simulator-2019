@@ -1,27 +1,42 @@
 #include "constants/constants.h"
+#include "drivers/main_driver.h"
+#include "drivers/shared_memory_utils/shared_memory_main.h"
+#include "drivers/timer.h"
+#include "game/game.h"
+#include "logger/logger.h"
+#include "physics/vector.hpp"
+#include "state/actor/actor.h"
+#include "state/actor/factory.h"
+#include "state/actor/soldier.h"
+#include "state/actor/villager.h"
+#include "state/command_giver.h"
 #include "state/map/map.h"
+#include "state/path_planner/path_planner.h"
+#include "state/player_state.h"
+#include "state/state.h"
+#include "state/state_syncer.h"
 #include "state/utilities.h"
+
+#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <random>
 
 using namespace std;
+using namespace drivers;
 using namespace state;
+using namespace logger;
+using namespace physics;
 
-/*
- * The example file should be of the format -
- * L L L L L
- * L W W W L
- * L L G L L
- * L L L L L
- * L L L L L
- * File and each line ends with a '\n'. TerrainType separated by ' '.
- */
-const auto MAP_FILE_NAME = "example.txt";
+// The map file contains the terrain layout for initializing the game map
+const auto MAP_FILE_NAME = "map.txt";
 
-const auto L = TerrainType::LAND;
-const auto W = TerrainType::WATER;
-const auto G = TerrainType::GOLD_MINE;
+// The security key file contains a single string, which is prefixed to the
+// output scores so that the player cannot directly print a score
+const auto KEY_FILE_NAME = "key.txt";
+
+auto shm_names = vector<string>(2);
 
 unique_ptr<Map> BuildMap() {
 	auto map_elements = vector<vector<TerrainType>>{};
@@ -40,13 +55,13 @@ unique_ptr<Map> BuildMap() {
 	for (auto character : map_file_input) {
 		switch (character) {
 		case 'L':
-			map_row.push_back(L);
+			map_row.push_back(TerrainType::LAND);
 			break;
 		case 'W':
-			map_row.push_back(W);
+			map_row.push_back(TerrainType::WATER);
 			break;
 		case 'G':
-			map_row.push_back(G);
+			map_row.push_back(TerrainType::GOLD_MINE);
 			break;
 		case ' ':
 			break;
