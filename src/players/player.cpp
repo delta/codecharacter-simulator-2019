@@ -4,9 +4,12 @@
 #include "drivers/timer.h"
 #include "player_code/player_code.h"
 #include "player_wrapper/player_code_wrapper.h"
+
+#include <cstdio>
 #include <cstdlib>
-#include <iostream>
+#include <fstream>
 #include <memory>
+#include <string>
 
 using namespace drivers;
 using namespace player_wrapper;
@@ -33,12 +36,35 @@ BuildPlayerDriver(std::string shm_name, std::string player_debug_log_file) {
 	    max_debug_logs_turn_length);
 }
 
+std::string GetKeyFromFile(std::string file_name) {
+	std::ifstream key_file(file_name, std::ifstream::in);
+	std::string read_buffer;
+	getline(key_file, read_buffer);
+	return read_buffer;
+}
+
+bool FileExists(const std::string &name) {
+	std::ifstream f(name.c_str());
+	return f.good();
+}
+
 int main(int argc, char *argv[]) {
-	if (argc < 2) {
-		std::cerr << argv[0] << " Requires SHM player name as arg";
-		exit(EXIT_FAILURE);
+	// Get the player number. The process will be named './player_1' or
+	// './player_2'
+	auto process_name = std::string{argv[0]};
+	auto player_number = process_name[process_name.size() - 1] - '0';
+
+	// Read the SHM file to get the SHM name
+	auto shm_file_name = SHM_FILE_NAMES[player_number - 1];
+	if (not FileExists(shm_file_name)) {
+		std::cerr << "Could not find SHM file. Aborting...\n";
+		return EXIT_FAILURE;
 	}
-	std::string shm_name(argv[1]);
+
+	std::string shm_name(GetKeyFromFile(shm_file_name));
+
+	// We've read the SHM file name, remove the file
+	auto remote_result = std::remove(shm_file_name.c_str());
 
 	std::cout << "Running " << argv[0] << " ..." << std::endl;
 	auto driver = BuildPlayerDriver(shm_name, std::string(argv[0]) +
