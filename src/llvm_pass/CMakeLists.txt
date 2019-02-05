@@ -7,10 +7,10 @@ set(SOURCE_FILES
 
 find_package(LLVM REQUIRED CONFIG)
 
-if (${LLVM_PACKAGE_VERSION} VERSION_EQUAL "7.0.0")
+if (${LLVM_PACKAGE_VERSION} VERSION_EQUAL "4.0.0")
 	message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 else()
-	message(FATAL_ERROR "Need LLVM version 7.0.0" )
+	message(FATAL_ERROR "Need LLVM version 4.0.0" )
 endif()
 
 add_definitions(${LLVM_DEFINITIONS})
