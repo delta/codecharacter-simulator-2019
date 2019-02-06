@@ -75,6 +75,17 @@ class STATE_EXPORT IGoldManager {
 	 * @param[in]  player_id Player who triggered the suicide
 	 */
 	virtual void RewardMineGold(PlayerId player_id) = 0;
+
+	/**
+	 * Function to add build request to current requests
+	 */
+
+	virtual void AddBuildRequest(PlayerId player_id, Vec2D offset) = 0;
+
+	/**
+	 * Function to assign amount of gold to be given to each player
+	 */
+	virtual void AssignGold() = 0;
 };
 
 } // namespace state

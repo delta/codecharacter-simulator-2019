@@ -11,6 +11,7 @@
 
 #include <array>
 #include <cstdint>
+#include <map>
 #include <vector>
 
 namespace state {
@@ -81,6 +82,19 @@ class STATE_EXPORT GoldManager : public IGoldManager {
 	 */
 	std::vector<GoldMine> gold_mines;
 
+	/**
+	 * Map to manage user build requests
+	 * It maps each gold mine to number of requests made by the player to mine
+	 * that location
+	 */
+	std::array<std::map<GoldMine, int64_t>, 2> mine_requests;
+
+	/**
+	 * Function to return gold mine given the Vec2D offset
+	 */
+
+	GoldMine GetGoldMine(Vec2D offset);
+
   public:
 	/**
 	 * Constructor for Gold Manager class
@@ -105,7 +119,7 @@ class STATE_EXPORT GoldManager : public IGoldManager {
 	 *
 	 * @throw      std::out_of_range If the amount is not positive
 	 */
-	void Increase(PlayerId player_id, int64_t amount);
+	void Increase(PlayerId player_id, int64_t amount) override;
 
 	/**
 	 * Method to decrease player money
@@ -116,28 +130,28 @@ class STATE_EXPORT GoldManager : public IGoldManager {
 	 * @throw      std::out_of_range If the amount is not positive
 	 *                               player has insufficuent balance
 	 */
-	void Decrease(PlayerId player_id, int64_t amount);
+	void Decrease(PlayerId player_id, int64_t amount) override;
 
 	/**
 	 * Reward the player for killing an enemy actor
 	 *
 	 * @param[in]  enemy_actor  Pointer to the killed enemy
 	 */
-	void RewardKill(Actor *enemy_actor);
+	void RewardKill(Actor *enemy_actor) override;
 
 	/**
 	 * Returns the cost for creating a particular unit
 	 *
 	 * @param[in]  actor_type  ActorType to fetch cost
 	 */
-	int64_t GetCreateUnitCost(ActorType unit_type);
+	int64_t GetCreateUnitCost(ActorType unit_type) override;
 
 	/**
 	 * Decreases player's gold for creating specific actor type
 	 *
 	 * @param[in]  actor_type Pointer to the actor which player wants to build
 	 */
-	void DeductUnitCreateCost(PlayerId player_id, Actor *actor);
+	void DeductUnitCreateCost(PlayerId player_id, Actor *actor) override;
 
 	/**
 	 * Get the current balance amount of the PlayerId passed
@@ -146,27 +160,37 @@ class STATE_EXPORT GoldManager : public IGoldManager {
 	 *
 	 * @return     The balance.
 	 */
-	int64_t GetBalance(PlayerId player_id);
+	int64_t GetBalance(PlayerId player_id) override;
 
 	/**
 	 * Gets the maximum balance.
 	 *
 	 * @return     The maximum possible balance.
 	 */
-	int64_t GetMaxGold();
+	int64_t GetMaxGold() override;
 
 	/**
 	 * Penalty for player triggering suicide
 	 *
 	 * @param[in]  player_id Player who triggered the suicide
 	 */
-	void DeductFactorySuicidePenalty(PlayerId player_id);
+	void DeductFactorySuicidePenalty(PlayerId player_id) override;
 
 	/**
 	 * Penalty for player triggering suicide
 	 *
 	 * @param[in]  player_id Player who triggered the suicide
 	 */
-	void RewardMineGold(PlayerId player_id);
+	void RewardMineGold(PlayerId player_id) override;
+
+	/**
+	 * Function to add build request to current requests
+	 */
+	void AddBuildRequest(PlayerId player_id, Vec2D offset) override;
+
+	/**
+	 * Function to assign amount of gold to be given to each player
+	 */
+	void AssignGold() override;
 };
 } // namespace state

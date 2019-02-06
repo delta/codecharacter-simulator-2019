@@ -122,4 +122,10 @@ void GoldManager::RewardMineGold(PlayerId player_id) {
 	Increase(player_id, reward_mining);
 }
 
+void GoldManager::AddBuildRequest(PlayerId player_id, Vec2D offset) {}
+
+void GoldManager::AssignGold() {}
+
+GoldMine GoldManager::GetGoldMine(Vec2D offset) {}
+
 } // namespace state

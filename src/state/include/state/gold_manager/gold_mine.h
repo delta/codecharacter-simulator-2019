@@ -1,5 +1,7 @@
 #include "physics/vector.hpp"
 
+namespace state {
+
 class GoldMine {
   public:
 	/**
@@ -12,5 +14,19 @@ class GoldMine {
 	 */
 	int64_t value;
 
-	void ExtractGold(int64_t mine_rate);
+	/**
+	 * Constructors
+	 */
+
+	GoldMine();
+
+	GoldMine(Vec2D offset, int64_t value);
+
+	/**
+	 * Helper function to extract valid amount of gold depending on amount of
+	 * gold left in the gold mine
+	 */
+	int64_t ExtractGold(int64_t ext_amount);
 };
+
+} // namespace state
