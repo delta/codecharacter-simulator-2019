@@ -5,11 +5,13 @@
 
 #pragma once
 
+#include "state/interfaces/i_gold_manager.h"
 #include "state/state_export.h"
 #include "state/utilities.h"
 
 #include <array>
 #include <cstdint>
+#include <vector>
 
 namespace state {
 
@@ -21,7 +23,7 @@ class Actor;
 /**
  * Gold Manager class that handles player gold
  */
-class STATE_EXPORT GoldManager {
+class STATE_EXPORT GoldManager : public IGoldManager {
 
   private:
 	/**
@@ -73,6 +75,11 @@ class STATE_EXPORT GoldManager {
 	 * Reward for 1 villager mining gold for 1 unit of time
 	 */
 	int64_t mining_reward;
+
+	/**
+	 * Vector of the gold mines
+	 */
+	std::vector<GoldMine> gold_mines;
 
   public:
 	/**

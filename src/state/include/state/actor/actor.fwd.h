@@ -7,5 +7,5 @@
 
 namespace state {
 
-class Factory;
+class Actor;
 }

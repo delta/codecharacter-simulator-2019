@@ -17,6 +17,9 @@ namespace state {
 /**
  * Actor base class
  */
+
+class GoldManager;
+
 class STATE_EXPORT Actor : public IUpdatable {
   protected:
 	/**
