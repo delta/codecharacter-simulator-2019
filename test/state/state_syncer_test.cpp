@@ -1,3 +1,4 @@
+#include "logger/mocks/logger_mock.h"
 #include "state/actor/soldier_states/soldier_state.h"
 #include "state/command_giver.h"
 #include "state/interfaces/i_state_syncer.h"
@@ -13,6 +14,7 @@ using namespace std;
 using namespace state;
 using namespace physics;
 using namespace testing;
+using namespace logger;
 
 class StateSyncerTest : public Test {
   protected:
@@ -38,6 +40,9 @@ class StateSyncerTest : public Test {
 	// Creating a command taker
 	CommandTakerMock *command_taker;
 
+	// Creating a mock logger
+	unique_ptr<LoggerMock> logger;
+
 	// Creating player states
 	array<player_state::State, 2> player_states;
 
@@ -59,9 +64,11 @@ class StateSyncerTest : public Test {
 		this->command_taker = command_taker.get();
 		this->command_giver = command_giver.get();
 
+		this->logger = make_unique<LoggerMock>();
+
 		// Creating a state syncer
-		this->state_syncer =
-		    make_unique<StateSyncer>(move(command_giver), move(command_taker));
+		this->state_syncer = make_unique<StateSyncer>(
+		    move(command_giver), move(command_taker), logger.get());
 
 		// Initializing the actor id to 0
 		Actor::SetActorIdIncrement(0);
@@ -286,6 +293,9 @@ TEST_F(StateSyncerTest, UpdationTest) {
 	    .Times(5)
 	    .WillRepeatedly(Return(factories3))
 	    .RetiresOnSaturation();
+
+	// Expect a LogState call for each UpdatePlayerStates call
+	EXPECT_CALL(*this->logger, LogState()).Times(3);
 
 	// Updating the player states
 	this->state_syncer->UpdatePlayerStates(this->player_states);
