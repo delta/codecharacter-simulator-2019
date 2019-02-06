@@ -8,8 +8,10 @@
 namespace state {
 
 StateSyncer::StateSyncer(std::unique_ptr<ICommandGiver> command_giver,
-                         std::unique_ptr<ICommandTaker> state)
-    : command_giver(std::move(command_giver)), state(std::move(state)) {}
+                         std::unique_ptr<ICommandTaker> state,
+                         logger::ILogger *logger)
+    : command_giver(std::move(command_giver)), state(std::move(state)),
+      logger(logger) {}
 
 void StateSyncer::UpdateMainState(
     const std::array<player_state::State, 2> &player_states) {
@@ -121,6 +123,9 @@ void StateSyncer::UpdatePlayerStates(
 			    gold_mine_location);
 		}
 	}
+
+	// Log the current state
+	logger->LogState();
 }
 
 std::array<int64_t, 2> StateSyncer::GetScores() { return state->GetScores(); }

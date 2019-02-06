@@ -177,8 +177,8 @@ unique_ptr<MainDriver> BuildMainDriver() {
 	                        VILLAGER_MAX_HP, FACTORY_MAX_HP);
 
 	auto command_giver = make_unique<CommandGiver>(state.get(), logger.get());
-	auto state_syncer =
-	    make_unique<StateSyncer>(move(command_giver), move(state));
+	auto state_syncer = make_unique<StateSyncer>(move(command_giver),
+	                                             move(state), logger.get());
 
 	vector<unique_ptr<SharedMemoryMain>> shm_mains;
 	for (int i = 0; i < 2; ++i) {

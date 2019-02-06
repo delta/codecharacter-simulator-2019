@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "logger/interfaces/i_logger.h"
 #include "state/interfaces/i_command_giver.h"
 #include "state/interfaces/i_command_taker.h"
 #include "state/interfaces/i_state_syncer.h"
@@ -25,6 +26,11 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 	 * State instance, to give commands to
 	 */
 	std::unique_ptr<ICommandTaker> state;
+
+	/**
+	 * Pointer to logger instance for logging game state every turn
+	 */
+	logger::ILogger *logger;
 
 	/**
 	 * Flips an induvidual position to know it's equivalent position that player
@@ -61,7 +67,7 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 
   public:
 	StateSyncer(std::unique_ptr<ICommandGiver> command_giver,
-	            std::unique_ptr<ICommandTaker> state);
+	            std::unique_ptr<ICommandTaker> state, logger::ILogger *logger);
 
 	/**
 	 * @see IStateSyncer#UpdateMainState
