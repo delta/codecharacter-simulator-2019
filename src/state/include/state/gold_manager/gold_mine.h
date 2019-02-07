@@ -29,4 +29,16 @@ class GoldMine {
 	int64_t ExtractGold(int64_t ext_amount);
 };
 
+/**
+ * Defining a way to compare 2 GoldMine objects so that is can be stored in a
+ * hash map
+ */
+
+class GoldMineCompare {
+  public:
+	bool operator()(const GoldMine &lhs, const GoldMine &rhs) {
+		return (lhs.value - rhs.value);
+	}
+};
+
 } // namespace state

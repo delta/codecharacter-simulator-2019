@@ -74,7 +74,8 @@ class STATE_EXPORT IGoldManager {
 	 *
 	 * @param[in]  player_id Player who triggered the suicide
 	 */
-	virtual void RewardMineGold(PlayerId player_id) = 0;
+	virtual void RewardMineGold(PlayerId player_id, GoldMine gold_mine,
+	                            int64_t mining_reward) = 0;
 
 	/**
 	 * Function to add build request to current requests

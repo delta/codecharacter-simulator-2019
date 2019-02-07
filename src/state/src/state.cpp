@@ -369,6 +369,9 @@ bool State::IsGameOver(PlayerId &winner) {
 
 	// If no one died, is_game_over is false by default, leave winner alone
 	return is_game_over;
+
+	// Late gold manager update
+	gold_manager->AssignGold();
 }
 
 } // namespace state
