@@ -76,8 +76,16 @@ const int64_t VILLAGER_BUILD_RANGE = 5;
 // Mine range of the villager
 const int64_t VILLAGER_MINE_RANGE = 5;
 
+// Player 1 start position
+// Player 2 is the same position flipped
+const auto PLAYER1_START_POSITION = DoubleVec2D{5, 5};
+const auto PLAYER2_START_POSITION =
+    DoubleVec2D{(MAP_SIZE * ELEMENT_SIZE - 1) - PLAYER1_START_POSITION.x,
+                (MAP_SIZE * ELEMENT_SIZE - 1) - PLAYER1_START_POSITION.y};
+
 // Starting positions of actors for both players
-const std::vector<DoubleVec2D> ACTOR_START_POSITIONS = {{2, 2}, {40, 40}};
+const std::vector<DoubleVec2D> ACTOR_START_POSITIONS = {PLAYER1_START_POSITION,
+                                                        PLAYER2_START_POSITION};
 
 // Total number of units on the map
 constexpr size_t TOTAL_MAP_TILES = MAP_SIZE * MAP_SIZE;
