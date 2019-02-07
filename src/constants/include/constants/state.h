@@ -23,7 +23,7 @@ const size_t MAX_NUM_FACTORIES = 20;
 const size_t NUM_VILLAGERS_START = 10;
 
 // Size of the map in grid elements
-const size_t MAP_SIZE = 50;
+const size_t MAP_SIZE = 30;
 
 // Size of each grid element on the map
 const size_t ELEMENT_SIZE = 10;
