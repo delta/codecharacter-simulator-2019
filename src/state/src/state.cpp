@@ -43,6 +43,11 @@ void State::ProduceUnit(PlayerId player_id, ActorType actor_type,
 	auto player_id_index = static_cast<int>(player_id);
 
 	if (actor_type == ActorType::VILLAGER) {
+		// If number of villagers would exceed MAX_NUM_VILLAGERS, stop
+		if (this->villagers.size() == MAX_NUM_VILLAGERS) {
+			return;
+		}
+
 		// Create and add the new villager
 		auto new_villager = VillagerBuilder(player_id, position);
 		this->villagers[player_id_index].push_back(std::move(new_villager));
@@ -52,6 +57,11 @@ void State::ProduceUnit(PlayerId player_id, ActorType actor_type,
 		gold_manager->DeductUnitCreateCost(player_id, villager);
 
 	} else if (actor_type == ActorType::SOLDIER) {
+		// If number of soldiers would exceed MAX_NUM_SOLDIERS, stop
+		if (this->soldiers.size() == MAX_NUM_SOLDIERS) {
+			return;
+		}
+
 		// Create and add the new soldier
 		auto new_soldier = SoldierBuilder(player_id, position);
 		this->soldiers[player_id_index].push_back(std::move(new_soldier));
