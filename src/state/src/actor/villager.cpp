@@ -61,7 +61,9 @@ void Villager::Build(Factory *build_target) {
 	this->is_destination_set = false;
 }
 
-void Villager::Mine(Vec2D mine_target) { this->SetMineTarget(mine_target); }
+void Villager::Mine(Vec2D mine_target) { 
+	this->SetMineTarget(mine_target); 
+}
 
 void Villager::SetMineTarget(Vec2D mine_target) {
 	this->mine_target = mine_target;

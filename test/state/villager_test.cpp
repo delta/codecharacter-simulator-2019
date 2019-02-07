@@ -61,6 +61,10 @@ class VillagerTest : public Test {
 		std::vector<GoldMine> gold_mines;
 		std::array<std::map<GoldMine, int64_t, GoldMineCompare>, 2>
 		    mine_requests;
+		GoldMine gold_mine1(Vec2D(10, 10), 100);
+		GoldMine gold_mine2(Vec2D(20, 10), 100);
+		gold_mines.push_back(gold_mine1);
+		gold_mines.push_back(gold_mine2);
 
 		this->gold_manager = make_unique<GoldManager>(
 		    player_gold, max_gold, soldier_kill_reward_gold,
@@ -144,7 +148,7 @@ TEST_F(VillagerTest, TransitionToDeadState) {
 }
 
 TEST_F(VillagerTest, MoveToMine) {
-	this->villager->SetMineTarget(Vec2D(25, 30));
+	this->villager->SetMineTarget(Vec2D(20, 10));
 
 	while (this->villager->GetState() != VillagerStateName::MINE) {
 		this->villager->Update();

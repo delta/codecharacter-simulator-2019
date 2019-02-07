@@ -4,9 +4,7 @@ namespace state {
 
 GoldMine::GoldMine() : offset(Vec2D::null), value(0){};
 
-GoldMine::GoldMine(Vec2D offset, int64_t value){
-
-};
+GoldMine::GoldMine(Vec2D offset, int64_t value) : offset(offset), value(value) {};
 
 int64_t GoldMine::ExtractGold(int64_t ext_amount) {
 	if (this->value - ext_amount < 0) {
