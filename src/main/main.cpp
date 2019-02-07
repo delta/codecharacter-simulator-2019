@@ -66,6 +66,13 @@ unique_ptr<Map> BuildMap() {
 		case ' ':
 			break;
 		case '\n':
+			// Ensure that size of the row matches MAP_SIZE
+			if (map_row.size() != MAP_SIZE) {
+				std::cerr << "Bad map file! Match MAP_SIZE " << MAP_SIZE
+				          << '\n';
+				exit(EXIT_FAILURE);
+			}
+
 			map_elements.push_back(map_row);
 			map_row.clear();
 			break;
@@ -73,7 +80,13 @@ unique_ptr<Map> BuildMap() {
 	}
 	map_file.close();
 
-	return make_unique<Map>(map_elements, map_elements.size(), ELEMENT_SIZE);
+	// Ensure that number of rows matches MAP_SIZE
+	if (map_elements.size() != MAP_SIZE) {
+		std::cerr << "Bad map file! Match MAP_SIZE " << MAP_SIZE << '\n';
+		exit(EXIT_FAILURE);
+	}
+
+	return make_unique<Map>(map_elements, MAP_SIZE, ELEMENT_SIZE);
 }
 
 unique_ptr<GoldManager> BuildGoldManager() {
