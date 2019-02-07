@@ -36,8 +36,8 @@ class GoldMine {
 
 class GoldMineCompare {
   public:
-	bool operator()(const GoldMine &lhs, const GoldMine &rhs) {
-		return (lhs.value - rhs.value);
+	bool operator()(const GoldMine *lhs, const GoldMine *rhs) {
+		return (lhs->value - rhs->value);
 	}
 };
 

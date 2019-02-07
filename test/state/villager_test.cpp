@@ -58,19 +58,17 @@ class VillagerTest : public Test {
 		this->villager_kill_reward_gold = VILLAGER_KILL_REWARD_AMOUNT;
 		this->factory_kill_reward_gold = FACTORY_KILL_REWARD_AMOUNT;
 
-		std::vector<GoldMine> gold_mines;
-		std::array<std::map<GoldMine, int64_t, GoldMineCompare>, 2>
-		    mine_requests;
-		GoldMine gold_mine1(Vec2D(10, 10), 100);
-		GoldMine gold_mine2(Vec2D(20, 10), 100);
-		gold_mines.push_back(gold_mine1);
-		gold_mines.push_back(gold_mine2);
+		std::vector<std::unique_ptr<GoldMine>> gold_mines;
+		auto gold_mine1 = make_unique<GoldMine>(Vec2D(10, 10), 100);
+		auto gold_mine2 = make_unique<GoldMine>(Vec2D(20, 10), 100);
+		gold_mines.push_back(std::move(gold_mine1));
+		gold_mines.push_back(std::move(gold_mine2));
 
 		this->gold_manager = make_unique<GoldManager>(
 		    player_gold, max_gold, soldier_kill_reward_gold,
 		    villager_kill_reward_gold, factory_kill_reward_gold,
 		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
-		    MINING_REWARD, gold_mines, mine_requests);
+		    MINING_REWARD, std::move(gold_mines));
 
 		this->path_planner = make_unique<PathPlanner>(map.get());
 

@@ -50,15 +50,13 @@ class LoggerTest : public testing::Test {
 		player_gold[1] = 5000;
 		max_gold = 10000;
 
-		std::vector<GoldMine> gold_mines;
-		std::array<std::map<GoldMine, int64_t, GoldMineCompare>, 2>
-		    mine_requests;
+		std::vector<std::unique_ptr<GoldMine>> gold_mines;
 
 		this->gold_manager = make_unique<GoldManager>(
 		    player_gold, max_gold, SOLDIER_KILL_REWARD_AMOUNT,
 		    VILLAGER_KILL_REWARD_AMOUNT, FACTORY_KILL_REWARD_AMOUNT,
 		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
-		    MINING_REWARD, gold_mines, mine_requests);
+		    MINING_REWARD, std::move(gold_mines));
 	}
 };
 

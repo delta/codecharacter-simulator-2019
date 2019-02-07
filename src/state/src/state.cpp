@@ -233,7 +233,7 @@ const std::array<std::vector<T *>, 2> GetRawPtrsFromUniquePtrs(
 		auto player_actors = std::vector<T *>{};
 		player_actors.reserve(actors[i].size());
 
-		// For each actor,
+		// For each actor
 		for (int j = 0; j < actors[i].size(); ++j) {
 			player_actors.push_back(actors[i][j].get());
 		}

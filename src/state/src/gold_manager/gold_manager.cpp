@@ -12,13 +12,14 @@ namespace state {
 
 GoldManager::GoldManager() {}
 
-GoldManager::GoldManager(
-    std::array<int64_t, 2> players_gold, int64_t max_gold,
-    int64_t soldier_kill_reward_amount, int64_t villager_kill_reward_amount,
-    int64_t factory_kill_reward_amount, int64_t factory_suicide_penalty_amount,
-    int64_t villager_cost, int64_t soldier_cost, int64_t factory_cost,
-    int64_t mining_reward, std::vector<GoldMine> gold_mines,
-    std::array<std::map<GoldMine, int64_t, GoldMineCompare>, 2> mine_requests)
+GoldManager::GoldManager(std::array<int64_t, 2> players_gold, int64_t max_gold,
+                         int64_t soldier_kill_reward_amount,
+                         int64_t villager_kill_reward_amount,
+                         int64_t factory_kill_reward_amount,
+                         int64_t factory_suicide_penalty_amount,
+                         int64_t villager_cost, int64_t soldier_cost,
+                         int64_t factory_cost, int64_t mining_reward,
+                         std::vector<std::unique_ptr<GoldMine>> gold_mines)
     : players_gold(players_gold), max_gold(max_gold),
       soldier_kill_reward_amount(soldier_kill_reward_amount),
       villager_kill_reward_amount(villager_kill_reward_amount),
@@ -26,7 +27,7 @@ GoldManager::GoldManager(
       factory_suicide_penalty_amount(factory_suicide_penalty_amount),
       villager_cost(villager_cost), soldier_cost(soldier_cost),
       factory_cost(factory_cost), mining_reward(mining_reward),
-      gold_mines(gold_mines), mine_requests(mine_requests) {}
+      gold_mines(std::move(gold_mines)), mine_requests({}) {}
 
 void GoldManager::Increase(PlayerId player_id, int64_t amount) {
 
@@ -118,10 +119,10 @@ void GoldManager::DeductFactorySuicidePenalty(PlayerId player_id) {
 	Decrease(player_id, suicide_penalty);
 }
 
-void GoldManager::RewardMineGold(PlayerId player_id, GoldMine gold_mine,
+void GoldManager::RewardMineGold(PlayerId player_id, GoldMine *gold_mine,
                                  int64_t mining_reward) {
 	// Extracting gold from the gold mine
-	int64_t extracted_amount = gold_mine.ExtractGold(mining_reward);
+	int64_t extracted_amount = gold_mine->ExtractGold(mining_reward);
 
 	// Increasing the player's gold
 	Increase(player_id, extracted_amount);
@@ -129,15 +130,15 @@ void GoldManager::RewardMineGold(PlayerId player_id, GoldMine gold_mine,
 
 void GoldManager::AddBuildRequest(PlayerId player_id, Vec2D offset) {
 	int64_t id = static_cast<int64_t>(player_id);
-	auto &player_requests = this->mine_requests[id];
-	auto const gold_mine = GetGoldMine(offset);
+	auto player_requests = this->mine_requests[id];
+	auto gold_mine = GetGoldMine(offset);
 
 	// If the gold mine dosen't already exist in the hash map, then we add an
 	// entry with count 1
 	if (player_requests.empty()) {
-		player_requests.insert(std::pair<GoldMine, int64_t>(gold_mine, 1));
+		player_requests.insert(std::pair<GoldMine *, int64_t>(gold_mine, 1));
 	} else if (player_requests.find(gold_mine) != player_requests.end()) {
-		player_requests.insert(std::pair<GoldMine, int64_t>(gold_mine, 1));
+		player_requests.insert(std::pair<GoldMine *, int64_t>(gold_mine, 1));
 	} else {
 		auto request = player_requests.find(gold_mine);
 		request->second += 1;
@@ -169,7 +170,7 @@ void GoldManager::AssignGold() {
 
 				// If the gold mine has enough gold to accomodate both the
 				// player's requests
-				if (gold_mine.value >= total_gold_required) {
+				if (gold_mine->value >= total_gold_required) {
 					// Deducting the player's requested gold
 					int64_t mining_reward =
 					    this->mining_reward * no_player_requests;
@@ -182,7 +183,7 @@ void GoldManager::AssignGold() {
 					// Finding the ratio of gold that this player will recieve
 					float gold_ratio = float(no_player_requests) /
 					                   (no_enemy_requests + no_enemy_requests);
-					int gold_recieved = gold_ratio * gold_mine.value;
+					int gold_recieved = gold_ratio * gold_mine->value;
 					RewardMineGold(player_id, gold_mine, gold_recieved);
 				}
 			}
@@ -197,10 +198,10 @@ void GoldManager::AssignGold() {
 	}
 }
 
-const GoldMine GoldManager::GetGoldMine(Vec2D offset) {
-	for (auto gold_mine : this->gold_mines) {
-		if (gold_mine.offset == offset) {
-			return gold_mine;
+GoldMine *GoldManager::GetGoldMine(Vec2D offset) {
+	for (int i = 0; i < this->gold_mines.size(); ++i) {
+		if (this->gold_mines[i]->offset == offset) {
+			return this->gold_mines[i].get();
 		}
 	}
 	// TODO : Return null value

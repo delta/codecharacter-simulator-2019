@@ -12,6 +12,7 @@
 #include <array>
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <vector>
 
 namespace state {
@@ -80,20 +81,20 @@ class STATE_EXPORT GoldManager : public IGoldManager {
 	/**
 	 * Vector of the gold mines
 	 */
-	std::vector<GoldMine> gold_mines;
+	std::vector<std::unique_ptr<GoldMine>> gold_mines;
 
 	/**
 	 * Map to manage user build requests
 	 * It maps each gold mine to number of requests made by the player to mine
 	 * that location
 	 */
-	std::array<std::map<GoldMine, int64_t, GoldMineCompare>, 2> mine_requests;
+	std::array<std::map<GoldMine *, int64_t, GoldMineCompare>, 2> mine_requests;
 
 	/**
 	 * Function to return gold mine given the Vec2D offset
 	 */
 
-	const GoldMine GetGoldMine(Vec2D offset);
+	GoldMine *GetGoldMine(Vec2D offset);
 
   public:
 	/**
@@ -107,9 +108,8 @@ class STATE_EXPORT GoldManager : public IGoldManager {
 	            int64_t factory_kill_reward_amount,
 	            int64_t factory_suicide_penalty_amount, int64_t villager_cost,
 	            int64_t soldier_cost, int64_t soldier_factory_cost,
-	            int64_t mining_reward, std::vector<GoldMine> gold_mines,
-	            std::array<std::map<GoldMine, int64_t, GoldMineCompare>, 2>
-	                mine_requests);
+	            int64_t mining_reward,
+	            std::vector<std::unique_ptr<GoldMine>> gold_mines);
 
 	/**
 	 * Method to increase player money
@@ -183,7 +183,7 @@ class STATE_EXPORT GoldManager : public IGoldManager {
 	 *
 	 * @param[in]  player_id Player who triggered the suicide
 	 */
-	void RewardMineGold(PlayerId player_id, GoldMine gold_mine,
+	void RewardMineGold(PlayerId player_id, GoldMine *gold_mine,
 	                    int64_t mining_reward) override;
 
 	/**
