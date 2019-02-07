@@ -90,11 +90,13 @@ unique_ptr<Map> BuildMap() {
 }
 
 unique_ptr<GoldManager> BuildGoldManager() {
+	std::vector<GoldMine> gold_mines;
+	std::array<std::map<GoldMine, int64_t, GoldMineCompare>, 2> mine_requests;
 	return make_unique<GoldManager>(
 	    array<int64_t, 2>{GOLD_START, GOLD_START}, GOLD_MAX,
 	    SOLDIER_KILL_REWARD_AMOUNT, VILLAGER_KILL_REWARD_AMOUNT,
 	    FACTORY_KILL_REWARD_AMOUNT, FACTORY_SUICIDE_PENALTY, VILLAGER_COST,
-	    SOLDIER_COST, FACTORY_COST, MINING_REWARD);
+	    SOLDIER_COST, FACTORY_COST, MINING_REWARD, gold_mines, mine_requests);
 }
 
 unique_ptr<PathPlanner> BuildPathPlanner(Map *map) {

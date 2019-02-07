@@ -51,11 +51,15 @@ class SoldierTest : public Test {
 		this->villager_kill_reward_gold = VILLAGER_KILL_REWARD_AMOUNT;
 		this->factory_kill_reward_gold = FACTORY_KILL_REWARD_AMOUNT;
 
+		std::vector<GoldMine> gold_mines;
+		std::array<std::map<GoldMine, int64_t, GoldMineCompare>, 2>
+		    mine_requests;
+
 		this->gold_manager = make_unique<GoldManager>(
 		    player_gold, max_gold, soldier_kill_reward_gold,
 		    villager_kill_reward_gold, factory_kill_reward_gold,
 		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
-		    MINING_REWARD);
+		    MINING_REWARD, gold_mines, mine_requests);
 		this->path_planner = make_unique<PathPlanner>(map.get());
 
 		this->soldier =
