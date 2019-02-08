@@ -10,8 +10,8 @@
 #include "state/actor/factory.h"
 #include "state/actor/soldier.h"
 #include "state/actor/villager.h"
-#include "state/gold_manager/gold_manager.h"
 #include "state/interfaces/i_command_taker.h"
+#include "state/interfaces/i_gold_manager.h"
 #include "state/interfaces/i_updatable.h"
 #include "state/map/map.h"
 #include "state/path_planner/path_planner.h"
@@ -34,7 +34,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	/**
 	 * Gold Manager instance to maintain player gold
 	 */
-	std::unique_ptr<GoldManager> gold_manager;
+	std::unique_ptr<IGoldManager> gold_manager;
 
 	/**
 	 * Path Planner instance
@@ -159,7 +159,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	/**
 	 * Constructor
 	 */
-	State(std::unique_ptr<Map> map, std::unique_ptr<GoldManager> gold_manager,
+	State(std::unique_ptr<Map> map, std::unique_ptr<IGoldManager> gold_manager,
 	      std::unique_ptr<PathPlanner> path_planner,
 	      std::array<std::vector<std::unique_ptr<Soldier>>, 2> soldiers,
 	      std::array<std::vector<std::unique_ptr<Villager>>, 2> villagers,

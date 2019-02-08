@@ -10,6 +10,7 @@
 #include "state/actor/soldier.h"
 #include "state/actor/villager.h"
 #include "state/command_giver.h"
+#include "state/gold_manager/gold_manager.h"
 #include "state/map/map.h"
 #include "state/path_planner/path_planner.h"
 #include "state/player_state.h"

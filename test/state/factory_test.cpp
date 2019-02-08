@@ -3,7 +3,7 @@
 #include "state/actor/factory.h"
 #include "state/actor/soldier.h"
 #include "state/actor/villager.h"
-#include "state/gold_manager/gold_manager.h"
+#include "state/mocks/gold_manager_mock.h"
 #include "gtest/gtest.h"
 
 using namespace std;
@@ -22,7 +22,7 @@ class FactoryTest : public Test {
 	Soldier model_soldier;
 	Villager model_villager;
 
-	unique_ptr<GoldManager> gold_manager;
+	unique_ptr<GoldManagerMock> gold_manager;
 	unique_ptr<PathPlanner> path_planner;
 	unique_ptr<Factory> factory;
 
@@ -77,11 +77,7 @@ class FactoryTest : public Test {
 
 		std::vector<std::unique_ptr<GoldMine>> gold_mines;
 
-		this->gold_manager = make_unique<GoldManager>(
-		    player_gold, max_gold, soldier_kill_reward_gold,
-		    villager_kill_reward_gold, factory_kill_reward_gold,
-		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
-		    MINING_REWARD, std::move(gold_mines));
+		this->gold_manager = make_unique<GoldManagerMock>();
 
 		villager_list = std::vector<std::unique_ptr<Villager>>{};
 		soldier_list = std::vector<std::unique_ptr<Soldier>>{};

@@ -1,6 +1,7 @@
 #include "constants/gold_manager.h"
 #include "constants/state.h"
 #include "gmock/gmock.h"
+#include "state/mocks/gold_manager_mock.h"
 #include "state/state.h"
 #include "gtest/gtest.h"
 #include <memory>
@@ -29,7 +30,7 @@ class StateTest : public Test {
 	std::vector<std::unique_ptr<Villager>> temp_villager_list;
 	std::vector<std::unique_ptr<Soldier>> temp_soldier_list;
 
-	unique_ptr<GoldManager> gold_manager;
+	unique_ptr<GoldManagerMock> gold_manager;
 	unique_ptr<PathPlanner> path_planner;
 	Villager model_villager;
 	Soldier model_soldier;
@@ -62,13 +63,7 @@ class StateTest : public Test {
 		this->villager_kill_reward_gold = VILLAGER_KILL_REWARD_AMOUNT;
 		this->factory_kill_reward_gold = FACTORY_KILL_REWARD_AMOUNT;
 
-		std::vector<std::unique_ptr<GoldMine>> gold_mines;
-
-		this->gold_manager = make_unique<GoldManager>(
-		    player_gold, max_gold, soldier_kill_reward_gold,
-		    villager_kill_reward_gold, factory_kill_reward_gold,
-		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
-		    MINING_REWARD, std::move(gold_mines));
+		gold_manager = make_unique<GoldManagerMock>();
 
 		this->path_planner = make_unique<PathPlanner>(map.get());
 
@@ -204,8 +199,14 @@ TEST_F(StateTest, CreateFactoryTest) {
 	ASSERT_EQ(curr_factories[0].size(), 1);
 	ASSERT_EQ(factory->GetState(), FactoryStateName::UNBUILT);
 
+<<<<<<< e22e3eaa527dea449d4e47edfe57c4f9204a9c48
 	auto gold_manager = villager->GetGoldManager();
 	ASSERT_EQ(gold_manager->GetBalance(PlayerId::PLAYER1), 5000 - FACTORY_COST);
+=======
+	//This is a gold manager test
+	// auto gold_manager = curr_villagers[0].front()->GetGoldManager();
+	// ASSERT_EQ(gold_manager->GetBalance(PlayerId::PLAYER1), 5000 - FACTORY_COST);
+>>>>>>> Replace GoldManager with mock in all tests
 }
 
 TEST_F(StateTest, BuildFactoryTest) {

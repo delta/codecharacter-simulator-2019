@@ -10,7 +10,7 @@
 namespace state {
 
 State::State(std::unique_ptr<Map> map,
-             std::unique_ptr<GoldManager> gold_manager,
+             std::unique_ptr<IGoldManager> gold_manager,
              std::unique_ptr<PathPlanner> path_planner,
              std::array<std::vector<std::unique_ptr<Soldier>>, 2> soldiers,
              std::array<std::vector<std::unique_ptr<Villager>>, 2> villagers,

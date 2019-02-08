@@ -4,6 +4,7 @@
 #include "state/interfaces/i_state_syncer.h"
 #include "state/mocks/command_giver_mock.h"
 #include "state/mocks/command_taker_mock.h"
+#include "state/mocks/gold_manager_mock.h"
 #include "state/player_state.h"
 #include "state/state.h"
 #include "state/state_syncer.h"
@@ -47,7 +48,7 @@ class StateSyncerTest : public Test {
 	array<player_state::State, 2> player_states;
 
 	// Creating a gold manager
-	unique_ptr<GoldManager> gold_manager;
+	unique_ptr<GoldManagerMock> gold_manager;
 
 	StateSyncerTest() {
 		// Creating 2 player states
@@ -57,9 +58,10 @@ class StateSyncerTest : public Test {
 		player_states[0] = player_state1;
 		player_states[1] = player_state2;
 
-		// Creating a mock command giver and taker
+		// Creating a mock command giver, command taker and gold manager
 		auto command_taker = make_unique<CommandTakerMock>();
 		auto command_giver = make_unique<CommandGiverMock>();
+		auto gold_manager = make_unique<GoldManagerMock>();
 
 		this->command_taker = command_taker.get();
 		this->command_giver = command_giver.get();
