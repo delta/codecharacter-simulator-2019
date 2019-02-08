@@ -79,17 +79,8 @@ enum class FactoryState {
 	UNBUILT,
 	// Factory is built and idle
 	IDLE,
-	// Factory is currently producing villagers
-	VILLAGER_PRODUCTION,
-	// Factory is currently producing soldiers
-	SOLDIER_PRODUCTION,
-};
-
-enum class FactoryProduction {
-	// Factory is producing villagers
-	VILLAGER,
-	// Factory is producing Soldiers
-	SOLDIER
+	// Factory is currently producing units
+	PRODUCTION
 };
 
 inline std::ostream &operator<<(std::ostream &os, FactoryState factory_state) {
@@ -100,11 +91,28 @@ inline std::ostream &operator<<(std::ostream &os, FactoryState factory_state) {
 	case FactoryState::IDLE:
 		os << "IDLE";
 		break;
-	case FactoryState::VILLAGER_PRODUCTION:
-		os << "VILLAGER_PRODUCTION";
+	case FactoryState::PRODUCTION:
+		os << "PRODUCTION";
 		break;
-	case FactoryState::SOLDIER_PRODUCTION:
-		os << "SOLDIER_PRODUCTION";
+	}
+	return os;
+}
+
+enum class FactoryProduction {
+	// Factory is producing villagers
+	VILLAGER,
+	// Factory is producing Soldiers
+	SOLDIER
+};
+
+inline std::ostream &operator<<(std::ostream &os,
+                                FactoryProduction factory_production) {
+	switch (factory_production) {
+	case FactoryProduction::VILLAGER:
+		os << "VILLAGER";
+		break;
+	case FactoryProduction::SOLDIER:
+		os << "SOLDIER";
 		break;
 	}
 	return os;

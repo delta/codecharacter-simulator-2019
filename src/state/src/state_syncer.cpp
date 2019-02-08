@@ -281,35 +281,25 @@ void StateSyncer::AssignFactoryAttributes(
 	std::vector<player_state::Factory> new_factories;
 
 	for (int64_t i = 0; i < state_factories[id].size(); ++i) {
+		auto state_factory = state_factories[id][i];
+
 		// Reassinging basic attributes
 		player_state::Factory new_factory;
-		new_factory.id = state_factories[id][i]->GetActorId();
-		new_factory.hp = state_factories[id][i]->GetHp();
+		new_factory.id = state_factory->GetActorId();
+		new_factory.hp = state_factory->GetHp();
 
-		// Assigning default values to all other quantities
-		new_factory.build_percent = 0;
-		new_factory.built = false;
-		new_factory.stopped = false;
-		new_factory._suicide = false;
-		new_factory.production_state =
-		    player_state::FactoryProduction::VILLAGER;
+		// Get construction details
+		auto current = (double)state_factory->GetConstructionCompletion();
+		auto total = (double)state_factory->GetTotalConstructionCompletion();
+		new_factory.build_percent = floor((current / total) * 100);
+		new_factory.built = current == total;
+
+		// Get production details
+		new_factory.stopped = state_factory->IsStopped();
 
 		// Checking if the state is dead
-		auto factory_state = state_factories[id][i]->GetState();
-		auto factory_production_state =
-		    state_factories[id][i]->GetProductionState();
-
-		// Reassigning production state
-		switch (factory_production_state) {
-		case ActorType::SOLDIER:
-			new_factory.production_state =
-			    player_state::FactoryProduction::SOLDIER;
-			break;
-		case ActorType::VILLAGER:
-			new_factory.production_state =
-			    player_state::FactoryProduction::VILLAGER;
-			break;
-		}
+		auto factory_state = state_factory->GetState();
+		auto production_state = state_factory->GetProductionState();
 
 		// Reassinging the factory state
 		switch (factory_state) {
