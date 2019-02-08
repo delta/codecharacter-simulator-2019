@@ -5,6 +5,8 @@
 
 #include "state/state_syncer.h"
 
+#include <cmath>
+
 namespace state {
 
 StateSyncer::StateSyncer(std::unique_ptr<ICommandGiver> command_giver,
@@ -117,11 +119,10 @@ void StateSyncer::UpdatePlayerStates(
 				}
 			}
 		}
-		// Assinging the gold mine_locations to the player state
-		for (auto gold_mine_location : gold_mine_locations) {
-			player_states[player_id].gold_mine_locations.push_back(
-			    gold_mine_location);
-		}
+
+		// Assigning the gold mine_locations to the player state
+		player_states[player_id].gold_mine_locations =
+		    std::move(gold_mine_locations);
 	}
 
 	// Log the current state
@@ -312,31 +313,28 @@ void StateSyncer::AssignFactoryAttributes(
 			new_factory.state = player_state::FactoryState::IDLE;
 			break;
 		case FactoryStateName::PRODUCTION:
-			// Finding whether the factory produces
-			auto production_state =
-			    state_factories[id][i]->GetProductionState();
-			if (production_state == ActorType::SOLDIER) {
-				new_factory.state =
-				    player_state::FactoryState::SOLDIER_PRODUCTION;
-				new_factory.production_state =
-				    player_state::FactoryProduction::SOLDIER;
-			} else {
-				new_factory.state =
-				    player_state::FactoryState::VILLAGER_PRODUCTION;
-				new_factory.production_state =
-				    player_state::FactoryProduction::VILLAGER;
-			}
+			new_factory.state = player_state::FactoryState::PRODUCTION;
+			break;
+		}
+
+		// Reassigning production state
+		switch (production_state) {
+		case ActorType::SOLDIER:
+			new_factory.production_state =
+			    player_state::FactoryProduction::SOLDIER;
+			break;
+		case ActorType::VILLAGER:
+			new_factory.production_state =
+			    player_state::FactoryProduction::VILLAGER;
 			break;
 		}
 
 		// Assigning the position
 		if (static_cast<PlayerId>(player_id) == PlayerId::PLAYER1) {
-			new_factory.position =
-			    state_factories[id][i]->GetPosition().to_int();
+			new_factory.position = state_factory->GetPosition().to_int();
 		} else {
 			new_factory.position =
-			    FlipPosition(map, state_factories[id][i]->GetPosition())
-			        .to_int();
+			    FlipPosition(map, state_factory->GetPosition()).to_int();
 		}
 
 		// Pushing the factory into the new_factories vector
