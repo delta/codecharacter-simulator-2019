@@ -140,21 +140,31 @@ void CommandGiver::RunCommands(
 	auto state_gold = state->GetGold();
 
 	// Iterating through the soldiers and assigning soldier tasks
+
+	// For each player...
 	for (int player_id = 0; player_id < player_states.size(); ++player_id) {
+
+		// For each soldier...
 		for (int64_t soldier_index = 0;
 		     soldier_index < player_states[player_id].soldiers.size();
 		     ++soldier_index) {
+
+			// Get the player soldier and the 'true' soldier from state
 			auto soldier = player_states[player_id].soldiers[soldier_index];
 			auto state_soldier = state_soldiers[player_id][soldier_index];
+
+			PlayerId Player_Id = static_cast<PlayerId>(player_id);
+
+			// Check what the soldier wants to perform
 			bool is_attacking = soldier.target != -1;
 			bool is_moving = (soldier.destination != Vec2D(-1, -1));
-			PlayerId Player_Id = static_cast<PlayerId>(player_id);
+
 			// Validating the the soldier id
 			if (soldier.id != state_soldier->GetActorId()) {
 				logger->LogError(Player_Id,
 				                 logger::ErrorType::NO_ALTER_ACTOR_ID,
 				                 "Cannot alter soldier id");
-				return;
+				continue;
 			}
 
 			// Check if soldier is alive
@@ -162,7 +172,7 @@ void CommandGiver::RunCommands(
 				logger->LogError(Player_Id,
 				                 logger::ErrorType::NO_ACTION_BY_DEAD_SOLDIER,
 				                 "Dead soldier cannot perform actions");
-				return;
+				continue;
 			}
 
 			// Checking if the soldier is attacking and moving at the same time
@@ -170,7 +180,6 @@ void CommandGiver::RunCommands(
 				logger->LogError(
 				    Player_Id, logger::ErrorType::NO_MULTIPLE_SOLDIER_TASKS,
 				    "Soldier cannot attack and move at the same time");
-				return;
 			} else {
 				if (is_attacking) {
 					// Checking if the target is an enemy
@@ -186,28 +195,30 @@ void CommandGiver::RunCommands(
 								    Player_Id,
 								    logger::ErrorType::NO_ATTACK_SELF_SOLDIER,
 								    "Soldier is attacking his own soldier");
-								return;
+								break;
 							case ActorType::VILLAGER:
 								logger->LogError(
 								    Player_Id,
 								    logger::ErrorType::NO_ATTACK_SELF_VILLAGER,
 								    "Soldier is attacking his own villager");
-								return;
+								break;
 							case ActorType::FACTORY:
 
 								logger->LogError(
 								    Player_Id,
 								    logger::ErrorType::NO_ATTACK_SELF_FACTORY,
 								    "Soldier is attacking his own soldier");
-								return;
+								break;
 							}
 						} else {
 							logger->LogError(
 							    Player_Id, logger::ErrorType::INVALID_TARGET_ID,
 							    "Invalid target id");
-							return;
 						}
+
+						continue;
 					}
+
 					// If the target is valid, then checking if the enemy has HP
 					// or the target is dead
 					ActorType enemy_type;
@@ -220,19 +231,19 @@ void CommandGiver::RunCommands(
 							    Player_Id,
 							    logger::ErrorType::NO_ATTACK_DEAD_SOLDIER,
 							    "Soldier attacking a dead soldier");
-							return;
+							break;
 						case ActorType::VILLAGER:
 							logger->LogError(
 							    Player_Id,
 							    logger::ErrorType::NO_ATTACK_DEAD_VILLAGER,
 							    "Soldier is attacking a dead villager");
-							return;
+							break;
 						case ActorType::FACTORY:
 							logger->LogError(
 							    Player_Id,
 							    logger::ErrorType::NO_ATTACK_RAZED_FACTORY,
 							    "Soldier is attacking a dead factory");
-							return;
+							break;
 						}
 					}
 					AttackActor(Player_Id, soldier.id, soldier.target);
@@ -249,7 +260,6 @@ void CommandGiver::RunCommands(
 						logger->LogError(
 						    Player_Id, logger::ErrorType::INVALID_MOVE_POSITION,
 						    "Soldier trying to move to invalid location");
-						return;
 					}
 				}
 			}
@@ -257,28 +267,35 @@ void CommandGiver::RunCommands(
 	}
 
 	// Iterating through the villagers and assigning tasks
+
+	// For each player...
 	for (int player_id = 0; player_id < player_states.size(); ++player_id) {
+
+		// For each villager...
 		for (int64_t villager_index = 0;
 		     villager_index < player_states[player_id].villagers.size();
 		     ++villager_index) {
-			// Checking if a villager wants to build a new factory or wants to
-			// continue building a factory that already exists
+
+			// Get the player villager, and the 'true' villager from state
 			auto villager = player_states[player_id].villagers[villager_index];
 			auto state_villager = state_villagers[player_id][villager_index];
-			bool create_factory = villager.build_position != Vec2D::null;
-			bool build_factory = villager.target_factory_id != -1;
-			bool is_moving = villager.destination != Vec2D::null;
-			bool is_attacking = villager.target != -1;
-			bool is_mining = villager.mine_target != Vec2D::null;
+
 			int64_t factory_target = villager.target_factory_id;
 			PlayerId Player_id = static_cast<PlayerId>(player_id);
 
-			// Validation of id
+			// Check what the villager wants to perform
+			bool should_create_factory = villager.build_position != Vec2D::null;
+			bool should_build_factory = villager.target_factory_id != -1;
+			bool should_move = villager.destination != Vec2D::null;
+			bool should_attack = villager.target != -1;
+			bool should_mine = villager.mine_target != Vec2D::null;
+
+			// Check if the villager's id is valid
 			if (villager.id != state_villager->GetActorId()) {
 				logger->LogError(Player_id,
 				                 logger::ErrorType::NO_ALTER_ACTOR_ID,
 				                 "Cannot alter villager id");
-				return;
+				continue;
 			}
 
 			// Checking if the villager is alive
@@ -286,20 +303,21 @@ void CommandGiver::RunCommands(
 				logger->LogError(Player_id,
 				                 logger::ErrorType::NO_ACTION_BY_DEAD_VILLAGER,
 				                 "Dead villager cannot act");
-				return;
+				continue;
 			}
 
-			std::vector<bool> checks{create_factory, build_factory, is_moving,
-			                         is_attacking, is_mining};
-
+			// Check to make sure only one action is being attempted
+			std::vector<bool> checks{should_create_factory,
+			                         should_build_factory, should_move,
+			                         should_attack, should_mine};
 			if (std::count(checks.begin(), checks.end(), true) > 1) {
 				logger->LogError(
 				    Player_id, logger::ErrorType::NO_MULTIPLE_VILLAGER_TASKS,
 				    "Villager cannot do multiple tasks at the same time");
-				return;
+				continue;
 			}
 
-			else if (create_factory) {
+			else if (should_create_factory) {
 				// If villager is creating a new factory
 				bool is_valid = IsValidPosition(villager.build_position);
 				if (is_valid) {
@@ -332,7 +350,6 @@ void CommandGiver::RunCommands(
 								    logger::ErrorType::NO_MORE_FACTORIES,
 								    "Trying to build more factories that the "
 								    "factory limit");
-								return;
 							}
 							break;
 						case TerrainType::WATER:
@@ -340,34 +357,31 @@ void CommandGiver::RunCommands(
 							    Player_id,
 							    logger::ErrorType::NO_BUILD_FACTORY_ON_WATER,
 							    "Villager trying to build factory on water");
-							return;
-
+							break;
 						case TerrainType::GOLD_MINE:
 							logger->LogError(
 							    Player_id,
 							    logger::ErrorType::
 							        NO_BUILD_FACTORY_ON_GOLD_MINE,
 							    "Villager trying to build factory ");
-							return;
+							break;
 						}
 					} else {
 						logger->LogError(Player_id,
 						                 logger::ErrorType::INSUFFICIENT_FUNDS,
 						                 "You do not have sufficient funds to "
 						                 "purchase a factory");
-						return;
 					}
 				} else {
 					logger->LogError(Player_id,
 					                 logger::ErrorType::INVALID_BUILD_POSITION,
 					                 "Villager cannot build factory in "
 					                 "invalid position");
-					return;
 				}
 			}
 
 			// If villager is building an existing factory
-			else if (build_factory) {
+			else if (should_build_factory) {
 				// Validating whether factory exists
 				bool factory_exists = false;
 				for (auto &factory : state_factories[player_id]) {
@@ -383,12 +397,11 @@ void CommandGiver::RunCommands(
 					    Player_id,
 					    logger::ErrorType::NO_BUILD_FACTORY_THAT_DOSENT_EXIST,
 					    "Villager trying to build factory that dosen't exist");
-					return;
 				}
 			}
 
 			// If the villager is moving to another destination
-			else if (is_moving) {
+			else if (should_move) {
 				// Validating the move position
 				bool is_valid = IsValidPosition(villager.destination);
 				if (is_valid) {
@@ -397,12 +410,11 @@ void CommandGiver::RunCommands(
 					logger->LogError(
 					    Player_id, logger::ErrorType::INVALID_MOVE_POSITION,
 					    "Villager cannot move to invalid position");
-					return;
 				}
 			}
 
 			// If the villager is attacking another actor
-			else if (is_attacking) {
+			else if (should_attack) {
 				ActorType self_target_type;
 				bool found = false;
 				bool valid_target = IsValidTarget(player_id, villager.target,
@@ -415,27 +427,27 @@ void CommandGiver::RunCommands(
 							    Player_id,
 							    logger::ErrorType::NO_ATTACK_SELF_SOLDIER,
 							    "Villager is attacking his own soldier");
-							return;
+							break;
 						case ActorType::VILLAGER:
 							logger->LogError(
 							    Player_id,
 							    logger::ErrorType::NO_ATTACK_SELF_VILLAGER,
 							    "Villager is attacking his own villager");
-							return;
+							break;
 						case ActorType::FACTORY:
 							logger->LogError(
 							    Player_id,
 							    logger::ErrorType::NO_ATTACK_SELF_FACTORY,
 							    "Villager is attacking his own soldier");
-							return;
+							break;
 						}
 					} else {
 						logger->LogError(Player_id,
 						                 logger::ErrorType::INVALID_TARGET_ID,
 						                 "Invalid target id");
-						return;
 					}
 				}
+
 				// If the target is valid, then checking if the enemy has HP or
 				// the target is dead
 				ActorType enemy_type;
@@ -448,25 +460,26 @@ void CommandGiver::RunCommands(
 						    Player_id,
 						    logger::ErrorType::NO_ATTACK_DEAD_SOLDIER,
 						    "Villager attacking a dead soldier");
-						return;
+						break;
 					case ActorType::VILLAGER:
 						logger->LogError(
 						    Player_id,
 						    logger::ErrorType::NO_ATTACK_DEAD_VILLAGER,
 						    "Villager is attacking a dead villager");
-						return;
+						break;
 					case ActorType::FACTORY:
 						logger->LogError(
 						    Player_id,
 						    logger::ErrorType::NO_ATTACK_RAZED_FACTORY,
 						    "Villager is attacking a dead factory");
-						return;
+						break;
 					}
 				}
 				AttackActor(Player_id, villager.id, villager.target);
 			}
+
 			// If the villager is wants to mine gold
-			else if (is_mining) {
+			else if (should_mine) {
 				// Validating the mine location
 				bool is_valid = IsValidOffset(villager.mine_target);
 				if (is_valid) {
@@ -481,20 +494,22 @@ void CommandGiver::RunCommands(
 						logger->LogError(
 						    Player_id, logger::ErrorType::INVALID_MINE_POSITION,
 						    "Villager cannot mine in invalid position");
-						return;
 					}
 				} else {
 					logger->LogError(
 					    Player_id, logger::ErrorType::INVALID_MINE_POSITION,
 					    "Villager cannot mine in invalid position");
-					return;
 				}
 			}
 		}
 	}
 
 	// Iterating through all the factories
+
+	// For each player...
 	for (int player_id = 0; player_id < player_states.size(); ++player_id) {
+
+		// For each factory...
 		for (int64_t factory_index = 0;
 		     factory_index < player_states[player_id].factories.size();
 		     ++factory_index) {
@@ -507,7 +522,7 @@ void CommandGiver::RunCommands(
 				logger->LogError(Player_id,
 				                 logger::ErrorType::NO_ALTER_ACTOR_ID,
 				                 "Cannot alter factory id");
-				return;
+				continue;
 			}
 
 			// Validating factory hp
@@ -515,7 +530,7 @@ void CommandGiver::RunCommands(
 				logger->LogError(Player_id,
 				                 logger::ErrorType::NO_ACTION_BY_DEAD_FACTORY,
 				                 "Dead factory cannot act");
-				return;
+				continue;
 			}
 
 			// Starting or stopping factory production
