@@ -147,6 +147,20 @@ struct Soldier : _Unit {
 	Soldier() : _Unit() {}
 };
 
+inline std::ostream &operator<<(std::ostream &os, Soldier soldier) {
+	using std::endl;
+
+	os << "Soldier(id: " << soldier.id << ") {" << endl;
+	os << "    position: " << soldier.position << endl;
+	os << "    hp: " << soldier.hp << endl;
+	os << "    destination: " << soldier.destination << endl;
+	os << "    target: " << soldier.target << endl;
+	os << "    state: " << soldier.state << endl;
+	os << "}";
+
+	return os;
+}
+
 struct Villager : _Unit {
 	int64_t target_factory_id;
 	Vec2D mine_target;
@@ -175,13 +189,28 @@ struct Villager : _Unit {
 	      build_factory_type(FactoryProduction::VILLAGER) {}
 };
 
+inline std::ostream &operator<<(std::ostream &os, Villager villager) {
+	using std::endl;
+
+	os << "Villager(id: " << villager.id << ") {" << endl;
+	os << "    position: " << villager.position << endl;
+	os << "    hp: " << villager.hp << endl;
+	os << "    destination: " << villager.destination << endl;
+	os << "    target: " << villager.target << endl;
+	os << "    target_factory_id: " << villager.target_factory_id << endl;
+	os << "    mine_target: " << villager.mine_target << endl;
+	os << "    build_position: " << villager.build_position << endl;
+	os << "    build_factory_type: " << villager.build_factory_type << endl;
+	os << "    state: " << villager.state << endl;
+	os << "}";
+
+	return os;
+}
+
 struct Factory : _Actor {
 	double_t build_percent;
 	bool built;
 	bool stopped;
-
-	// Suicide if set
-	bool _suicide;
 
 	FactoryProduction production_state;
 	FactoryState state;
@@ -203,13 +232,25 @@ struct Factory : _Actor {
 
 	void start() { stopped = false; }
 
-	// Self destruct
-	void suicide() { _suicide = true; }
-
 	Factory()
 	    : _Actor(), build_percent(0), built(false), stopped(false),
 	      production_state(FactoryProduction::VILLAGER) {}
 };
+
+inline std::ostream &operator<<(std::ostream &os, Factory factory) {
+	using std::endl;
+
+	os << "Factory(id: " << factory.id << ") {" << endl;
+	os << "    position: " << factory.position << endl;
+	os << "    hp: " << factory.hp << endl;
+	os << "    build_percent: " << factory.build_percent << endl;
+	os << "    stopped: " << factory.stopped << endl;
+	os << "    production_state: " << factory.production_state << endl;
+	os << "    state: " << factory.state << endl;
+	os << "}";
+
+	return os;
+}
 
 enum class TerrainType { LAND, WATER, GOLD_MINE };
 
@@ -233,5 +274,70 @@ struct State {
 	int64_t score;
 	int64_t gold;
 };
+
+inline std::ostream &operator<<(std::ostream &os, State state) {
+	using std::endl;
+
+	os << "Map:" << endl;
+	for (auto const &row : state.map) {
+		for (auto const &elem : row) {
+			switch (elem) {
+			case TerrainType::LAND:
+				os << "L"
+				   << " ";
+				break;
+			case TerrainType::WATER:
+				os << "W"
+				   << " ";
+				break;
+			case TerrainType::GOLD_MINE:
+				os << "G"
+				   << " ";
+				break;
+			}
+		}
+		os << endl;
+	}
+
+	os << "-- Villagers --" << endl;
+	for (auto const &villager : state.villagers) {
+		os << villager << endl;
+	}
+	os << "-- Enemy Villagers --" << endl;
+	for (auto const &villager : state.enemy_villagers) {
+		os << villager << endl;
+	}
+
+	os << "-- Soldiers --" << endl;
+	for (auto const &villager : state.soldiers) {
+		os << villager << endl;
+	}
+	os << "-- Enemy Soldiers --" << endl;
+	for (auto const &villager : state.enemy_soldiers) {
+		os << villager << endl;
+	}
+
+	os << "-- Factories --" << endl;
+	for (auto const &villager : state.factories) {
+		os << villager << endl;
+	}
+	os << "-- Enemy Factories --" << endl;
+	for (auto const &villager : state.enemy_factories) {
+		os << villager << endl;
+	}
+
+	os << "-- Gold Mine Locations --" << endl;
+	for (auto const &gold_mine : state.gold_mine_locations) {
+		os << gold_mine << endl;
+	}
+
+	os << "-- Score --" << endl;
+	os << state.score << endl;
+
+	os << "-- Gold --" << endl;
+	os << state.gold << endl;
+
+	return os;
+}
 
 } // namespace player_state
