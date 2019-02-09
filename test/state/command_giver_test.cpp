@@ -23,72 +23,37 @@ Vec2D FlipPosition(Vec2D position, int map_size, int ele_size) {
 }
 
 // Helper functions to create state objects
-vector<Soldier *> CreateStateSoldier(int64_t actor_id, int hp,
-                                     GoldManager *gold_manager,
-                                     PathPlanner *path_planner,
-                                     DoubleVec2D position) {
+Soldier *CreateStateSoldier(int64_t actor_id, int hp, GoldManager *gold_manager,
+                            PathPlanner *path_planner, DoubleVec2D position) {
 	vector<Soldier *> soldiers;
 	auto soldier =
 	    new Soldier(actor_id, PlayerId::PLAYER1, ActorType::SOLDIER, hp, 100,
 	                position, gold_manager, path_planner, 5, 5, 40);
-	soldiers.push_back(soldier);
-	return soldiers;
+
+	return soldier;
 }
 
-vector<Villager *> CreateStateVillager(int64_t actor_id, int hp,
-                                       GoldManager *gold_manager,
-                                       PathPlanner *path_planner,
-                                       DoubleVec2D position) {
+Villager *CreateStateVillager(int64_t actor_id, int hp,
+                              GoldManager *gold_manager,
+                              PathPlanner *path_planner, DoubleVec2D position) {
 	vector<Villager *> villagers;
 	auto villager =
 	    new Villager(actor_id, PlayerId::PLAYER1, ActorType::VILLAGER, hp, 100,
 	                 position, gold_manager, path_planner, 2, 5, 20, 5, 5, 5);
-	villagers.push_back(villager);
-	return villagers;
+
+	return villager;
 }
 
-vector<Factory *> CreateStateFactory(int64_t actor_id, int hp,
-                                     GoldManager *gold_manager,
-                                     PathPlanner *path_planner,
-                                     DoubleVec2D position,
-                                     ActorType actor_type) {
+Factory *CreateStateFactory(int64_t actor_id, int hp, GoldManager *gold_manager,
+                            PathPlanner *path_planner, DoubleVec2D position,
+                            ActorType actor_type) {
 	vector<Factory *> factories;
 	ActorType actor;
 	auto factory = new Factory(actor_id, PlayerId::PLAYER1, ActorType::FACTORY,
 	                           hp, 500, position, gold_manager, 100, 100,
 	                           actor_type, 5, 5, UnitProductionCallback{});
-	auto type = factory->GetActorType();
-	factories.push_back(factory);
-	return factories;
-}
 
-// Helper function to manage state expectations
-void ManageActorExpectations(array<vector<Soldier *>, 2> soldiers,
-                             array<vector<Villager *>, 2> villagers,
-                             array<vector<Factory *>, 2> factories,
-                             CommandTakerMock *command_taker,
-                             array<player_state::State, 2> &player_states,
-                             CommandGiver *command_giver,
-                             ActorType actor_type) {
-	EXPECT_CALL(*command_taker, GetSoldiers).WillOnce(Return(soldiers));
-	EXPECT_CALL(*command_taker, GetVillagers).WillOnce(Return(villagers));
-	EXPECT_CALL(*command_taker, GetFactories).WillOnce(Return(factories));
-	command_giver->RunCommands(player_states);
-
-	if (actor_type == ActorType::SOLDIER) {
-		// Resetting the player state soldier
-		player_states[0].soldiers[0] = player_state::Soldier{};
-		player_states[0].soldiers[0].id = 0;
-	} else if (actor_type == ActorType::VILLAGER) {
-		// Resetting the villager's state
-		player_states[0].villagers[0] = player_state::Villager{};
-		player_states[0].villagers[0].id = 2;
-
-	} else {
-		// Resetting the factory's state
-		player_states[0].factories[0] = player_state::Factory{};
-		player_states[0].factories[0].id = 4;
-	}
+	return factory;
 }
 
 class CommandGiverTest : public Test {
@@ -108,6 +73,28 @@ class CommandGiverTest : public Test {
 	// Creating player states
 	array<player_state::State, 2> player_states;
 	array<int64_t, 2> player_gold;
+
+	// Helper function to manage state expectations
+	void ManageActorExpectations(array<vector<Soldier *>, 2> soldiers,
+	                             array<vector<Villager *>, 2> villagers,
+	                             array<vector<Factory *>, 2> factories,
+	                             array<player_state::State, 2> &player_states,
+	                             ActorType actor_type) {
+		EXPECT_CALL(*command_taker, GetSoldiers).WillOnce(Return(soldiers));
+		EXPECT_CALL(*command_taker, GetVillagers).WillOnce(Return(villagers));
+		EXPECT_CALL(*command_taker, GetFactories).WillOnce(Return(factories));
+		command_giver->RunCommands(player_states);
+
+		if (actor_type == ActorType::SOLDIER) {
+			// Resetting the player state soldier
+			player_states[0].soldiers[0] = player_state::Soldier{};
+			player_states[0].soldiers[0].id = 0;
+		} else if (actor_type == ActorType::VILLAGER) {
+			// Resetting the villager's state
+			player_states[0].villagers[0] = player_state::Villager{};
+			player_states[0].villagers[0].id = 2;
+		}
+	}
 
   public:
 	CommandGiverTest() {
@@ -227,23 +214,6 @@ class CommandGiverTest : public Test {
 			    new_villager);
 		}
 
-		// Init Factories
-		for (int i = 0; i < 2; ++i) {
-			// Reassinging basic attributes
-			player_state::Factory new_factory;
-			new_factory.id = actor_id_count;
-			actor_id_count++;
-			new_factory.hp = 500;
-
-			this->player_states[i % 2].factories.push_back(new_factory);
-
-			// Flipping the position
-			new_factory.position = Vec2D(this->map_size * this->ele_size - 1,
-			                             this->map_size * this->ele_size - 1);
-			this->player_states[(1 + i) % 2].enemy_factories.push_back(
-			    new_factory);
-		}
-
 		this->player_states[0].gold = 500;
 		this->player_states[1].gold = 500;
 		this->player_gold = {500, 500};
@@ -251,521 +221,393 @@ class CommandGiverTest : public Test {
 };
 
 TEST_F(CommandGiverTest, CommandExecutionTest) {
-	// Expect errors from logger
-	// Soldier errors
+	// NOTE!
+	// SetFactoryProduction and StopOrStartFactory will ALWAYS be called for
+	// every factory for every turn. If state contains any factories, you MUST
+	// set expectations for those methods.
 
-	EXPECT_CALL(*this->command_taker, GetMap())
-	    .WillRepeatedly(Return(this->map.get()));
-	EXPECT_CALL(
-	    *this->logger,
-	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_SOLDIER_TASKS, _))
-	    .Times(1);
-	EXPECT_CALL(*this->logger,
-	            LogError(PlayerId::PLAYER1, ErrorType::NO_ALTER_ACTOR_ID, _))
-	    .Times(3);
-	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
-	                                    ErrorType::NO_ATTACK_SELF_SOLDIER, _))
-	    .Times(1);
-	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
-	                                    ErrorType::NO_ATTACK_SELF_VILLAGER, _))
-	    .Times(1);
-	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
-	                                    ErrorType::NO_ATTACK_SELF_FACTORY, _))
-	    .Times(1);
-	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
-	                                    ErrorType::NO_ATTACK_DEAD_SOLDIER, _))
-	    .Times(1);
-	EXPECT_CALL(*this->logger,
-	            LogError(PlayerId::PLAYER1,
-	                     logger::ErrorType::NO_ATTACK_DEAD_VILLAGER, _));
-	EXPECT_CALL(*this->logger,
-	            LogError(PlayerId::PLAYER1,
-	                     logger::ErrorType::NO_ATTACK_RAZED_FACTORY, _));
-	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
-	                                    ErrorType::INVALID_MOVE_POSITION, _))
-	    .Times(1);
-	EXPECT_CALL(
-	    *this->logger,
-	    LogError(PlayerId::PLAYER1, ErrorType::NO_ACTION_BY_DEAD_SOLDIER, _))
-	    .Times(2);
-	EXPECT_CALL(*this->command_taker, GetGold)
-	    .WillRepeatedly(Return(this->player_gold));
+	/// ----- CREATE TEMPLATE OBJECTS (Used for setting ) -----
 
-	// Factory calls will occur every turn, so suppress them here
-	// TODO: Manually filter for factory updates in CommandGiver instead of
-	// unconditionally updating their state at every turn
-	EXPECT_CALL(*this->command_taker, SetFactoryProduction).Times(20);
-	EXPECT_CALL(*this->command_taker, StopOrStartFactory).Times(20);
-
-	// Creating state soldier
+	// Make soldiers
 	auto state_soldier1 = CreateStateSoldier(
 	    0, 100, this->gold_manager.get(), this->path_planner.get(),
 	    DoubleVec2D(this->ele_size, this->ele_size));
 	auto state_soldier2 = CreateStateSoldier(
 	    1, 100, this->gold_manager.get(), this->path_planner.get(),
 	    DoubleVec2D(this->ele_size, this->ele_size));
-	array<vector<Soldier *>, 2> state_soldiers = {state_soldier1,
-	                                              state_soldier2};
+	array<vector<Soldier *>, 2> state_soldiers = {
+	    {{state_soldier1}, {state_soldier2}}};
 
-	// Creating dead soldiers
-	auto dead_soldier1 = CreateStateSoldier(
-	    0, 0, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(this->ele_size, this->ele_size));
-	auto dead_soldier2 = CreateStateSoldier(
-	    1, 0, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(this->ele_size, this->ele_size));
-
-	// Creating state villagers
+	// Make villagers
 	auto state_villager1 = CreateStateVillager(
 	    2, 100, this->gold_manager.get(), this->path_planner.get(),
 	    DoubleVec2D(this->ele_size, this->ele_size));
 	auto state_villager2 = CreateStateVillager(
 	    3, 100, this->gold_manager.get(), this->path_planner.get(),
 	    DoubleVec2D(this->ele_size, this->ele_size));
-	array<vector<Villager *>, 2> state_villagers = {state_villager1,
-	                                                state_villager2};
+	array<vector<Villager *>, 2> state_villagers = {
+	    {{state_villager1}, {state_villager2}}};
 
-	// Creating dead villagers
-	auto dead_villager1 = CreateStateVillager(
-	    2, 0, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(this->ele_size, this->ele_size));
-	auto dead_villager2 = CreateStateVillager(
-	    3, 0, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(this->ele_size, this->ele_size));
-
-	// Creating state factories
+	// Make soldiers
+	// Used ONLY during Factory tests
 	auto state_factory1 = CreateStateFactory(
 	    4, 500, this->gold_manager.get(), this->path_planner.get(),
 	    DoubleVec2D(this->ele_size, this->ele_size), ActorType::VILLAGER);
 	auto state_factory2 = CreateStateFactory(
 	    5, 100, this->gold_manager.get(), this->path_planner.get(),
 	    DoubleVec2D(this->ele_size, this->ele_size), ActorType::SOLDIER);
-	array<vector<Factory *>, 2> state_factories = {state_factory1,
-	                                               state_factory2};
+	// NO Factories by default
+	array<vector<Factory *>, 2> state_factories = {};
 
-	// Creating a dead factory
-	auto dead_factory1 = CreateStateFactory(
-	    4, 0, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(1, 1), ActorType::SOLDIER);
-	auto dead_factory2 = CreateStateFactory(
-	    5, 0, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(1, 1), ActorType::VILLAGER);
+	/// ----- Set Expectations for Map and player gold -----
+	EXPECT_CALL(*this->command_taker, GetMap())
+	    .WillRepeatedly(Return(this->map.get()));
+	EXPECT_CALL(*this->command_taker, GetGold)
+	    .WillRepeatedly(Return(this->player_gold));
+
+	// ----- SOLDIER TESTS -----
 
 	// Making soldiers attack each other and move at the same time
+	EXPECT_CALL(
+	    *this->logger,
+	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_SOLDIER_TASKS, _));
 	this->player_states[0].soldiers[0].target =
 	    this->player_states[0].enemy_soldiers[0].id;
 	this->player_states[0].soldiers[0].destination =
 	    Vec2D(this->ele_size, this->ele_size);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
+	                        this->player_states, ActorType::SOLDIER);
 
 	// Soldier trying to attack soldiers after changing id
-	this->player_states[0].soldiers[0].id =
-	    this->player_states[0].soldiers[0].id + 1;
+	EXPECT_CALL(*this->logger,
+	            LogError(PlayerId::PLAYER1, ErrorType::NO_ALTER_ACTOR_ID, _));
+	this->player_states[0].soldiers[0].id = 69;
 	this->player_states[0].soldiers[0].target =
 	    this->player_states[0].enemy_soldiers[0].id;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
+	                        this->player_states, ActorType::SOLDIER);
 
 	// Soldier trying to attack villagers after changing id
-	this->player_states[0].soldiers[0].id =
-	    this->player_states[0].soldiers[0].id + 1;
+	EXPECT_CALL(*this->logger,
+	            LogError(PlayerId::PLAYER1, ErrorType::NO_ALTER_ACTOR_ID, _));
+	this->player_states[0].soldiers[0].id = 69;
 	this->player_states[0].soldiers[0].target =
 	    this->player_states[0].enemy_villagers[0].id;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
+	                        this->player_states, ActorType::SOLDIER);
 
 	// Soldier trying to attack factories after changing id
-	this->player_states[0].soldiers[0].id =
-	    this->player_states[0].enemy_factories[0].id + 1;
-	this->player_states[0].soldiers[0].target =
-	    this->player_states[0].enemy_factories[0].id;
+	EXPECT_CALL(*this->logger,
+	            LogError(PlayerId::PLAYER1, ErrorType::NO_ALTER_ACTOR_ID, _));
+	state_factories[1].push_back(state_factory2);
+	this->player_states[0].soldiers[0].id = 69;
+	this->player_states[0].soldiers[0].target = state_factory2->GetActorId();
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
+	                        this->player_states, ActorType::SOLDIER);
+	state_factories[1].clear();
 
 	// Soldier trying to attack own soldier
+	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
+	                                    ErrorType::NO_ATTACK_SELF_SOLDIER, _));
 	EXPECT_CALL(*this->command_taker, FindActorById)
 	    .WillOnce(Return(nullptr))
-	    .WillOnce(Return(state_soldier1[0]));
+	    .WillOnce(Return(state_soldier1));
 	this->player_states[0].soldiers[0].target =
 	    this->player_states[0].soldiers[0].id;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
+	                        this->player_states, ActorType::SOLDIER);
 
 	// Soldier trying to attack own villager
+	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
+	                                    ErrorType::NO_ATTACK_SELF_VILLAGER, _));
 	EXPECT_CALL(*this->command_taker, FindActorById)
 	    .WillOnce(Return(nullptr))
-	    .WillOnce(Return(state_villager1[0]));
+	    .WillOnce(Return(state_villager1));
 	this->player_states[0].soldiers[0].target =
 	    this->player_states[0].villagers[0].id;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
+	                        this->player_states, ActorType::SOLDIER);
 
 	// Soldier trying to attack own factory
+	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
+	                                    ErrorType::NO_ATTACK_SELF_FACTORY, _));
+	state_factories[0].push_back(state_factory1);
 	EXPECT_CALL(*this->command_taker, FindActorById)
 	    .WillOnce(Return(nullptr))
-	    .WillOnce(Return(state_factory1[0]));
-	this->player_states[0].soldiers[0].target =
-	    this->player_states[0].factories[0].id;
+	    .WillOnce(Return(state_factory1));
+	this->player_states[0].soldiers[0].target = state_factory1->GetActorId();
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
+	                        this->player_states, ActorType::SOLDIER);
+	state_factories[0].clear();
 
 	// Soldier trying to move out of the map
+	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
+	                                    ErrorType::INVALID_MOVE_POSITION, _));
 	this->player_states[0].soldiers[0].destination =
 	    Vec2D(this->map_size * this->ele_size, this->map_size * this->ele_size);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
+	                        this->player_states, ActorType::SOLDIER);
 
-	// Soldier trying to attack a dead soldier
-	EXPECT_CALL(*this->command_taker, FindActorById)
-	    .WillOnce(Return(dead_soldier2[0]))
-	    .WillOnce(Return(dead_soldier2[0]));
-	this->player_states[0].soldiers[0].target =
-	    this->player_states[0].enemy_soldiers[0].id;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
+	/// ----- VILLAGER TESTS -----
 
-	// Soldier trying to attack a dead villager
-	EXPECT_CALL(*this->command_taker, FindActorById)
-	    .WillOnce(Return(dead_villager2[0]))
-	    .WillOnce(Return(dead_villager2[0]));
-	this->player_states[0].soldiers[0].target =
+	// Villager trying to attack soldiers after changing id
+	EXPECT_CALL(*this->logger,
+	            LogError(PlayerId::PLAYER1, ErrorType::NO_ALTER_ACTOR_ID, _));
+	this->player_states[0].villagers[0].id =
+	    this->player_states[0].villagers[0].id + 1;
+	this->player_states[0].villagers[0].target =
 	    this->player_states[0].enemy_villagers[0].id;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
+	                        this->player_states, ActorType::VILLAGER);
 
-	// Soldier trying to attack a dead factory
-	EXPECT_CALL(*this->command_taker, FindActorById)
-	    .WillOnce(Return(dead_factory2[0]))
-	    .WillOnce(Return(dead_factory2[0]));
-	this->player_states[0].soldiers[0].target =
-	    this->player_states[0].enemy_factories[0].id;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
-
-	// Making player 1's soldier as dead and player 2's soldier as alive
-	state_soldiers[0] = dead_soldier1;
-	state_soldiers[1] = state_soldier2;
-
-	// Dead soldier trying to move
-	this->player_states[0].soldiers[0].destination =
-	    Vec2D(this->ele_size, this->ele_size);
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
-
-	// Dead soldier trying to attack
-	this->player_states[0].soldiers[0].target =
-	    this->player_states[0].enemy_soldiers[0].id;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
-
-	// Resetting state soldiers
-	state_soldiers = {state_soldier1, state_soldier2};
-
-	// Villager errors
-	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
-	                                    ErrorType::NO_ATTACK_DEAD_SOLDIER, _))
-	    .Times(1);
+	// Villager trying to attack villagers after changing id
 	EXPECT_CALL(*this->logger,
-	            LogError(PlayerId::PLAYER1,
-	                     logger::ErrorType::NO_ATTACK_DEAD_VILLAGER, _));
+	            LogError(PlayerId::PLAYER1, ErrorType::NO_ALTER_ACTOR_ID, _));
+	this->player_states[0].villagers[0].id =
+	    this->player_states[0].villagers[0].id + 1;
+	this->player_states[0].villagers[0].target =
+	    this->player_states[0].enemy_villagers[0].id;
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Villager trying to attack factories after changing id
+	state_factories[1].push_back(state_factory2);
 	EXPECT_CALL(*this->logger,
-	            LogError(PlayerId::PLAYER1,
-	                     logger::ErrorType::NO_ATTACK_RAZED_FACTORY, _));
-	EXPECT_CALL(*this->logger,
-	            LogError(PlayerId::PLAYER1, ErrorType::NO_ALTER_ACTOR_ID, _))
-	    .Times(3);
+	            LogError(PlayerId::PLAYER1, ErrorType::NO_ALTER_ACTOR_ID, _));
+	this->player_states[0].villagers[0].id = 69;
+	this->player_states[0].villagers[0].target = state_factory2->GetActorId();
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+	state_factories[1].clear();
+
+	// Villager trying to attack and move
 	EXPECT_CALL(
 	    *this->logger,
-	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _))
-	    .Times(10);
+	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _));
+	this->player_states[0].villagers[0].target =
+	    this->player_states[0].enemy_villagers[0].id;
+	this->player_states[0].villagers[0].destination =
+	    Vec2D(this->ele_size, this->ele_size);
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Villager trying to attack and mine gold
+	EXPECT_CALL(
+	    *this->logger,
+	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _));
+	this->player_states[0].villagers[0].target =
+	    this->player_states[0].enemy_soldiers[0].id;
+	this->player_states[0].villagers[0].mine_target =
+	    Vec2D(this->ele_size, this->ele_size);
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Villager trying to attack and create factory at the same time
+	EXPECT_CALL(
+	    *this->logger,
+	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _));
+	this->player_states[0].villagers[0].target =
+	    this->player_states[0].enemy_soldiers[0].id;
+	this->player_states[0].villagers[0].build_position =
+	    Vec2D(this->ele_size, this->ele_size);
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Villager trying to attack and build factory
+	EXPECT_CALL(
+	    *this->logger,
+	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _));
+	state_factories[0].push_back(state_factory1);
+	this->player_states[0].villagers[0].target =
+	    this->player_states[0].enemy_soldiers[0].id;
+	this->player_states[0].villagers[0].target_factory_id =
+	    state_factory1->GetActorId();
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+	state_factories[0].clear();
+
+	// Villager trying to move and mine gold
+	EXPECT_CALL(
+	    *this->logger,
+	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _));
+	this->player_states[0].villagers[0].destination =
+	    Vec2D(this->ele_size, this->ele_size);
+	this->player_states[0].villagers[0].mine_target =
+	    Vec2D(this->ele_size, this->ele_size);
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Villager trying to move and create factory
+	EXPECT_CALL(
+	    *this->logger,
+	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _));
+	this->player_states[0].villagers[0].destination =
+	    Vec2D(this->ele_size, this->ele_size);
+	this->player_states[0].villagers[0].build_position =
+	    Vec2D(this->ele_size, this->ele_size);
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Villager trying to move and build factory
+	EXPECT_CALL(
+	    *this->logger,
+	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _));
+	state_factories[0].push_back(state_factory1);
+	this->player_states[0].villagers[0].destination =
+	    Vec2D(this->ele_size, this->ele_size);
+	this->player_states[0].villagers[0].target_factory_id =
+	    state_factory1->GetActorId();
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+	state_factories[0].clear();
+
+	// Villager trying to mine target and create factory
+	EXPECT_CALL(
+	    *this->logger,
+	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _));
+	this->player_states[0].villagers[0].mine_target =
+	    Vec2D(this->ele_size, this->ele_size);
+	this->player_states[0].villagers[0].build_position =
+	    Vec2D(this->ele_size, this->ele_size);
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Villager trying to mine target and build factory
+	EXPECT_CALL(
+	    *this->logger,
+	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _));
+	state_factories[0].push_back(state_factory1);
+	this->player_states[0].villagers[0].mine_target =
+	    Vec2D(this->ele_size, this->ele_size);
+	this->player_states[0].villagers[0].target_factory_id =
+	    state_factory1->GetActorId();
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+	state_factories[0].clear();
+
+	// Villager trying to create factory and build factory
+	EXPECT_CALL(
+	    *this->logger,
+	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _));
+	state_factories[0].push_back(state_factory1);
+	this->player_states[0].villagers[0].build_position =
+	    Vec2D(this->ele_size, this->ele_size);
+	this->player_states[0].villagers[0].target_factory_id =
+	    state_factory1->GetActorId();
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+	state_factories[0].clear();
+
+	// Making villager go out of the map
 	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
-	                                    ErrorType::INVALID_MOVE_POSITION, _))
-	    .Times(1);
+	                                    ErrorType::INVALID_MOVE_POSITION, _));
+	this->player_states[0].villagers[0].destination =
+	    Vec2D(this->map_size * this->ele_size, this->map_size * this->ele_size);
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Making villager create a factory outside map
 	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
-	                                    ErrorType::INVALID_BUILD_POSITION, _))
-	    .Times(2);
+	                                    ErrorType::INVALID_BUILD_POSITION, _));
+	this->player_states[0].villagers[0].build_position =
+	    Vec2D(this->map_size * this->ele_size, this->map_size * this->ele_size);
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Making villager create a factory on water
+	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
+	                                    ErrorType::INVALID_BUILD_POSITION, _));
+	// (0, 0) is a water tile
+	this->player_states[0].villagers[0].build_position = Vec2D(0, 0);
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Villager trying to create a factory with insufficient funds
+	auto player_gold2 = this->player_gold;
+	player_gold2[0] = 0;
+	EXPECT_CALL(*this->command_taker, GetGold)
+	    .WillRepeatedly(Return(player_gold2));
+
 	EXPECT_CALL(
 	    *this->logger,
 	    LogError(PlayerId::PLAYER1, logger::ErrorType::INSUFFICIENT_FUNDS, _));
+	this->player_states[0].villagers[0].build_position =
+	    Vec2D(this->map_size, 0);
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	EXPECT_CALL(*this->command_taker, GetGold)
+	    .WillRepeatedly(Return(this->player_gold)); // Reset player gold
+
+	// Making villagers try and mine outside map
 	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
-	                                    ErrorType::INVALID_MINE_POSITION, _))
-	    .Times(3);
+	                                    ErrorType::INVALID_MINE_POSITION, _));
+	this->player_states[0].villagers[0].mine_target =
+	    Vec2D(this->map_size * this->ele_size, this->map_size * this->ele_size);
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Making villagers mine land
+	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
+	                                    ErrorType::INVALID_MINE_POSITION, _));
+	this->player_states[0].villagers[0].mine_target = Vec2D(1, 0);
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Making villager mine water
+	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
+	                                    ErrorType::INVALID_MINE_POSITION, _));
+	this->player_states[0].villagers[0].mine_target = Vec2D(1, 1);
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Making villager build factory that dosen't exist
 	EXPECT_CALL(*this->logger,
 	            LogError(PlayerId::PLAYER1,
 	                     logger::ErrorType::NO_BUILD_FACTORY_THAT_DOSENT_EXIST,
 	                     _));
-
-	// Villager trying to attack dead soldier
-	EXPECT_CALL(*this->command_taker, FindActorById)
-	    .WillOnce(Return(dead_soldier2[0]))
-	    .WillOnce(Return(dead_soldier2[0]));
-	this->player_states[0].villagers[0].target =
-	    this->player_states[0].enemy_soldiers[0].id;
+	this->player_states[0].villagers[0].target_factory_id = 69;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
+	                        this->player_states, ActorType::VILLAGER);
 
-	// Villager trying to attack dead villager
-	EXPECT_CALL(*this->command_taker, FindActorById)
-	    .WillOnce(Return(dead_villager2[0]))
-	    .WillOnce(Return(dead_villager2[0]));
-	this->player_states[0].villagers[0].target =
-	    this->player_states[0].enemy_villagers[0].id;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
+	/// ----- FACTORY TESTS -----
 
-	// Villager trying to attack dead factory
-	EXPECT_CALL(*this->command_taker, FindActorById)
-	    .WillOnce(Return(dead_factory2[0]))
-	    .WillOnce(Return(dead_factory2[0]));
-	this->player_states[0].soldiers[0].target =
-	    this->player_states[0].enemy_factories[0].id;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
-
-	// Villager changing it's id and attacks soldiers
-	this->player_states[0].villagers[0].id =
-	    this->player_states[0].villagers[0].id + 1;
-	this->player_states[0].villagers[0].target =
-	    this->player_states[0].enemy_villagers[0].id;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Villager trying to attack villagers after changing id
-	this->player_states[0].villagers[0].id =
-	    this->player_states[0].villagers[0].id + 1;
-	this->player_states[0].villagers[0].target =
-	    this->player_states[0].enemy_villagers[0].id;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Villager trying to attack factories after changing id
-	this->player_states[0].villagers[0].id =
-	    this->player_states[0].villagers[0].id + 1;
-	this->player_states[0].villagers[0].target =
-	    this->player_states[0].enemy_factories[0].id;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Villager trying to attack and move
-	this->player_states[0].villagers[0].target =
-	    this->player_states[0].enemy_villagers[0].id;
-	this->player_states[0].villagers[0].destination =
-	    Vec2D(this->ele_size, this->ele_size);
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Villager trying to attack and mine gold
-	this->player_states[0].villagers[0].target =
-	    this->player_states[0].enemy_soldiers[0].id;
-	this->player_states[0].villagers[0].mine_target =
-	    Vec2D(this->ele_size, this->ele_size);
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Villager trying to attack and create factory at the same time
-	this->player_states[0].villagers[0].target =
-	    this->player_states[0].enemy_soldiers[0].id;
-	this->player_states[0].villagers[0].build_position =
-	    Vec2D(this->ele_size, this->ele_size);
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Villager trying to attack and build factory
-	this->player_states[0].villagers[0].target =
-	    this->player_states[0].enemy_soldiers[0].id;
-	this->player_states[0].villagers[0].target_factory_id =
-	    this->player_states[0].factories[0].id;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Villager trying to move and mine gold
-	this->player_states[0].villagers[0].destination =
-	    Vec2D(this->ele_size, this->ele_size);
-	this->player_states[0].villagers[0].mine_target =
-	    Vec2D(this->ele_size, this->ele_size);
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Villager trying to move and create factory
-	this->player_states[0].villagers[0].destination =
-	    Vec2D(this->ele_size, this->ele_size);
-	this->player_states[0].villagers[0].build_position =
-	    Vec2D(this->ele_size, this->ele_size);
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Villager trying to move and build factory
-	this->player_states[0].villagers[0].destination =
-	    Vec2D(this->ele_size, this->ele_size);
-	this->player_states[0].villagers[0].target_factory_id =
-	    this->player_states[0].factories[0].id;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Villager trying to mine target and create factory
-	this->player_states[0].villagers[0].mine_target =
-	    Vec2D(this->ele_size, this->ele_size);
-	this->player_states[0].villagers[0].build_position =
-	    Vec2D(this->ele_size, this->ele_size);
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Villager trying to mine target and build factory
-	this->player_states[0].villagers[0].mine_target =
-	    Vec2D(this->ele_size, this->ele_size);
-	this->player_states[0].villagers[0].target_factory_id =
-	    this->player_states[0].factories[0].id;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Villager trying to create factory and build factory
-	this->player_states[0].villagers[0].build_position =
-	    Vec2D(this->ele_size, this->ele_size);
-	this->player_states[0].villagers[0].target_factory_id =
-	    this->player_states[0].factories[0].id;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Making villager go out of the map
-	this->player_states[0].villagers[0].destination =
-	    Vec2D(this->map_size * this->ele_size, this->map_size * this->ele_size);
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Making villager create a factory outside map
-	this->player_states[0].villagers[0].build_position =
-	    Vec2D(this->map_size * this->ele_size, this->map_size * this->ele_size);
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Making villager create a factory on water
-	this->player_states[0].villagers[0].build_position =
-	    Vec2D(this->map_size * this->ele_size, this->map_size * this->ele_size);
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	auto player_gold2 = this->player_gold;
-	player_gold2[0] = 0;
-
-	EXPECT_CALL(*this->command_taker, GetGold)
-	    .WillRepeatedly(Return(player_gold2));
-
-	// Villager trying to create a factory with insufficient funds
-	this->player_states[0].villagers[0].build_position =
-	    Vec2D(this->map_size, 0);
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Resetting the amount of player gold
-	EXPECT_CALL(*this->command_taker, GetGold)
-	    .WillRepeatedly(Return(this->player_gold));
-
-	// Making villagers try and mine outside map
-	this->player_states[0].villagers[0].mine_target =
-	    Vec2D(this->map_size * this->ele_size, this->map_size * this->ele_size);
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Making villagers mine land
-	this->player_states[0].villagers[0].mine_target = Vec2D(1, 0);
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Making villager mine water
-	this->player_states[0].villagers[0].mine_target = Vec2D(1, 1);
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Making villager build factory that dosen't exist
-	this->player_states[0].villagers[0].target_factory_id =
-	    this->player_states[0].enemy_soldiers[0].id;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
-
-	// Writing tests for factories
-	EXPECT_CALL(*this->logger,
-	            LogError(PlayerId::PLAYER1,
-	                     logger::ErrorType::NO_ACTION_BY_DEAD_FACTORY, _));
+	// Making a factory change it's actor id
 	EXPECT_CALL(
 	    *this->logger,
 	    LogError(PlayerId::PLAYER1, logger::ErrorType::NO_ALTER_ACTOR_ID, _));
+	state_factories[0].push_back(state_factory1);
+	this->player_states[0].factories.push_back(player_state::Factory{});
+	this->player_states[0].factories[0].id = 69; // Changed id
+
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::FACTORY);
+	this->player_states[0].factories.clear();
+
+	// Creating 50 factories to trigger maximum limit on number of factories
 	EXPECT_CALL(
 	    *this->logger,
 	    LogError(PlayerId::PLAYER1, logger::ErrorType::NO_MORE_FACTORIES, _));
-
-	// Making a factory change it's actor id
-	this->player_states[0].factories[0].id += 1;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::FACTORY);
-
-	// Making a dead factory try and produce soldiers
-	state_factories[0] = dead_factory1;
-	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::FACTORY);
-
-	// Creating 50 soldiers to trigger maximum limit on number of soldiers
 	vector<Factory *> state_max_factories;
 	for (int i = 0; i < MAX_NUM_FACTORIES; ++i) {
 		auto new_factory = CreateStateFactory(
 		    4, 500, this->gold_manager.get(), this->path_planner.get(),
 		    DoubleVec2D(this->ele_size, this->ele_size), ActorType::FACTORY);
-		state_max_factories.push_back(new_factory[0]);
+		state_max_factories.push_back(new_factory);
 	}
 	state_factories[0] = state_max_factories;
 	this->player_states[0].villagers[0].build_position =
 	    Vec2D(3 * this->map_size, 0 * this->map_size);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
+	                        this->player_states, ActorType::VILLAGER);
+	state_factories[0].clear();
 
-	// Resetting factories
-	state_factories[0] = state_factory1;
+	/// ----- VALID OPERATIONS TEST -----
 
-	// Executing valid actions
-	// Soldiers attacking all targets
+	/// SOLDIERS' ATTACK
+	// Soldier attacking soldier
 	EXPECT_CALL(*this->command_taker, FindActorById)
-	    .WillOnce(Return(state_soldier2[0]))
-	    .WillOnce(Return(state_soldier2[0]));
+	    .WillOnce(Return(state_soldier2));
 	EXPECT_CALL(*this->command_taker,
 	            AttackActor(PlayerId::PLAYER1,
 	                        this->player_states[0].soldiers[0].id,
@@ -773,11 +615,11 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	this->player_states[0].soldiers[0].target =
 	    this->player_states[0].enemy_soldiers[0].id;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
+	                        this->player_states, ActorType::SOLDIER);
+
+	// Soldier attacking villager
 	EXPECT_CALL(*this->command_taker, FindActorById)
-	    .WillOnce(Return(state_villager2[0]))
-	    .WillOnce(Return(state_villager2[0]));
+	    .WillOnce(Return(state_villager2));
 	EXPECT_CALL(*this->command_taker,
 	            AttackActor(PlayerId::PLAYER1,
 	                        this->player_states[0].soldiers[0].id,
@@ -785,24 +627,25 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	this->player_states[0].soldiers[0].target =
 	    this->player_states[0].enemy_villagers[0].id;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
+	                        this->player_states, ActorType::SOLDIER);
+
+	// Soldier attacking factory
+	state_factories[1].push_back(state_factory2);
 	EXPECT_CALL(*this->command_taker,
 	            AttackActor(PlayerId::PLAYER1,
 	                        this->player_states[0].soldiers[0].id,
-	                        this->player_states[0].enemy_factories[0].id));
+	                        state_factory2->GetActorId()));
 	EXPECT_CALL(*this->command_taker, FindActorById)
-	    .WillOnce(Return(state_factory2[0]))
-	    .WillOnce(Return(state_factory2[0]));
-	this->player_states[0].soldiers[0].target =
-	    this->player_states[0].enemy_factories[0].id;
+	    .WillOnce(Return(state_factory2));
+	this->player_states[0].soldiers[0].target = state_factory2->GetActorId();
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::SOLDIER);
-	// Villagers attack all targets
+	                        this->player_states, ActorType::SOLDIER);
+	state_factories[1].clear();
+
+	/// VILLAGERS' ATTACK
+	// Villagers attacking soldiers
 	EXPECT_CALL(*this->command_taker, FindActorById)
-	    .WillOnce(Return(state_soldier1[0]))
-	    .WillOnce(Return(state_soldier1[0]));
+	    .WillOnce(Return(state_soldier1));
 	EXPECT_CALL(*this->command_taker,
 	            AttackActor(PlayerId::PLAYER1,
 	                        this->player_states[0].villagers[0].id,
@@ -810,11 +653,11 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	this->player_states[0].villagers[0].target =
 	    this->player_states[0].enemy_soldiers[0].id;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Villagers attacking villagers
 	EXPECT_CALL(*this->command_taker, FindActorById)
-	    .WillOnce(Return(state_villager2[0]))
-	    .WillOnce(Return(state_villager2[0]));
+	    .WillOnce(Return(state_villager2));
 	EXPECT_CALL(*this->command_taker,
 	            AttackActor(PlayerId::PLAYER1,
 	                        this->player_states[0].villagers[0].id,
@@ -822,22 +665,23 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	this->player_states[0].villagers[0].target =
 	    this->player_states[0].enemy_villagers[0].id;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Villager attacking factories
+	state_factories[1].push_back(state_factory2);
 	EXPECT_CALL(*this->command_taker, FindActorById)
-	    .WillOnce(Return(state_factory2[0]))
-	    .WillOnce(Return(state_factory2[0]));
+	    .WillOnce(Return(state_factory2));
 	EXPECT_CALL(*this->command_taker,
 	            AttackActor(PlayerId::PLAYER1,
 	                        this->player_states[0].villagers[0].id,
-	                        this->player_states[0].enemy_factories[0].id));
-	this->player_states[0].villagers[0].target =
-	    this->player_states[0].enemy_factories[0].id;
+	                        state_factory2->GetActorId()));
+	this->player_states[0].villagers[0].target = state_factory2->GetActorId();
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
+	                        this->player_states, ActorType::VILLAGER);
+	state_factories[1].clear();
 
-	// Villagers creating and building factories
+	/// VILLAGERS' OPERATIONS
+	// Villager create factory
 	EXPECT_CALL(*this->command_taker,
 	            CreateFactory(PlayerId::PLAYER1,
 	                          this->player_states[0].villagers[0].id,
@@ -845,28 +689,30 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	this->player_states[0].villagers[0].build_position =
 	    Vec2D(3 * this->map_size, 0 * this->map_size);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
+	                        this->player_states, ActorType::VILLAGER);
 
+	// Villager build factory
+	state_factories[0].push_back(state_factory1);
 	EXPECT_CALL(*this->command_taker,
 	            BuildFactory(PlayerId::PLAYER1,
 	                         this->player_states[0].villagers[0].id,
-	                         this->player_states[0].factories[0].id));
+	                         state_factory1->GetActorId()));
 	this->player_states[0].villagers[0].target_factory_id =
-	    this->player_states[0].factories[0].id;
+	    state_factory1->GetActorId();
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
+	                        this->player_states, ActorType::VILLAGER);
+	state_factories[0].clear();
 
-	// Villagers mining gold and moving
+	// Villager mine gold
 	EXPECT_CALL(*this->command_taker,
 	            MineLocation(PlayerId::PLAYER1,
 	                         this->player_states[0].villagers[0].id,
 	                         Vec2D(4, 2)));
 	this->player_states[0].villagers[0].mine_target = Vec2D(4, 2);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Villager move
 	EXPECT_CALL(*this->command_taker,
 	            MoveUnit(PlayerId::PLAYER1,
 	                     this->player_states[0].villagers[0].id,
@@ -874,6 +720,7 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	this->player_states[0].villagers[0].destination =
 	    Vec2D(this->ele_size, this->ele_size);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
-	                        this->command_taker.get(), this->player_states,
-	                        this->command_giver.get(), ActorType::VILLAGER);
+	                        this->player_states, ActorType::VILLAGER);
+
+	/// ----- END -----
 }
