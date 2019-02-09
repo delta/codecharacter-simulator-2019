@@ -39,19 +39,6 @@ bool CommandGiver::IsValidOffset(Vec2D position) const {
 	return true;
 }
 
-bool CommandGiver::IsDeadTarget(int64_t player_id, int64_t enemy_actor_id,
-                                ActorType &enemy_type) {
-	int64_t enemy_id =
-	    (player_id + 1) % static_cast<int>(PlayerId::PLAYER_COUNT);
-	auto actor =
-	    state->FindActorById(static_cast<PlayerId>(enemy_id), enemy_actor_id);
-	bool is_dead_target = (actor->GetHp() == 0);
-	if (is_dead_target) {
-		enemy_type = actor->GetActorType();
-	}
-	return is_dead_target;
-}
-
 bool CommandGiver::IsValidTarget(int64_t player_id, int64_t enemy_actor_id,
                                  ActorType &target_type, bool &found) {
 	// Checking a player's own actors to see if the target belongs to his own
@@ -167,14 +154,6 @@ void CommandGiver::RunCommands(
 				continue;
 			}
 
-			// Check if soldier is alive
-			else if (state_soldier->GetHp() == 0) {
-				logger->LogError(Player_Id,
-				                 logger::ErrorType::NO_ACTION_BY_DEAD_SOLDIER,
-				                 "Dead soldier cannot perform actions");
-				continue;
-			}
-
 			// Checking if the soldier is attacking and moving at the same time
 			else if (is_attacking && is_moving) {
 				logger->LogError(
@@ -219,33 +198,6 @@ void CommandGiver::RunCommands(
 						continue;
 					}
 
-					// If the target is valid, then checking if the enemy has HP
-					// or the target is dead
-					ActorType enemy_type;
-					bool is_dead =
-					    IsDeadTarget(player_id, soldier.target, enemy_type);
-					if (is_dead) {
-						switch (enemy_type) {
-						case ActorType::SOLDIER:
-							logger->LogError(
-							    Player_Id,
-							    logger::ErrorType::NO_ATTACK_DEAD_SOLDIER,
-							    "Soldier attacking a dead soldier");
-							break;
-						case ActorType::VILLAGER:
-							logger->LogError(
-							    Player_Id,
-							    logger::ErrorType::NO_ATTACK_DEAD_VILLAGER,
-							    "Soldier is attacking a dead villager");
-							break;
-						case ActorType::FACTORY:
-							logger->LogError(
-							    Player_Id,
-							    logger::ErrorType::NO_ATTACK_RAZED_FACTORY,
-							    "Soldier is attacking a dead factory");
-							break;
-						}
-					}
 					AttackActor(Player_Id, soldier.id, soldier.target);
 				}
 
@@ -295,14 +247,6 @@ void CommandGiver::RunCommands(
 				logger->LogError(Player_id,
 				                 logger::ErrorType::NO_ALTER_ACTOR_ID,
 				                 "Cannot alter villager id");
-				continue;
-			}
-
-			// Checking if the villager is alive
-			else if (state_villager->GetHp() == 0) {
-				logger->LogError(Player_id,
-				                 logger::ErrorType::NO_ACTION_BY_DEAD_VILLAGER,
-				                 "Dead villager cannot act");
 				continue;
 			}
 
@@ -441,6 +385,8 @@ void CommandGiver::RunCommands(
 							    "Villager is attacking his own soldier");
 							break;
 						}
+
+						continue;
 					} else {
 						logger->LogError(Player_id,
 						                 logger::ErrorType::INVALID_TARGET_ID,
@@ -448,33 +394,6 @@ void CommandGiver::RunCommands(
 					}
 				}
 
-				// If the target is valid, then checking if the enemy has HP or
-				// the target is dead
-				ActorType enemy_type;
-				bool is_dead =
-				    IsDeadTarget(player_id, villager.target, enemy_type);
-				if (is_dead == true) {
-					switch (enemy_type) {
-					case ActorType::SOLDIER:
-						logger->LogError(
-						    Player_id,
-						    logger::ErrorType::NO_ATTACK_DEAD_SOLDIER,
-						    "Villager attacking a dead soldier");
-						break;
-					case ActorType::VILLAGER:
-						logger->LogError(
-						    Player_id,
-						    logger::ErrorType::NO_ATTACK_DEAD_VILLAGER,
-						    "Villager is attacking a dead villager");
-						break;
-					case ActorType::FACTORY:
-						logger->LogError(
-						    Player_id,
-						    logger::ErrorType::NO_ATTACK_RAZED_FACTORY,
-						    "Villager is attacking a dead factory");
-						break;
-					}
-				}
 				AttackActor(Player_id, villager.id, villager.target);
 			}
 
@@ -522,14 +441,6 @@ void CommandGiver::RunCommands(
 				logger->LogError(Player_id,
 				                 logger::ErrorType::NO_ALTER_ACTOR_ID,
 				                 "Cannot alter factory id");
-				continue;
-			}
-
-			// Validating factory hp
-			else if (state_factories[player_id][factory_index]->GetHp() == 0) {
-				logger->LogError(Player_id,
-				                 logger::ErrorType::NO_ACTION_BY_DEAD_FACTORY,
-				                 "Dead factory cannot act");
 				continue;
 			}
 

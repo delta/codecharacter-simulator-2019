@@ -38,21 +38,6 @@ enum class ErrorType {
 	NO_ALTER_ACTOR_ID,
 
 	/**
-	 * Trying to command a dead soldier
-	 */
-	NO_ACTION_BY_DEAD_SOLDIER,
-
-	/**
-	 * Trying to command a dead villager
-	 */
-	NO_ACTION_BY_DEAD_VILLAGER,
-
-	/**
-	 * Trying to command a dead factory
-	 */
-	NO_ACTION_BY_DEAD_FACTORY,
-
-	/**
 	 * Trying to move a soldier / villager to an invalid position
 	 */
 	INVALID_MOVE_POSITION,
@@ -83,16 +68,6 @@ enum class ErrorType {
 	NO_ATTACK_SELF_FACTORY,
 
 	/**
-	 * Trying to attack a dead soldier
-	 */
-	NO_ATTACK_DEAD_SOLDIER,
-
-	/**
-	 * Trying to attack a dead villager
-	 */
-	NO_ATTACK_DEAD_VILLAGER,
-
-	/**
 	 * Trying to attack a dead villager
 	 */
 	NO_BUILD_FACTORY_THAT_DOSENT_EXIST,
@@ -106,12 +81,6 @@ enum class ErrorType {
 	 * Trying to build factory after reaching maximum limit
 	 */
 	NO_MORE_FACTORIES,
-
-	/**
-	 * Trying to attack factory that will be razed in same turn by opponent
-	 */
-	NO_ATTACK_RAZED_FACTORY,
-
 	/**
 	 * Trying to build factory on water
 	 */
@@ -141,21 +110,15 @@ const std::vector<std::string> ErrorTypeName = {
     "NO_MULTIPLE_VILLAGER_TASKS",
     "NO_MULTIPLE_FACTORY_TASKS",
     "NO_ALTER_ACTOR_ID",
-    "NO_ACTION_BY_DEAD_SOLDIER",
-    "NO_ACTION_BY_DEAD_VILLAGER",
-    "NO_ACTION_BY_DEAD_FACTORY",
     "INVALID_MOVE_POSITION",
     "INVALID_MINE_POSITION",
     "INVALID_BUILD_POSITION",
     "NO_ATTACK_SELF_SOLDIER",
     "NO_ATTACK_SELF_VILLAGER",
     "NO_ATTACK_SELF_FACTORY",
-    "NO_ATTACK_DEAD_SOLDIER",
-    "NO_ATTACK_DEAD_VILLAGER",
     "NO_BUILD_FACTORY_THAT_DOSENT_EXIST",
     "INSUFFICIENT_FUNDS",
     "NO_MORE_FACTORIES",
-    "NO_ATTACK_RAZED_FACTORY",
     "NO_BUILD_FACTORY_ON_WATER",
     "NO_BUILD_FACTORY_ON_GOLD_MINE",
     "INVALID_TARGET_ID",
