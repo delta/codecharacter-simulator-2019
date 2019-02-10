@@ -27,11 +27,22 @@ class GoldMine {
 	 * gold left in the gold mine
 	 */
 	int64_t ExtractGold(int64_t ext_amount);
+
+	/**
+	 * Helper function to get the amount of gold in the GoldMine
+	 */
+
+	int64_t GetGoldReserve();
+
+	/**
+	 * Helper function to set the amount of gold reserve in a GoldMine
+	 */
+	void SetGoldReserve(int64_t gold_value);
 };
 
 /**
- * Defining a way to compare 2 GoldMine objects so that is can be stored in a
- * hash map
+ * Defining a way to compare 2 GoldMine objects so that is can be stored in an
+ * unordered hash map
  */
 
 class GoldMineCompare {

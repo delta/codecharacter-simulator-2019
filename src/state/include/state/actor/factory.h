@@ -7,6 +7,7 @@
 #include "state/actor/factory_states/factory_state.h"
 #include "state/actor/soldier.h"
 #include "state/actor/villager.h"
+#include "state/interfaces/i_gold_manager.h"
 #include "state/state_export.h"
 #include "state/utilities.h"
 

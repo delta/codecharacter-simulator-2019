@@ -371,7 +371,7 @@ bool State::IsGameOver(PlayerId &winner) {
 	return is_game_over;
 
 	// Late gold manager update
-	gold_manager->AssignGold();
+	gold_manager->Update();
 }
 
 } // namespace state

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "state/actor/actor.fwd.h"
-#include "state/actor/actor.h"
 #include "state/gold_manager/gold_mine.h"
 #include "state/state_export.h"
 #include "state/utilities.h"
@@ -67,13 +66,6 @@ class STATE_EXPORT IGoldManager {
 	 *
 	 * @param[in]  player_id Player who triggered the suicide
 	 */
-	virtual void DeductFactorySuicidePenalty(PlayerId player_id) = 0;
-
-	/**
-	 * Penalty for player triggering suicide
-	 *
-	 * @param[in]  player_id Player who triggered the suicide
-	 */
 	virtual void RewardMineGold(PlayerId player_id, GoldMine *gold_mine,
 	                            int64_t mining_reward) = 0;
 
@@ -85,7 +77,7 @@ class STATE_EXPORT IGoldManager {
 	/**
 	 * Function to assign amount of gold to be given to each player
 	 */
-	virtual void AssignGold() = 0;
+	virtual void Update() = 0;
 };
 
 } // namespace state

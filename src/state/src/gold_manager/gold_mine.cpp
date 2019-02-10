@@ -16,4 +16,9 @@ int64_t GoldMine::ExtractGold(int64_t ext_amount) {
 		return ext_amount;
 	}
 }
+
+int64_t GoldMine::GetGoldReserve() { return this->value; }
+
+void GoldMine::SetGoldReserve(int64_t gold_value) { this->value = gold_value; }
+
 } // namespace state

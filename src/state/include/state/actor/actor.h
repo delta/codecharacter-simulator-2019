@@ -14,14 +14,6 @@
 #include <memory>
 
 namespace state {
-/**
- * Actor base class
- */
-
-/**
- * Forward declaration of IGoldManager
- */
-class IGoldManager;
 
 class STATE_EXPORT Actor : public IUpdatable {
   protected:

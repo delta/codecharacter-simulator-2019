@@ -55,9 +55,8 @@ class SoldierTest : public Test {
 
 		this->gold_manager = make_unique<GoldManager>(
 		    player_gold, max_gold, soldier_kill_reward_gold,
-		    villager_kill_reward_gold, factory_kill_reward_gold,
-		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
-		    MINING_REWARD, std::move(gold_mines));
+		    villager_kill_reward_gold, factory_kill_reward_gold, VILLAGER_COST,
+		    SOLDIER_COST, FACTORY_COST, MINING_REWARD, std::move(gold_mines));
 		this->path_planner = make_unique<PathPlanner>(map.get());
 
 		this->soldier =

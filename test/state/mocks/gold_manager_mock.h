@@ -14,8 +14,7 @@ class GoldManagerMock : public IGoldManager {
 	MOCK_METHOD2(DeductUnitCreateCost, void(PlayerId, Actor *));
 	MOCK_METHOD1(GetBalance, int64_t(PlayerId));
 	MOCK_METHOD0(GetMaxGold, int64_t());
-	MOCK_METHOD1(DeductFactorySuicidePenalty, void(PlayerId));
 	MOCK_METHOD3(RewardMineGold, void(PlayerId, GoldMine *, int64_t));
 	MOCK_METHOD2(AddMineRequest, void(PlayerId, Vec2D));
-	MOCK_METHOD0(AssignGold, void());
+	MOCK_METHOD0(Update, void());
 };

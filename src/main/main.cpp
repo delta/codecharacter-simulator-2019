@@ -95,8 +95,8 @@ unique_ptr<GoldManager> BuildGoldManager() {
 	return make_unique<GoldManager>(
 	    array<int64_t, 2>{GOLD_START, GOLD_START}, GOLD_MAX,
 	    SOLDIER_KILL_REWARD_AMOUNT, VILLAGER_KILL_REWARD_AMOUNT,
-	    FACTORY_KILL_REWARD_AMOUNT, FACTORY_SUICIDE_PENALTY, VILLAGER_COST,
-	    SOLDIER_COST, FACTORY_COST, MINING_REWARD, std::move(gold_mines));
+	    FACTORY_KILL_REWARD_AMOUNT, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
+	    MINING_REWARD, std::move(gold_mines));
 }
 
 unique_ptr<PathPlanner> BuildPathPlanner(Map *map) {

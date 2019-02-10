@@ -54,11 +54,6 @@ class STATE_EXPORT GoldManager : public IGoldManager {
 	int64_t factory_kill_reward_amount;
 
 	/**
-	 * Penalty amount for a suicide of a factory
-	 */
-	int64_t factory_suicide_penalty_amount;
-
-	/**
 	 * Amount of gold to create a villager
 	 */
 	int64_t villager_cost;
@@ -105,9 +100,8 @@ class STATE_EXPORT GoldManager : public IGoldManager {
 	GoldManager(std::array<int64_t, 2> player_gold, int64_t max_gold,
 	            int64_t soldier_kill_reward_amount,
 	            int64_t villager_kill_reward_amount,
-	            int64_t factory_kill_reward_amount,
-	            int64_t factory_suicide_penalty_amount, int64_t villager_cost,
-	            int64_t soldier_cost, int64_t soldier_factory_cost,
+	            int64_t factory_kill_reward_amount, int64_t villager_cost,
+	            int64_t soldier_cost, int64_t factory_cost,
 	            int64_t mining_reward,
 	            std::vector<std::unique_ptr<GoldMine>> gold_mines);
 
@@ -176,13 +170,6 @@ class STATE_EXPORT GoldManager : public IGoldManager {
 	 *
 	 * @param[in]  player_id Player who triggered the suicide
 	 */
-	void DeductFactorySuicidePenalty(PlayerId player_id) override;
-
-	/**
-	 * Penalty for player triggering suicide
-	 *
-	 * @param[in]  player_id Player who triggered the suicide
-	 */
 	void RewardMineGold(PlayerId player_id, GoldMine *gold_mine,
 	                    int64_t mining_reward) override;
 
@@ -194,6 +181,6 @@ class STATE_EXPORT GoldManager : public IGoldManager {
 	/**
 	 * Function to assign amount of gold to be given to each player
 	 */
-	void AssignGold() override;
+	void Update() override;
 };
 } // namespace state

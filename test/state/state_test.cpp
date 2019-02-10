@@ -121,7 +121,7 @@ class StateTest : public Test {
 
 TEST_F(StateTest, MoveUnitTest) {
 	// Adding expectation for gold manager as state is updated
-	EXPECT_CALL(*gold_manager, AssignGold());
+	EXPECT_CALL(*gold_manager, Update());
 
 	state->MoveUnit(PlayerId::PLAYER1, 1, Vec2D(5, 5));
 	auto curr_villagers = state->GetVillagers();
@@ -136,7 +136,7 @@ TEST_F(StateTest, MoveUnitTest) {
 
 TEST_F(StateTest, MineLocationTest) {
 	// Adding expectation for gold manager as state is updated
-	EXPECT_CALL(*gold_manager, AssignGold());
+	EXPECT_CALL(*gold_manager, Update());
 
 	state->MineLocation(PlayerId::PLAYER1, 1, Vec2D(25, 25));
 	auto curr_villagers = state->GetVillagers();
@@ -152,7 +152,7 @@ TEST_F(StateTest, MineLocationTest) {
 
 TEST_F(StateTest, VillagerAttackEnemyTest) {
 	// Adding expectation for gold manager as state is updated
-	EXPECT_CALL(*gold_manager, AssignGold());
+	EXPECT_CALL(*gold_manager, Update());
 
 	state->AttackActor(PlayerId::PLAYER1, 1, 2);
 	auto curr_villagers = state->GetVillagers();
@@ -171,7 +171,7 @@ TEST_F(StateTest, VillagerAttackEnemyTest) {
 
 TEST_F(StateTest, SoldierAttackEnemyTest) {
 	// Adding expectation for gold manager as state is updated
-	EXPECT_CALL(*gold_manager, AssignGold());
+	EXPECT_CALL(*gold_manager, Update());
 
 	state->AttackActor(PlayerId::PLAYER2, 2, 1);
 	auto curr_soldiers = state->GetSoldiers();
@@ -202,7 +202,7 @@ TEST_F(StateTest, CreateFactoryTest) {
 	}
 =======
 	// Adding expectation for gold manager as state is updated
-	EXPECT_CALL(*gold_manager, AssignGold());
+	EXPECT_CALL(*gold_manager, Update());
 
 	state->Update();
 >>>>>>> Add expectations for GoldManager mock
@@ -245,6 +245,7 @@ TEST_F(StateTest, BuildFactoryTest) {
 		state->Update();
 	}
 
+<<<<<<< 8d7402a77dd4b1910544206ee76d36a175b1ae5d
 	ASSERT_EQ(villager->GetState(), VillagerStateName::BUILD);
 
 	// Getting the updated factories from state
@@ -252,6 +253,9 @@ TEST_F(StateTest, BuildFactoryTest) {
 	auto factory = curr_factories[0].front();
 =======
 	EXPECT_CALL(*gold_manager, AssignGold());
+=======
+	EXPECT_CALL(*gold_manager, Update());
+>>>>>>> Add tests for GoldManager
 
 	state->Update();
 
@@ -269,7 +273,7 @@ TEST_F(StateTest, BuildFactoryTest) {
 	// Updating state again
 =======
 	// Adding expectation for gold manager as state is updated
-	EXPECT_CALL(*gold_manager, AssignGold());
+	EXPECT_CALL(*gold_manager, Update());
 
 >>>>>>> Add expectations for GoldManager mock
 	state->Update();
@@ -281,7 +285,7 @@ TEST_F(StateTest, BuildFactoryTest) {
 	state->BuildFactory(PlayerId::PLAYER1, 3, factory->GetActorId());
 
 	// Adding expectation for gold manager as state is updated
-	EXPECT_CALL(*gold_manager, AssignGold());
+	EXPECT_CALL(*gold_manager, Update());
 
 	state->Update();
 
@@ -304,7 +308,7 @@ TEST_F(StateTest, FactoryProductionTest) {
 	}
 =======
 	// Adding expectation for gold manager as state is updated
-	EXPECT_CALL(*gold_manager, AssignGold());
+	EXPECT_CALL(*gold_manager, Update());
 
 	state->Update();
 >>>>>>> Add expectations for GoldManager mock
@@ -324,7 +328,7 @@ TEST_F(StateTest, FactoryProductionTest) {
 	                            ActorType::SOLDIER);
 
 	// Adding expectation for gold manager as state is updated
-	EXPECT_CALL(*gold_manager, AssignGold());
+	EXPECT_CALL(*gold_manager, Update());
 
 	state->Update();
 
@@ -347,7 +351,7 @@ TEST_F(StateTest, FactoryDeathTest) {
 	}
 =======
 	// Adding expectation for gold manager as state is updated
-	EXPECT_CALL(*gold_manager, AssignGold());
+	EXPECT_CALL(*gold_manager, Update());
 
 	state->Update();
 >>>>>>> Add expectations for GoldManager mock
@@ -373,7 +377,7 @@ TEST_F(StateTest, FactoryDeathTest) {
 	// Updating the state
 =======
 	// Kill factory
-	EXPECT_CALL(*gold_manager, AssignGold());
+	EXPECT_CALL(*gold_manager, Update());
 
 	auto curr_factory = curr_factories[0].front();
 	curr_factory->SetHp(0);
@@ -386,7 +390,7 @@ TEST_F(StateTest, FactoryDeathTest) {
 
 TEST_F(StateTest, VillagerDeathTest) {
 	// Adding expectation for gold manager as state is updated
-	EXPECT_CALL(*gold_manager, AssignGold());
+	EXPECT_CALL(*gold_manager, Update());
 
 	auto curr_villagers = state->GetVillagers();
 	ASSERT_EQ(curr_villagers[0].size(), 2);
@@ -401,7 +405,7 @@ TEST_F(StateTest, VillagerDeathTest) {
 
 TEST_F(StateTest, SoldierDeathTest) {
 	// Adding expectation for gold manager as state is updated
-	EXPECT_CALL(*gold_manager, AssignGold());
+	EXPECT_CALL(*gold_manager, Update());
 
 	auto curr_soldiers = state->GetSoldiers();
 	ASSERT_EQ(curr_soldiers[1].size(), 1);

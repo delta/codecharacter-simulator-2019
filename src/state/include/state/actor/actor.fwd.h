@@ -1,6 +1,6 @@
 /**
- * @file factory.fwd.h
- * Forward declaration for the Factory class
+ * @file actor.fwd.h
+ * Forward declaration for the Actor class
  */
 
 #pragma once
