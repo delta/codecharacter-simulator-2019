@@ -2,7 +2,7 @@
 #include "gmock/gmock.h"
 #include "state/actor/soldier.h"
 #include "state/actor/villager.h"
-#include "state/gold_manager/gold_manager.h"
+#include "state/mocks/gold_manager_mock.h"
 #include "gtest/gtest.h"
 
 using namespace std;
@@ -20,13 +20,7 @@ class SoldierTest : public Test {
 	int64_t element_size = 10;
 	unique_ptr<Map> map;
 
-	array<int64_t, 2> player_gold;
-	int64_t soldier_kill_reward_gold;
-	int64_t villager_kill_reward_gold;
-	int64_t factory_kill_reward_gold;
-	int64_t max_gold;
-
-	unique_ptr<GoldManager> gold_manager;
+	unique_ptr<GoldManagerMock> gold_manager;
 	unique_ptr<PathPlanner> path_planner;
 	unique_ptr<Soldier> soldier;
 
@@ -41,23 +35,7 @@ class SoldierTest : public Test {
 		}};
 
 		map = make_unique<Map>(map_matrix, map_size, element_size);
-
-		for (int i = 0; i < (int)PlayerId::PLAYER_COUNT; ++i) {
-			player_gold[i] = 5000; // Start balance
-		}
-
-		this->max_gold = 10000;
-		this->soldier_kill_reward_gold = SOLDIER_KILL_REWARD_AMOUNT;
-		this->villager_kill_reward_gold = VILLAGER_KILL_REWARD_AMOUNT;
-		this->factory_kill_reward_gold = FACTORY_KILL_REWARD_AMOUNT;
-
-		std::vector<std::unique_ptr<GoldMine>> gold_mines;
-
-		this->gold_manager = make_unique<GoldManager>(
-		    player_gold, max_gold, soldier_kill_reward_gold,
-		    villager_kill_reward_gold, factory_kill_reward_gold, VILLAGER_COST,
-		    SOLDIER_COST, FACTORY_COST, MINING_REWARD, std::move(gold_mines));
-		this->path_planner = make_unique<PathPlanner>(map.get());
+		gold_manager = make_unique<GoldManagerMock>();
 
 		this->soldier =
 		    make_unique<Soldier>(1, PlayerId::PLAYER1, ActorType::SOLDIER, 100,
@@ -120,8 +98,13 @@ TEST_F(SoldierTest, MoveToDeadState) {
 	                DoubleVec2D(15, 15), gold_manager.get(), path_planner.get(),
 	                10, 10, attack_damage);
 
+	// Making soldier attack the other soldier
 	this->soldier->Attack(target_soldier);
 
+	// Expect calls to GoldManager for killing unit
+	EXPECT_CALL(*gold_manager, RewardKill(target_soldier));
+
+	// Soldier continuously attacking the other soldier until he dies
 	while (target_soldier->GetHp() != 0) {
 		this->soldier->Update();
 		target_soldier->Update();
@@ -135,7 +118,7 @@ TEST_F(SoldierTest, MoveToDeadState) {
 TEST_F(SoldierTest, SoldierKillReward) {
 	int64_t initial_hp = 100;
 	int64_t attack_damage = 10;
-	int64_t initial_gold = player_gold[0];
+	int64_t initial_gold = 100;
 
 	auto *target_soldier =
 	    new Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, initial_hp, 100,
@@ -144,27 +127,30 @@ TEST_F(SoldierTest, SoldierKillReward) {
 
 	this->soldier->Attack(target_soldier);
 
+	// Expecting call to gold manager to reward kill of soldier
+	EXPECT_CALL(*gold_manager, RewardKill(target_soldier));
+
 	while (target_soldier->GetHp() != 0) {
 		this->soldier->Update();
 		target_soldier->Update();
 		this->soldier->LateUpdate();
 		target_soldier->LateUpdate();
 	}
-
-	ASSERT_EQ(gold_manager->GetBalance(PlayerId::PLAYER1),
-	          (initial_gold + soldier_kill_reward_gold));
 }
 
 TEST_F(SoldierTest, PursuitAndKill) {
 	int64_t initial_hp = 100;
 	int64_t attack_damage = 10;
-
 	auto *target_soldier =
 	    new Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, initial_hp, 100,
-	                DoubleVec2D(10, 40), gold_manager.get(), path_planner.get(),
+	                DoubleVec2D(15, 15), gold_manager.get(), path_planner.get(),
 	                10, 10, attack_damage);
 
 	this->soldier->SetAttackTarget(target_soldier);
+
+	// Expecting call to gold manager to reward the soldier for killing target
+	// soldier
+	EXPECT_CALL(*gold_manager, RewardKill(target_soldier));
 
 	while (target_soldier->GetHp() != 0) {
 		this->soldier->Update();
@@ -177,12 +163,19 @@ TEST_F(SoldierTest, PursuitAndKill) {
 }
 
 TEST_F(SoldierTest, SimultaneousKill) {
-	auto target_soldier = make_unique<Soldier>(
-	    2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100, DoubleVec2D(35, 45),
-	    gold_manager.get(), path_planner.get(), 10, 10, 10);
+	auto *target_soldier =
+	    new Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
+	                DoubleVec2D(15, 15), gold_manager.get(), path_planner.get(),
+	                10, 10, 10);
 
-	soldier->Attack(target_soldier.get());
+	// Both soldiers attacking each other
+	soldier->Attack(target_soldier);
 	target_soldier->Attack(soldier.get());
+
+
+	// Expecting call to gold manager to reward gold to each soldier for killing the other
+	EXPECT_CALL(*gold_manager, RewardKill(target_soldier));
+	EXPECT_CALL(*gold_manager, RewardKill(soldier.get())); 
 
 	while (target_soldier->GetHp() != 0) {
 		this->soldier->Update();

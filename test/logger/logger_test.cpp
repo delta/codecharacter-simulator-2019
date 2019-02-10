@@ -24,8 +24,6 @@ class LoggerTest : public testing::Test {
 
 	std::unique_ptr<GoldManagerMock> gold_manager;
 	std::unique_ptr<PathPlanner> path_planner;
-	std::array<int64_t, 2> player_gold;
-	int64_t max_gold;
 
 	std::unique_ptr<Map> map;
 
@@ -47,10 +45,6 @@ class LoggerTest : public testing::Test {
 		    {W, W, W, W, W},
 		}};
 		map = make_unique<Map>(map_matrix, TEST_MAP_SIZE, ELEMENT_SIZE);
-
-		player_gold[0] = 5000;
-		player_gold[1] = 5000;
-		max_gold = 10000;
 	}
 };
 

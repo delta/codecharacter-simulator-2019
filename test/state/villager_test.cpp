@@ -21,12 +21,6 @@ class VillagerTest : public Test {
 	int64_t element_size = 10;
 	unique_ptr<Map> map;
 
-	array<int64_t, 2> player_gold;
-	int64_t soldier_kill_reward_gold;
-	int64_t villager_kill_reward_gold;
-	int64_t factory_kill_reward_gold;
-	int64_t max_gold;
-
 	unique_ptr<GoldManagerMock> gold_manager;
 	unique_ptr<PathPlanner> path_planner;
 	unique_ptr<Villager> villager;
@@ -49,15 +43,6 @@ class VillagerTest : public Test {
 		}};
 
 		map = make_unique<Map>(map_matrix, map_size, element_size);
-		for (int i = 0; i < (int)PlayerId::PLAYER_COUNT; ++i) {
-			player_gold[i] = 5000; // Start balance
-		}
-
-		this->max_gold = 10000;
-		this->soldier_kill_reward_gold = SOLDIER_KILL_REWARD_AMOUNT;
-		this->villager_kill_reward_gold = VILLAGER_KILL_REWARD_AMOUNT;
-		this->factory_kill_reward_gold = FACTORY_KILL_REWARD_AMOUNT;
-
 		this->gold_manager = make_unique<GoldManagerMock>();
 
 		this->path_planner = make_unique<PathPlanner>(map.get());

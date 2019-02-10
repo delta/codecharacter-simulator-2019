@@ -13,12 +13,6 @@ using namespace testing;
 
 class FactoryTest : public Test {
   protected:
-	array<int64_t, 2> player_gold;
-	int64_t soldier_kill_reward_gold;
-	int64_t villager_kill_reward_gold;
-	int64_t factory_kill_reward_gold;
-	int64_t max_gold;
-
 	Soldier model_soldier;
 	Villager model_villager;
 
@@ -59,8 +53,6 @@ class FactoryTest : public Test {
 
 	FactoryTest() {
 
-		player_gold[0] = player_gold[1] = 5000;
-
 		model_villager =
 		    Villager(2, PlayerId::PLAYER2, ActorType::VILLAGER, 100, 100,
 		             DoubleVec2D(15, 15), gold_manager.get(),
@@ -69,13 +61,6 @@ class FactoryTest : public Test {
 		model_soldier = Soldier(1, PlayerId::PLAYER1, ActorType::SOLDIER, 100,
 		                        100, DoubleVec2D(10, 10), gold_manager.get(),
 		                        path_planner.get(), 10, 10, 10);
-
-		this->max_gold = 10000;
-		this->soldier_kill_reward_gold = SOLDIER_KILL_REWARD_AMOUNT;
-		this->villager_kill_reward_gold = VILLAGER_KILL_REWARD_AMOUNT;
-		this->factory_kill_reward_gold = FACTORY_KILL_REWARD_AMOUNT;
-
-		std::vector<std::unique_ptr<GoldMine>> gold_mines;
 
 		this->gold_manager = make_unique<GoldManagerMock>();
 

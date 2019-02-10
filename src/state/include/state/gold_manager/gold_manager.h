@@ -11,8 +11,8 @@
 
 #include <array>
 #include <cstdint>
-#include <map>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 namespace state {
@@ -83,12 +83,11 @@ class STATE_EXPORT GoldManager : public IGoldManager {
 	 * It maps each gold mine to number of requests made by the player to mine
 	 * that location
 	 */
-	std::array<std::map<GoldMine *, int64_t, GoldMineCompare>, 2> mine_requests;
+	std::array<std::unordered_map<GoldMine *, int64_t>, 2> mine_requests;
 
 	/**
 	 * Function to return gold mine given the Vec2D offset
 	 */
-
 	GoldMine *GetGoldMine(Vec2D offset);
 
   public:

@@ -99,7 +99,6 @@ class GoldManagerTest : public testing::Test {
 		 * L L L W L
 		 * L L L L W
 		 */
-
 		vector<vector<TerrainType>> dummy_map;
 		for (int i = 0; i < map_size; ++i) {
 			vector<TerrainType> dummy_row;
@@ -126,7 +125,7 @@ class GoldManagerTest : public testing::Test {
 TEST_F(GoldManagerTest, AddMineRequest) {
 	auto villager = MakeStateVillager(PlayerId::PLAYER1);
 	auto gold_mine = this->gold_mines[0];
-	gold_mine->SetGoldReserve(100);
+	gold_mine->value = 100;
 	int64_t player_id = static_cast<int64_t>(PlayerId::PLAYER1);
 	villager->SetMineTarget(Vec2D(2, 2));
 
@@ -152,7 +151,7 @@ TEST_F(GoldManagerTest, AddMineRequest) {
 TEST_F(GoldManagerTest, SplitGoldTest) {
 	// Reassigning the GoldMine gold to have 16 gold units
 	auto gold_mine = this->gold_mines[0];
-	gold_mine->SetGoldReserve(16);
+	gold_mine->value = 16;
 
 	// Making a villager each for player 1 and player 2
 	// Since both villagers start at the same position, they will reach the mine
@@ -178,7 +177,7 @@ TEST_F(GoldManagerTest, SplitGoldTest) {
 	          this->player_gold[0] + 8);
 	ASSERT_EQ(gold_manager->GetBalance(PlayerId::PLAYER2),
 	          this->player_gold[1] + 8);
-	ASSERT_EQ(gold_mine->GetGoldReserve(), 0);
+	ASSERT_EQ(gold_mine->value, 0);
 
 	// Updating the player gold in the test
 	this->player_gold[0] += 8;
@@ -186,7 +185,7 @@ TEST_F(GoldManagerTest, SplitGoldTest) {
 
 	// Reassigning gold manager to have an odd number and checking if the
 	// remaining gold is removed
-	gold_mine->SetGoldReserve(28);
+	gold_mine->value = 28;
 
 	// Creating an additional player 2 villager and resetting the first 2
 	// villagers
@@ -221,5 +220,5 @@ TEST_F(GoldManagerTest, SplitGoldTest) {
 	          this->player_gold[1] + 18);
 
 	// Checking if the extra 1 gold coin is removed
-	ASSERT_EQ(gold_mine->GetGoldReserve(), 0);
+	ASSERT_EQ(gold_mine->value, 0);
 }
