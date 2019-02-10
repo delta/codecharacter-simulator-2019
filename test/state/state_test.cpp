@@ -30,7 +30,7 @@ class StateTest : public Test {
 	std::vector<std::unique_ptr<Villager>> temp_villager_list;
 	std::vector<std::unique_ptr<Soldier>> temp_soldier_list;
 
-	unique_ptr<GoldManagerMock> gold_manager;
+	GoldManagerMock *gold_manager;
 	unique_ptr<PathPlanner> path_planner;
 	Villager model_villager;
 	Soldier model_soldier;
@@ -63,42 +63,41 @@ class StateTest : public Test {
 		this->villager_kill_reward_gold = VILLAGER_KILL_REWARD_AMOUNT;
 		this->factory_kill_reward_gold = FACTORY_KILL_REWARD_AMOUNT;
 
-		gold_manager = make_unique<GoldManagerMock>();
+		auto unique_gold_manager = make_unique<GoldManagerMock>();
+		this->gold_manager = unique_gold_manager.get();
 
 		this->path_planner = make_unique<PathPlanner>(map.get());
 
 		this->model_villager =
 		    Villager(1, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		             DoubleVec2D(10, 10), gold_manager.get(),
-		             path_planner.get(), 10, 10, 10, 10, 10, 10);
+		             DoubleVec2D(10, 10), gold_manager, path_planner.get(), 10,
+		             10, 10, 10, 10, 10);
 
-		this->model_soldier =
-		    Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
-		            DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(),
-		            10, 10, 10);
+		this->model_soldier = Soldier(
+		    2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
+		    DoubleVec2D(10, 10), gold_manager, path_planner.get(), 10, 10, 10);
 
 		int64_t villager_frequency = 5;
 		int64_t soldier_frequency = 10;
 
-		this->model_factory =
-		    Factory(2, PlayerId::PLAYER2, ActorType::FACTORY, 1, 100,
-		            DoubleVec2D(15, 15), gold_manager.get(), 0, 100,
-		            ActorType::VILLAGER, villager_frequency, soldier_frequency,
-		            UnitProductionCallback{});
+		this->model_factory = Factory(
+		    2, PlayerId::PLAYER2, ActorType::FACTORY, 1, 100,
+		    DoubleVec2D(15, 15), gold_manager, 0, 100, ActorType::VILLAGER,
+		    villager_frequency, soldier_frequency, UnitProductionCallback{});
 
 		soldiers = {};
 		villagers = {};
 		factories = {};
 
 		// Player1 has 2 villagers say..
-		villagers[0].push_back(make_unique<Villager>(
-		    1, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
-		    10, 10, 10, 10));
-		villagers[0].push_back(make_unique<Villager>(
-		    3, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
-		    10, 10, 10, 10));
+		villagers[0].push_back(
+		    make_unique<Villager>(1, PlayerId::PLAYER1, ActorType::VILLAGER,
+		                          100, 100, DoubleVec2D(10, 10), gold_manager,
+		                          path_planner.get(), 10, 10, 10, 10, 10, 10));
+		villagers[0].push_back(
+		    make_unique<Villager>(3, PlayerId::PLAYER1, ActorType::VILLAGER,
+		                          100, 100, DoubleVec2D(10, 10), gold_manager,
+		                          path_planner.get(), 10, 10, 10, 10, 10, 10));
 
 		// Player 2 has 1 villager
 		villagers[1].push_back(make_unique<Villager>(
@@ -107,21 +106,23 @@ class StateTest : public Test {
 		    10, 10, 10, 10));
 
 		// Player2 has 1 soldier, say..
-		soldiers[1].push_back(
-		    make_unique<Soldier>(2, PlayerId::PLAYER2, ActorType::SOLDIER, 100,
-		                         100, DoubleVec2D(10, 10), gold_manager.get(),
-		                         path_planner.get(), 10, 10, 10));
+		soldiers[1].push_back(make_unique<Soldier>(
+		    2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
+		    DoubleVec2D(10, 10), gold_manager, path_planner.get(), 10, 10, 10));
 
 		Actor::SetActorIdIncrement(4);
 
 		this->state = make_unique<State>(
-		    move(map), move(gold_manager), move(path_planner), move(soldiers),
-		    move(villagers), move(factories), move(model_villager),
-		    move(model_soldier), move(model_factory));
+		    move(map), move(unique_gold_manager), move(path_planner),
+		    move(soldiers), move(villagers), move(factories),
+		    move(model_villager), move(model_soldier), move(model_factory));
 	}
 };
 
 TEST_F(StateTest, MoveUnitTest) {
+	// Adding expectation for gold manager as state is updated
+	EXPECT_CALL(*gold_manager, AssignGold());
+
 	state->MoveUnit(PlayerId::PLAYER1, 1, Vec2D(5, 5));
 	auto curr_villagers = state->GetVillagers();
 	auto curr_villager = curr_villagers[0].front();
@@ -134,6 +135,9 @@ TEST_F(StateTest, MoveUnitTest) {
 }
 
 TEST_F(StateTest, MineLocationTest) {
+	// Adding expectation for gold manager as state is updated
+	EXPECT_CALL(*gold_manager, AssignGold());
+
 	state->MineLocation(PlayerId::PLAYER1, 1, Vec2D(25, 25));
 	auto curr_villagers = state->GetVillagers();
 	auto curr_villager = curr_villagers[0].front();
@@ -147,6 +151,9 @@ TEST_F(StateTest, MineLocationTest) {
 }
 
 TEST_F(StateTest, VillagerAttackEnemyTest) {
+	// Adding expectation for gold manager as state is updated
+	EXPECT_CALL(*gold_manager, AssignGold());
+
 	state->AttackActor(PlayerId::PLAYER1, 1, 2);
 	auto curr_villagers = state->GetVillagers();
 	auto curr_villager = curr_villagers[0].front();
@@ -163,6 +170,9 @@ TEST_F(StateTest, VillagerAttackEnemyTest) {
 }
 
 TEST_F(StateTest, SoldierAttackEnemyTest) {
+	// Adding expectation for gold manager as state is updated
+	EXPECT_CALL(*gold_manager, AssignGold());
+
 	state->AttackActor(PlayerId::PLAYER2, 2, 1);
 	auto curr_soldiers = state->GetSoldiers();
 	auto curr_soldier = curr_soldiers[1].front();
@@ -179,15 +189,23 @@ TEST_F(StateTest, SoldierAttackEnemyTest) {
 }
 
 TEST_F(StateTest, CreateFactoryTest) {
+	EXPECT_CALL(*gold_manager, DeductUnitCreateCost);
 	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
 	auto villager = curr_villagers[0].front();
 
+<<<<<<< 72cb5844d7321e03c15e8a78f1b3e553a1a92ca5
 	// Updating the state and soldier
 	while (villager->GetState() != VillagerStateName::BUILD) {
 		state->Update();
 	}
+=======
+	// Adding expectation for gold manager as state is updated
+	EXPECT_CALL(*gold_manager, AssignGold());
+
+	state->Update();
+>>>>>>> Add expectations for GoldManager mock
 
 	// Checking if the villager has transitioned into the BUILD state
 	ASSERT_EQ(villager->GetState(), VillagerStateName::BUILD);
@@ -197,6 +215,7 @@ TEST_F(StateTest, CreateFactoryTest) {
 	curr_factories = state->GetFactories();
 	auto factory = curr_factories[0].front();
 	ASSERT_EQ(curr_factories[0].size(), 1);
+<<<<<<< 72cb5844d7321e03c15e8a78f1b3e553a1a92ca5
 	ASSERT_EQ(factory->GetState(), FactoryStateName::UNBUILT);
 
 <<<<<<< e22e3eaa527dea449d4e47edfe57c4f9204a9c48
@@ -207,15 +226,20 @@ TEST_F(StateTest, CreateFactoryTest) {
 	// auto gold_manager = curr_villagers[0].front()->GetGoldManager();
 	// ASSERT_EQ(gold_manager->GetBalance(PlayerId::PLAYER1), 5000 - FACTORY_COST);
 >>>>>>> Replace GoldManager with mock in all tests
+=======
+	ASSERT_EQ(curr_factories[0].front()->GetState(), FactoryStateName::UNBUILT);
+>>>>>>> Add expectations for GoldManager mock
 }
 
 TEST_F(StateTest, BuildFactoryTest) {
 	// Repeat CreateFactory as above..
+	EXPECT_CALL(*gold_manager, DeductUnitCreateCost);
 	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
 	auto villager = curr_villagers[0].front();
 
+<<<<<<< 72cb5844d7321e03c15e8a78f1b3e553a1a92ca5
 	// Updating the villager's state
 	while (villager->GetState() != VillagerStateName::BUILD) {
 		state->Update();
@@ -226,13 +250,28 @@ TEST_F(StateTest, BuildFactoryTest) {
 	// Getting the updated factories from state
 	curr_factories = state->GetFactories();
 	auto factory = curr_factories[0].front();
+=======
+	EXPECT_CALL(*gold_manager, AssignGold());
+
+	state->Update();
+
+	// Adding expectation for gold manager as state is updated
+
+	ASSERT_EQ(curr_villagers[0].front()->GetState(), VillagerStateName::BUILD);
+>>>>>>> Add expectations for GoldManager mock
 	ASSERT_EQ(curr_factories[0].size(), 1);
 	ASSERT_EQ(factory->GetState(), FactoryStateName::UNBUILT);
 
 	// Test BuildFactory for the same villager..
 	state->BuildFactory(PlayerId::PLAYER1, 1, factory->GetActorId());
 
+<<<<<<< 72cb5844d7321e03c15e8a78f1b3e553a1a92ca5
 	// Updating state again
+=======
+	// Adding expectation for gold manager as state is updated
+	EXPECT_CALL(*gold_manager, AssignGold());
+
+>>>>>>> Add expectations for GoldManager mock
 	state->Update();
 
 	ASSERT_EQ(curr_villagers[0].front()->GetState(), VillagerStateName::BUILD);
@@ -240,6 +279,9 @@ TEST_F(StateTest, BuildFactoryTest) {
 
 	// Test BuildFactory for the other villager..
 	state->BuildFactory(PlayerId::PLAYER1, 3, factory->GetActorId());
+
+	// Adding expectation for gold manager as state is updated
+	EXPECT_CALL(*gold_manager, AssignGold());
 
 	state->Update();
 
@@ -249,15 +291,23 @@ TEST_F(StateTest, BuildFactoryTest) {
 
 TEST_F(StateTest, FactoryProductionTest) {
 	// Repeat CreateFactory as above..
+	EXPECT_CALL(*gold_manager, DeductUnitCreateCost);
 	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
 	auto villager = curr_villagers[0].front();
 
+<<<<<<< 72cb5844d7321e03c15e8a78f1b3e553a1a92ca5
 	// Updating the villager's state
 	while (villager->GetState() != VillagerStateName::BUILD) {
 		state->Update();
 	}
+=======
+	// Adding expectation for gold manager as state is updated
+	EXPECT_CALL(*gold_manager, AssignGold());
+
+	state->Update();
+>>>>>>> Add expectations for GoldManager mock
 
 	ASSERT_EQ(villager->GetState(), VillagerStateName::BUILD);
 
@@ -273,6 +323,9 @@ TEST_F(StateTest, FactoryProductionTest) {
 	state->SetFactoryProduction(PlayerId::PLAYER1, factory->GetActorId(),
 	                            ActorType::SOLDIER);
 
+	// Adding expectation for gold manager as state is updated
+	EXPECT_CALL(*gold_manager, AssignGold());
+
 	state->Update();
 
 	ASSERT_EQ(factory->GetProductionState(), ActorType::SOLDIER);
@@ -280,16 +333,24 @@ TEST_F(StateTest, FactoryProductionTest) {
 
 TEST_F(StateTest, FactoryDeathTest) {
 	// Repeat CreateFactory as above..
+	EXPECT_CALL(*gold_manager, DeductUnitCreateCost);
 	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
 	ASSERT_EQ(curr_factories[0].size(), 0);
 	auto villager = curr_villagers[0].front();
 
+<<<<<<< 72cb5844d7321e03c15e8a78f1b3e553a1a92ca5
 	// Updating the villager's state
 	while (villager->GetState() != VillagerStateName::BUILD) {
 		state->Update();
 	}
+=======
+	// Adding expectation for gold manager as state is updated
+	EXPECT_CALL(*gold_manager, AssignGold());
+
+	state->Update();
+>>>>>>> Add expectations for GoldManager mock
 
 	ASSERT_EQ(villager->GetState(), VillagerStateName::BUILD);
 
@@ -299,6 +360,7 @@ TEST_F(StateTest, FactoryDeathTest) {
 	ASSERT_EQ(curr_factories[0].size(), 1);
 	ASSERT_EQ(factory->GetState(), FactoryStateName::UNBUILT);
 
+<<<<<<< 72cb5844d7321e03c15e8a78f1b3e553a1a92ca5
 	// Killing the factory
 	factory->SetHp(0);
 	factory->Update();
@@ -309,6 +371,13 @@ TEST_F(StateTest, FactoryDeathTest) {
 	ASSERT_EQ(factory->GetHp(), 0);
 
 	// Updating the state
+=======
+	// Kill factory
+	EXPECT_CALL(*gold_manager, AssignGold());
+
+	auto curr_factory = curr_factories[0].front();
+	curr_factory->SetHp(0);
+>>>>>>> Add expectations for GoldManager mock
 	state->Update();
 
 	auto new_facs = state->GetFactories();
@@ -316,6 +385,9 @@ TEST_F(StateTest, FactoryDeathTest) {
 }
 
 TEST_F(StateTest, VillagerDeathTest) {
+	// Adding expectation for gold manager as state is updated
+	EXPECT_CALL(*gold_manager, AssignGold());
+
 	auto curr_villagers = state->GetVillagers();
 	ASSERT_EQ(curr_villagers[0].size(), 2);
 
@@ -328,6 +400,9 @@ TEST_F(StateTest, VillagerDeathTest) {
 }
 
 TEST_F(StateTest, SoldierDeathTest) {
+	// Adding expectation for gold manager as state is updated
+	EXPECT_CALL(*gold_manager, AssignGold());
+
 	auto curr_soldiers = state->GetSoldiers();
 	ASSERT_EQ(curr_soldiers[1].size(), 1);
 

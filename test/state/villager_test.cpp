@@ -97,7 +97,7 @@ TEST_F(VillagerTest, MoveToDestination) {
 
 TEST_F(VillagerTest, TransitionToMineState) {
 	EXPECT_CALL(*this->gold_manager,
-	            AddBuildRequest(PlayerId::PLAYER1, Vec2D(10, 10)));
+	            AddMineRequest(PlayerId::PLAYER1, Vec2D(10, 10)));
 	this->villager->Mine(Vec2D(10, 10));
 
 	this->villager->Update();
@@ -127,6 +127,9 @@ TEST_F(VillagerTest, TransitionToDeadState) {
 
 	this->villager->Attack(target_villager.get());
 
+	// GoldManager expects call for villager killing target villager
+	EXPECT_CALL(*gold_manager, RewardKill(target_villager.get()));
+
 	while (target_villager->GetHp() != 0) {
 		this->villager->Update();
 		target_villager->Update();
@@ -138,7 +141,12 @@ TEST_F(VillagerTest, TransitionToDeadState) {
 }
 
 TEST_F(VillagerTest, MoveToMine) {
+	ASSERT_EQ(this->villager->GetState(), VillagerStateName::IDLE);
 	this->villager->SetMineTarget(Vec2D(20, 10));
+
+	// A build request will be added to the gold manager when the villager tries
+	// to mine
+	EXPECT_CALL(*gold_manager, AddMineRequest);
 
 	while (this->villager->GetState() != VillagerStateName::MINE) {
 		this->villager->Update();
@@ -147,31 +155,32 @@ TEST_F(VillagerTest, MoveToMine) {
 
 	ASSERT_EQ(this->villager->IsMineTargetInRange(), true);
 }
-//This is a test for gold manager, not for villager
-// TEST_F(VillagerTest, VillagerKillReward) {
-// 	int64_t initial_gold = player_gold[0];
+// This is a test for gold manager, not for villager
+TEST_F(VillagerTest, VillagerKillReward) {
 
-// 	auto target_villager = MakeTestVillager();
+	auto target_villager = MakeTestVillager();
 
-// 	EXPECT_CALL(*this->gold_manager, RewardKill(target_villager.get()));
-// 	this->villager->Attack(target_villager.get());
+	EXPECT_CALL(*this->gold_manager, RewardKill(target_villager.get()));
+	this->villager->Attack(target_villager.get());
 
-// 	while (target_villager->GetHp() != 0) {
-// 		this->villager->Update();
-// 		target_villager->Update();
-// 		this->villager->LateUpdate();
-// 		target_villager->LateUpdate();
-// 	}
-
-// 	ASSERT_EQ(gold_manager->GetBalance(PlayerId::PLAYER1),
-// 	          (initial_gold + villager_kill_reward_gold));
-// }
+	while (target_villager->GetHp() != 0) {
+		this->villager->Update();
+		target_villager->Update();
+		this->villager->LateUpdate();
+		target_villager->LateUpdate();
+	}
+}
 
 TEST_F(VillagerTest, SimultaneousKill) {
 	auto target_villager = MakeTestVillager();
 
 	villager->Attack(target_villager.get());
 	target_villager->Attack(villager.get());
+
+	// Expecting call to gold manager for rewarding gold to both villagers for
+	// killing each other
+	EXPECT_CALL(*gold_manager, RewardKill(target_villager.get()));
+	EXPECT_CALL(*gold_manager, RewardKill(this->villager.get()));
 
 	while (target_villager->GetHp() != 0) {
 		this->villager->Update();

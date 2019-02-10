@@ -80,8 +80,7 @@ class STATE_EXPORT IGoldManager {
 	/**
 	 * Function to add build request to current requests
 	 */
-
-	virtual void AddBuildRequest(PlayerId player_id, Vec2D offset) = 0;
+	virtual void AddMineRequest(PlayerId player_id, Vec2D offset) = 0;
 
 	/**
 	 * Function to assign amount of gold to be given to each player

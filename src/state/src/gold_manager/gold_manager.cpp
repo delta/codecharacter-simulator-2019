@@ -128,7 +128,7 @@ void GoldManager::RewardMineGold(PlayerId player_id, GoldMine *gold_mine,
 	Increase(player_id, extracted_amount);
 }
 
-void GoldManager::AddBuildRequest(PlayerId player_id, Vec2D offset) {
+void GoldManager::AddMineRequest(PlayerId player_id, Vec2D offset) {
 	int64_t id = static_cast<int64_t>(player_id);
 	auto player_requests = this->mine_requests[id];
 	auto gold_mine = GetGoldMine(offset);
