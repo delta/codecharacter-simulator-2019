@@ -15,6 +15,7 @@ namespace state {
 class STATE_EXPORT IUpdatable {
   public:
 	virtual ~IUpdatable(){};
+
 	virtual void Update() = 0;
 };
 } // namespace state

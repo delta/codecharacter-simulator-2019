@@ -101,8 +101,8 @@ void State::AttackActor(PlayerId player_id, ActorId unit_id,
 	unit->Attack(enemy_actor);
 }
 
-void State::CreateFactory(PlayerId p_player_id, ActorId villager_id,
-                          Vec2D offset) {
+void State::MakeFactory(PlayerId p_player_id, ActorId villager_id,
+                        Vec2D offset) {
 	auto player_id = static_cast<int64_t>(p_player_id);
 	auto factory = FindFactoryByOffset(p_player_id, offset);
 
@@ -121,6 +121,62 @@ void State::CreateFactory(PlayerId p_player_id, ActorId villager_id,
 	auto actor = FindActorById(p_player_id, villager_id);
 	auto villager = static_cast<Villager *>(actor);
 	villager->Build(factory);
+}
+
+void State::CreateFactory(PlayerId player_id, ActorId villager_id,
+                          Vec2D offset) {
+	int64_t id = static_cast<int64_t>(player_id);
+
+	// Creating the (Vec2d, villager_id) pair
+	std::pair<Vec2D, int64_t> new_entry = {offset, villager_id};
+
+	// Adding a new build request
+	auto &build_reqs = this->build_requests[id];
+	build_reqs.push_back(new_entry);
+}
+
+bool State::IsPositionTaken(Vec2D position, int64_t enemy_id) {
+	auto build_reqs = this->build_requests[enemy_id];
+	for (int64_t req_no = 0; req_no < build_reqs.size(); ++req_no) {
+		auto request = build_reqs[req_no];
+		if (request.first == position) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void State::HandleBuildRequests() {
+	// Iterating through the players requests
+	for (int64_t id = 0; id < 2; ++id) {
+		auto &build_reqs = this->build_requests[id];
+		int64_t enemy_id =
+		    (id + 1) % static_cast<int64_t>(PlayerId::PLAYER_COUNT);
+
+		// Iterating through each player's build requests
+		for (int64_t req_no = 0; req_no < build_reqs.size(); ++req_no) {
+			auto build_req = build_reqs[req_no];
+			Vec2D build_pos = build_req.first;
+			int64_t villager_id = build_req.second;
+
+			bool is_pos_taken = IsPositionTaken(build_pos, enemy_id);
+
+			// NOTE! : If both players simultaneously try to build a factory on
+			// a position, then none of the request will be processed
+
+			// If the enemy has not issued a build request at the same position
+			if (not is_pos_taken) {
+				// Calling MakeFactory for the given player as there are no
+				// build collisions
+				PlayerId player_id = static_cast<PlayerId>(id);
+				MakeFactory(player_id, villager_id, build_pos);
+			}
+		}
+	}
+
+	for (auto &player_build_requests : this->build_requests) {
+		player_build_requests.clear();
+	}
 }
 
 void State::BuildFactory(PlayerId p_player_id, ActorId villager_id,
@@ -278,6 +334,9 @@ void State::Update() {
 
 		player_factories.erase(last_valid_elem, player_factories.end());
 	}
+
+	// Handling build requests by villagers
+	HandleBuildRequests();
 }
 
 bool State::IsGameOver(PlayerId &winner) {

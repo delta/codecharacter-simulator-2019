@@ -19,6 +19,7 @@
 
 #include <array>
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace state {
@@ -71,6 +72,11 @@ class STATE_EXPORT State : public ICommandTaker {
 	Factory model_factory;
 
 	/**
+	 * An array of queues for handling build requests
+	 */
+	std::array<std::vector<std::pair<Vec2D, int64_t>>, 2> build_requests;
+
+	/**
 	 * Get pointer to Factory given map offset
 	 *
 	 * @param player_id
@@ -115,6 +121,12 @@ class STATE_EXPORT State : public ICommandTaker {
 	void ProduceUnit(PlayerId player_id, ActorType actor_type,
 	                 DoubleVec2D position);
 
+	/**
+	 * Function to check whether the opponent has given a build request at given
+	 * position
+	 */
+	bool IsPositionTaken(Vec2D position, int64_t enemy_id);
+
   public:
 	/**
 	 * Constructor
@@ -153,6 +165,17 @@ class STATE_EXPORT State : public ICommandTaker {
 	 */
 	void AttackActor(PlayerId player_id, ActorId unit_id,
 	                 ActorId enemy_actor_id) override;
+
+	/**
+	 * @see ICommandTaker#CreateFactory
+	 */
+	void MakeFactory(PlayerId player_id, ActorId villager_id,
+	                 Vec2D offset) override;
+
+	/**
+	 * @see ICommandTaker#HandleBuildRequests
+	 */
+	void HandleBuildRequests() override;
 
 	/**
 	 * @see ICommandTaker#CreateFactory
