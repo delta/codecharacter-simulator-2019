@@ -1,6 +1,6 @@
 #include "constants/constants.h"
 #include "logger/logger.h"
-#include "state/mocks/state_mock.h"
+#include "state/mocks/command_taker_mock.h"
 #include "state/utilities.h"
 #include "gtest/gtest.h"
 #include <sstream>
@@ -18,7 +18,7 @@ const auto G = TerrainType::GOLD_MINE;
 
 class LoggerTest : public testing::Test {
   protected:
-	std::unique_ptr<StateMock> state;
+	std::unique_ptr<CommandTakerMock> state;
 	std::unique_ptr<Logger> logger;
 
 	std::unique_ptr<GoldManager> gold_manager;
@@ -32,7 +32,7 @@ class LoggerTest : public testing::Test {
 	int64_t soldier_frequency = 10;
 
 	LoggerTest()
-	    : state(make_unique<StateMock>()),
+	    : state(make_unique<CommandTakerMock>()),
 	      logger(make_unique<Logger>(state.get(), PLAYER_INSTRUCTION_LIMIT_TURN,
 	                                 PLAYER_INSTRUCTION_LIMIT_GAME,
 	                                 SOLDIER_MAX_HP, VILLAGER_MAX_HP,
