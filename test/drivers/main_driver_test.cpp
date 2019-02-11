@@ -71,6 +71,7 @@ TEST_F(MainDriverTest, CleanRun) {
 	unique_ptr<StateSyncerMock> state_syncer_mock(new StateSyncerMock());
 
 	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns);
+	EXPECT_CALL(*state_syncer_mock, IsGameOver(_)).Times(num_turns);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_)).Times(num_turns + 1);
 
 	// EXPECT_CALL(*state_syncer_mock, GetScores())
@@ -89,9 +90,8 @@ TEST_F(MainDriverTest, CleanRun) {
 	driver = CreateMockMainDriver(move(state_syncer_mock), move(v_logger));
 
 	// Start main driver on new thread
-	vector<PlayerResult> player_results;
-	thread main_runner(
-	    [this, &player_results] { player_results = driver->Start(); });
+	GameResult game_result;
+	thread main_runner([this, &game_result] { game_result = driver->Start(); });
 
 	vector<thread> player_runners;
 	for (int i = 0; i < 2; ++i) {
@@ -111,12 +111,11 @@ TEST_F(MainDriverTest, CleanRun) {
 	// Wait for main driver to wrap up
 	main_runner.join();
 
-	// Number of result structs should equal number of players
-	EXPECT_EQ(player_results.size(), 2);
-
 	// Everyone gets a score of 10 and status is normal as game finished
 	// normally
-	for (auto result : player_results) {
+	EXPECT_EQ(game_result.winner, GameResult::Winner::TIE);
+	EXPECT_EQ(game_result.win_type, GameResult::WinType::SCORE);
+	for (auto const &result : game_result.player_results) {
 		EXPECT_EQ(result.score, 10);
 		EXPECT_EQ(result.status, PlayerResult::Status::NORMAL);
 	}
@@ -129,6 +128,7 @@ TEST_F(MainDriverTest, EarlyPlayerExit) {
 
 	// Expect only half the number of turns to be run
 	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns / 2);
+	EXPECT_CALL(*state_syncer_mock, IsGameOver(_)).Times(num_turns / 2);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_))
 	    .Times(num_turns / 2 + 1);
 	// EXPECT_CALL(*state_syncer_mock, GetScores()).Times(0);
@@ -144,9 +144,8 @@ TEST_F(MainDriverTest, EarlyPlayerExit) {
 
 	driver = CreateMockMainDriver(move(state_syncer_mock), move(v_logger));
 
-	vector<PlayerResult> player_results;
-	thread main_runner(
-	    [this, &player_results] { player_results = driver->Start(); });
+	GameResult game_result;
+	thread main_runner([this, &game_result] { game_result = driver->Start(); });
 
 	vector<thread> player_runners;
 	for (int i = 0; i < 2; ++i) {
@@ -164,11 +163,10 @@ TEST_F(MainDriverTest, EarlyPlayerExit) {
 	}
 	main_runner.join();
 
-	// Number of result structs should equal number of players
-	EXPECT_EQ(player_results.size(), 2);
-
+	EXPECT_EQ(game_result.winner, GameResult::Winner::NONE);
+	EXPECT_EQ(game_result.win_type, GameResult::WinType::NONE);
 	// Results are undefined as game didn't complete
-	for (auto result : player_results) {
+	for (auto result : game_result.player_results) {
 		EXPECT_EQ(result.status, PlayerResult::Status::UNDEFINED);
 	}
 }
@@ -180,6 +178,7 @@ TEST_F(MainDriverTest, InstructionLimitReached) {
 
 	// Expect only half the turns to run
 	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns / 2);
+	EXPECT_CALL(*state_syncer_mock, IsGameOver(_)).Times(num_turns / 2);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_))
 	    .Times(num_turns / 2 + 1);
 	// EXPECT_CALL(*state_syncer_mock, GetScores()).Times(0);
@@ -194,9 +193,8 @@ TEST_F(MainDriverTest, InstructionLimitReached) {
 
 	driver = CreateMockMainDriver(move(state_syncer_mock), move(v_logger));
 
-	vector<PlayerResult> player_results;
-	thread main_runner(
-	    [this, &player_results] { player_results = driver->Start(); });
+	GameResult game_result;
+	thread main_runner([this, &game_result] { game_result = driver->Start(); });
 
 	vector<thread> player_runners;
 	for (int i = 0; i < 2; ++i) {
@@ -231,10 +229,10 @@ TEST_F(MainDriverTest, InstructionLimitReached) {
 
 	main_runner.join();
 
-	// Number of result structs should equal number of players
-	EXPECT_EQ(player_results.size(), 2);
-
-	for (auto result : player_results) {
+	EXPECT_EQ(game_result.winner, GameResult::Winner::TIE);
+	EXPECT_EQ(game_result.win_type,
+	          GameResult::WinType::EXCEEDED_INSTRUCTION_LIMIT);
+	for (auto result : game_result.player_results) {
 		EXPECT_EQ(result.status,
 		          PlayerResult::Status::EXCEEDED_INSTRUCTION_LIMIT);
 	}
@@ -247,6 +245,7 @@ TEST_F(MainDriverTest, Cancellation) {
 
 	// Expect only one turn to run
 	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(1);
+	EXPECT_CALL(*state_syncer_mock, IsGameOver(_)).Times(1);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_)).Times(2);
 	// EXPECT_CALL(*state_syncer_mock, GetScores()).Times(0);
 
@@ -258,9 +257,8 @@ TEST_F(MainDriverTest, Cancellation) {
 
 	driver = CreateMockMainDriver(move(state_syncer_mock), move(v_logger));
 
-	vector<PlayerResult> player_results;
-	thread main_runner(
-	    [this, &player_results] { player_results = driver->Start(); });
+	GameResult game_result;
+	thread main_runner([this, &game_result] { game_result = driver->Start(); });
 
 	// Simulating one turn
 	for (const auto &shm_name : shared_memory_names) {
@@ -280,10 +278,9 @@ TEST_F(MainDriverTest, Cancellation) {
 
 	main_runner.join();
 
-	// Number of result structs should equal number of players
-	EXPECT_EQ(player_results.size(), 2);
-
-	for (auto result : player_results) {
+	EXPECT_EQ(game_result.winner, GameResult::Winner::NONE);
+	EXPECT_EQ(game_result.win_type, GameResult::WinType::NONE);
+	for (auto result : game_result.player_results) {
 		EXPECT_EQ(result.status, PlayerResult::Status::UNDEFINED);
 	}
 }

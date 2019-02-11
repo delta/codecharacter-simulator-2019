@@ -4,6 +4,8 @@
  */
 
 #include "drivers/main_driver.h"
+#include "drivers/game_result.h"
+
 #include <fstream>
 
 namespace drivers {
@@ -33,7 +35,15 @@ MainDriver::MainDriver(
 	this->transfer_states[1] = &shared_buffers[1]->transfer_state;
 }
 
-const std::vector<PlayerResult> MainDriver::Start() {
+void MainDriver::/*Avengers:*/ EndGame() {
+	std::ofstream log_file(log_file_name, std::ios::out | std::ios::binary);
+
+	logger->LogFinalGameParams();
+	logger->WriteGame(log_file);
+	this->game_timer.Cancel();
+}
+
+const GameResult MainDriver::Start() {
 	// Initialize contents of shared memory
 	for (int cur_player_id = 0; cur_player_id < 2; ++cur_player_id) {
 		this->shared_buffers[cur_player_id]->is_player_running = false;
@@ -59,15 +69,54 @@ const std::vector<PlayerResult> MainDriver::Start() {
 	return this->Run();
 }
 
-const std::vector<PlayerResult> MainDriver::Run() {
-	// Initializing stuff...
-	std::vector<bool> skip_player_turn(2, false);
-	std::vector<PlayerResult> player_results(
-	    2, PlayerResult{0, PlayerResult::Status::UNDEFINED});
-	std::vector<int64_t> player_scores(2, 0);
-	bool instruction_count_exceeded = false;
+GameResult::Winner
+GetWinnerByInstCountExceeded(std::array<PlayerResult, 2> player_results) {
+	auto status1 = player_results[0].status;
+	auto status2 = player_results[1].status;
+	auto FAIL = PlayerResult::Status::EXCEEDED_INSTRUCTION_LIMIT;
 
-	std::ofstream log_file(log_file_name, std::ios::out | std::ios::binary);
+	if (status1 == FAIL && status2 == FAIL) {
+		return GameResult::Winner::TIE;
+	} else if (status1 == FAIL) {
+		return GameResult::Winner::PLAYER2;
+	}
+	return GameResult::Winner::PLAYER1;
+}
+
+GameResult::Winner GetWinnerFromPlayerId(state::PlayerId player_id) {
+	switch (player_id) {
+	case state::PlayerId::PLAYER1:
+		return GameResult::Winner::PLAYER1;
+	case state::PlayerId::PLAYER2:
+		return GameResult::Winner::PLAYER2;
+	case state::PlayerId::PLAYER_NULL:
+		return GameResult::Winner::TIE;
+	}
+}
+
+GameResult::Winner
+GetWinnerByScore(std::array<PlayerResult, 2> player_results) {
+	auto score1 = player_results[0].score;
+	auto score2 = player_results[1].score;
+
+	if (score1 > score2) {
+		return GameResult::Winner::PLAYER1;
+	} else if (score1 < score2) {
+		return GameResult::Winner::PLAYER2;
+	}
+	return GameResult::Winner::TIE;
+}
+
+const GameResult MainDriver::Run() {
+	// Initializing stuff...
+	auto skip_player_turn = std::vector<bool>{false, false};
+	auto player_results = std::array<PlayerResult, 2>{
+	    PlayerResult{0, PlayerResult::Status::UNDEFINED},
+	    PlayerResult{0, PlayerResult::Status::UNDEFINED}};
+	auto winner = GameResult::Winner::NONE;
+	auto win_type = GameResult::WinType::NONE;
+	auto player_scores = std::vector<int64_t>{0, 0};
+	auto instruction_count_exceeded = false;
 
 	// Main loop that runs every turn
 	for (int i = 0; i < this->max_no_turns; ++i) {
@@ -83,15 +132,13 @@ const std::vector<PlayerResult> MainDriver::Run() {
 
 			// If game has been cancelled, return immediately
 			if (this->cancel) {
-				logger->LogFinalGameParams();
-				logger->WriteGame(log_file);
-				this->game_timer.Cancel();
 				this->cancel = false;
-				return player_results;
+				EndGame();
+				return GameResult{winner, win_type, player_results};
 			}
 
-			// Check for instruction counter to see if player has exceeded some
-			// limit
+			// Check for instruction counter to see if player has
+			// exceeded some limit
 			if (this->shared_buffers[cur_player_id]->instruction_counter >
 			    this->player_instruction_limit_game) {
 				player_results[cur_player_id].status =
@@ -111,20 +158,25 @@ const std::vector<PlayerResult> MainDriver::Run() {
 			    this->shared_buffers[cur_player_id]->instruction_counter);
 		}
 
-		// If the game instruction count has been exceeded by some player, game
-		// is forfeit
+		// If the game instruction count has been exceeded by some
+		// player, game is forfeit
+		if (instruction_count_exceeded) {
+			EndGame();
+			winner = GetWinnerByInstCountExceeded(player_results);
+			win_type = GameResult::WinType::EXCEEDED_INSTRUCTION_LIMIT;
+			return GameResult{winner, win_type, player_results};
+		}
+
 		// If the game timer has expired, the game has to stop
-		if (instruction_count_exceeded || this->is_game_timed_out) {
-			logger->LogFinalGameParams();
-			logger->WriteGame(log_file);
-			this->game_timer.Cancel();
-			return player_results;
+		if (this->is_game_timed_out) {
+			EndGame();
+			return GameResult{winner, win_type, player_results};
 		}
 
 		// If we're here, the game is not yet over
 
-		// Validate and run the player's commands. Skips a player if they have
-		// exceeded turn instruction limit
+		// Validate and run the player's commands. Skips a player if
+		// they have exceeded turn instruction limit
 		// TODO: Check for player turn skip
 
 		// Convert current transfer states into player states
@@ -133,7 +185,19 @@ const std::vector<PlayerResult> MainDriver::Run() {
 			    *(this->transfer_states[i]));
 		}
 		this->state_syncer->UpdateMainState(this->player_states);
-		// Write the updated main state back to the player's state copies
+
+		// If the game is over now, some player had all units killed
+		// End the game as a deathmatch
+		state::PlayerId player_winner;
+		if (this->state_syncer->IsGameOver(player_winner)) {
+			EndGame();
+			winner = GetWinnerFromPlayerId(player_winner);
+			win_type = GameResult::WinType::DEATHMATCH;
+			return GameResult{winner, win_type, player_results};
+		}
+
+		// Write the updated main state back to the player's state
+		// copies
 		this->state_syncer->UpdatePlayerStates(this->player_states);
 
 		// Convert these player states back into transfer states
@@ -155,10 +219,10 @@ const std::vector<PlayerResult> MainDriver::Run() {
 		    PlayerResult{player_scores[i], PlayerResult::Status::NORMAL};
 	}
 
-	logger->LogFinalGameParams();
-	logger->WriteGame(log_file);
-	this->game_timer.Cancel();
-	return player_results;
+	EndGame();
+	winner = GetWinnerByScore(player_results);
+	win_type = GameResult::WinType::SCORE;
+	return GameResult{winner, win_type, player_results};
 }
 
 void MainDriver::Cancel() {

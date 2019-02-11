@@ -57,7 +57,7 @@ class GAME_EXPORT Game {
 	/**
 	 * Creates and starts the main driver
 	 *
-	 * @return const std::vector<PlayerResult> Game results
+	 * @return GameResult object with winner, win type, and player results
 	 */
-	const std::vector<drivers::PlayerResult> Start();
+	const drivers::GameResult Start();
 };

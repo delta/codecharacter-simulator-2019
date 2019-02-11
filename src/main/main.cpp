@@ -259,8 +259,7 @@ int main(int argc, char *argv[]) {
 	auto results = game->Start();
 
 	// Game has finished
-	cout << prefix_key << " " << results[0].score << " " << results[0].status
-	     << " " << results[1].score << " " << results[1].status << endl;
+	cout << prefix_key << " " << results << endl;
 
 	return 0;
 }

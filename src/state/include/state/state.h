@@ -209,6 +209,11 @@ class STATE_EXPORT State : public ICommandTaker {
 	const std::array<int64_t, 2> GetScores() override;
 
 	/**
+	 * @see ICommandTaker#IsGameOver
+	 */
+	bool IsGameOver(PlayerId &winner) override;
+
+	/**
 	 * State's update method, to call updates on all actors
 	 */
 	void Update() override;
