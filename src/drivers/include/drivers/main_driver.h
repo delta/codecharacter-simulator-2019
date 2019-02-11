@@ -6,13 +6,14 @@
 #pragma once
 
 #include "drivers/drivers_export.h"
-#include "drivers/player_result.h"
+#include "drivers/game_result.h"
 #include "drivers/shared_memory_utils/shared_buffer.h"
 #include "drivers/shared_memory_utils/shared_memory_main.h"
 #include "drivers/timer.h"
 #include "drivers/transfer_state.h"
 #include "logger/interfaces/i_logger.h"
 #include "state/interfaces/i_state_syncer.h"
+
 #include <atomic>
 #include <string>
 #include <thread>
@@ -83,9 +84,9 @@ class DRIVERS_EXPORT MainDriver {
 	/**
 	 * Blocking function that runs the game
 	 *
-	 * @return     Results of the game indexed by player ID
+	 * @return     GameResult object with winner, win type, and player results
 	 */
-	const std::vector<PlayerResult> Run();
+	const GameResult Run();
 
 	/**
 	 * Instance of logger to write game to log file
@@ -101,6 +102,11 @@ class DRIVERS_EXPORT MainDriver {
 	 * Flag that is set to cancel the game
 	 */
 	std::atomic_bool cancel;
+
+	/**
+	 * Write final game parameters and stop the timer
+	 */
+	void EndGame();
 
   public:
 	/**
@@ -119,9 +125,9 @@ class DRIVERS_EXPORT MainDriver {
 	 *
 	 * Calls MainDriver::Run after setting up.
 	 *
-	 * @return     Results of the game indexed by player ID
+	 * @return     GameResult object with winner, win type, and player results
 	 */
-	const std::vector<PlayerResult> Start();
+	const GameResult Start();
 
 	/**
 	 * Cancels the execution of the main driver.

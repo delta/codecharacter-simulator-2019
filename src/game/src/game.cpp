@@ -26,7 +26,7 @@ std::string Game::GenerateRandomString(const std::string::size_type length) {
 	return s;
 }
 
-const std::vector<drivers::PlayerResult> Game::Start() {
+const drivers::GameResult Game::Start() {
 	// Start the player processes
 	for (int i = 1; i <= 2; ++i) {
 		std::string command = "./player_" + std::to_string(i) + " &";

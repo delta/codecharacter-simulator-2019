@@ -280,4 +280,36 @@ void State::Update() {
 	}
 }
 
+bool State::IsGameOver(PlayerId &winner) {
+	bool is_game_over = false;
+	auto is_player_dead = std::vector<bool>{false, false};
+
+	// For each player...
+	for (int i = 0; i < 2; ++i) {
+		auto &player_villagers = villagers[i];
+		auto &player_soldiers = soldiers[i];
+		auto &player_factories = factories[i];
+
+		// If all player units are dead...
+		if (player_villagers.empty() && player_soldiers.empty() &&
+		    player_factories.empty()) {
+
+			// ...then the game is over, and this player has died.
+			is_player_dead[i] = true;
+			is_game_over = true;
+		}
+	}
+
+	if (is_player_dead[0] && is_player_dead[1]) {
+		winner = PlayerId::PLAYER_NULL;
+	} else if (is_player_dead[0]) {
+		winner = PlayerId::PLAYER2;
+	} else if (is_player_dead[1]) {
+		winner = PlayerId::PLAYER1;
+	}
+
+	// If no one died, is_game_over is false by default, leave winner alone
+	return is_game_over;
+}
+
 } // namespace state

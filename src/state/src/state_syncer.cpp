@@ -348,4 +348,8 @@ void StateSyncer::AssignFactoryAttributes(
 	}
 }
 
+bool StateSyncer::IsGameOver(PlayerId &winner) {
+	return state->IsGameOver(winner);
+}
+
 } // namespace state
