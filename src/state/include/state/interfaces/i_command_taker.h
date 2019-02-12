@@ -61,7 +61,7 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	                         ActorId enemy_actor_id) = 0;
 
 	/**
-	 * Handles factory build
+	 * Adds mine request which will later be handled by HandleBuildRequests
 	 *
 	 * @param[in]  player_id     player to act upon
 	 * @param[in]  villager_id   villager to build

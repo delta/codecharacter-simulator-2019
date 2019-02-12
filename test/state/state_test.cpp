@@ -102,6 +102,12 @@ class StateTest : public Test {
 		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
 		    10, 10, 10, 10));
 
+		// Player 2 has 1 villager
+		villagers[1].push_back(make_unique<Villager>(
+		    4, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
+		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
+		    10, 10, 10, 10));
+
 		// Player2 has 1 soldier, say..
 		soldiers[1].push_back(
 		    make_unique<Soldier>(2, PlayerId::PLAYER2, ActorType::SOLDIER, 100,
@@ -178,14 +184,24 @@ TEST_F(StateTest, CreateFactoryTest) {
 	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
+	auto villager = curr_villagers[0].front();
 
-	state->Update();
+	// Updating the state and soldier
+	while (villager->GetState() != VillagerStateName::BUILD) {
+		state->Update();
+	}
 
-	ASSERT_EQ(curr_villagers[0].front()->GetState(), VillagerStateName::BUILD);
+	// Checking if the villager has transitioned into the BUILD state
+	ASSERT_EQ(villager->GetState(), VillagerStateName::BUILD);
+
+	// Checking if the number of state factories increased and the factory is in
+	// UNBUILT state
+	curr_factories = state->GetFactories();
+	auto factory = curr_factories[0].front();
 	ASSERT_EQ(curr_factories[0].size(), 1);
-	ASSERT_EQ(curr_factories[0].front()->GetState(), FactoryStateName::UNBUILT);
+	ASSERT_EQ(factory->GetState(), FactoryStateName::UNBUILT);
 
-	auto gold_manager = curr_villagers[0].front()->GetGoldManager();
+	auto gold_manager = villager->GetGoldManager();
 	ASSERT_EQ(gold_manager->GetBalance(PlayerId::PLAYER1), 5000 - FACTORY_COST);
 }
 
@@ -194,24 +210,32 @@ TEST_F(StateTest, BuildFactoryTest) {
 	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
+	auto villager = curr_villagers[0].front();
 
-	state->Update();
+	// Updating the villager's state
+	while (villager->GetState() != VillagerStateName::BUILD) {
+		state->Update();
+	}
 
-	ASSERT_EQ(curr_villagers[0].front()->GetState(), VillagerStateName::BUILD);
+	ASSERT_EQ(villager->GetState(), VillagerStateName::BUILD);
+
+	// Getting the updated factories from state
+	curr_factories = state->GetFactories();
+	auto factory = curr_factories[0].front();
 	ASSERT_EQ(curr_factories[0].size(), 1);
-	ASSERT_EQ(curr_factories[0].front()->GetState(), FactoryStateName::UNBUILT);
+	ASSERT_EQ(factory->GetState(), FactoryStateName::UNBUILT);
 
 	// Test BuildFactory for the same villager..
-	auto curr_factory = curr_factories[0].front();
-	state->BuildFactory(PlayerId::PLAYER1, 1, curr_factory->GetActorId());
+	state->BuildFactory(PlayerId::PLAYER1, 1, factory->GetActorId());
 
+	// Updating state again
 	state->Update();
 
 	ASSERT_EQ(curr_villagers[0].front()->GetState(), VillagerStateName::BUILD);
 	ASSERT_EQ(curr_factories[0].size(), 1);
 
 	// Test BuildFactory for the other villager..
-	state->BuildFactory(PlayerId::PLAYER1, 3, curr_factory->GetActorId());
+	state->BuildFactory(PlayerId::PLAYER1, 3, factory->GetActorId());
 
 	state->Update();
 
@@ -224,23 +248,30 @@ TEST_F(StateTest, FactoryProductionTest) {
 	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
+	auto villager = curr_villagers[0].front();
 
-	state->Update();
+	// Updating the villager's state
+	while (villager->GetState() != VillagerStateName::BUILD) {
+		state->Update();
+	}
 
-	ASSERT_EQ(curr_villagers[0].front()->GetState(), VillagerStateName::BUILD);
+	ASSERT_EQ(villager->GetState(), VillagerStateName::BUILD);
+
+	// Getting the updated state factories
+	curr_factories = state->GetFactories();
+	auto factory = curr_factories[0].front();
 	ASSERT_EQ(curr_factories[0].size(), 1);
-	ASSERT_EQ(curr_factories[0].front()->GetState(), FactoryStateName::UNBUILT);
+	ASSERT_EQ(factory->GetState(), FactoryStateName::UNBUILT);
 
 	// Test SetFactoryProduction
-	auto curr_factory = curr_factories[0].front();
-	ASSERT_EQ(curr_factory->GetProductionState(), ActorType::VILLAGER);
+	ASSERT_EQ(factory->GetProductionState(), ActorType::VILLAGER);
 
-	state->SetFactoryProduction(PlayerId::PLAYER1, curr_factory->GetActorId(),
+	state->SetFactoryProduction(PlayerId::PLAYER1, factory->GetActorId(),
 	                            ActorType::SOLDIER);
 
 	state->Update();
 
-	ASSERT_EQ(curr_factory->GetProductionState(), ActorType::SOLDIER);
+	ASSERT_EQ(factory->GetProductionState(), ActorType::SOLDIER);
 }
 
 TEST_F(StateTest, FactoryDeathTest) {
@@ -248,20 +279,36 @@ TEST_F(StateTest, FactoryDeathTest) {
 	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
+	ASSERT_EQ(curr_factories[0].size(), 0);
+	auto villager = curr_villagers[0].front();
 
-	state->Update();
+	// Updating the villager's state
+	while (villager->GetState() != VillagerStateName::BUILD) {
+		state->Update();
+	}
 
-	ASSERT_EQ(curr_villagers[0].front()->GetState(), VillagerStateName::BUILD);
+	ASSERT_EQ(villager->GetState(), VillagerStateName::BUILD);
+
+	// Updating current factories from the state
+	curr_factories = state->GetFactories();
+	auto factory = curr_factories[0].front();
 	ASSERT_EQ(curr_factories[0].size(), 1);
-	ASSERT_EQ(curr_factories[0].front()->GetState(), FactoryStateName::UNBUILT);
+	ASSERT_EQ(factory->GetState(), FactoryStateName::UNBUILT);
 
-	// Kill factory
-	auto curr_factory = curr_factories[0].front();
-	curr_factory->SetHp(0);
+	// Killing the factory
+	factory->SetHp(0);
+	factory->Update();
+	factory->LateUpdate();
+
+	// Checking if the factory has transitioned to dead state
+	ASSERT_EQ(factory->GetState(), FactoryStateName::DEAD);
+	ASSERT_EQ(factory->GetHp(), 0);
+
+	// Updating the state
 	state->Update();
 
-	auto new_factories = state->GetFactories();
-	ASSERT_EQ(new_factories[0].size(), 0);
+	auto new_facs = state->GetFactories();
+	ASSERT_EQ(new_facs[0].size(), 0);
 }
 
 TEST_F(StateTest, VillagerDeathTest) {
@@ -286,4 +333,31 @@ TEST_F(StateTest, SoldierDeathTest) {
 
 	auto new_soldiers = state->GetSoldiers();
 	ASSERT_EQ(new_soldiers[1].size(), 0);
+}
+
+TEST_F(StateTest, SimultaneousBuild) {
+	// Making both the villager try and build a factory at the same time
+	auto villagers = state->GetVillagers();
+	auto villager1 = villagers[0].front();
+	auto villager2 = villagers[1].front();
+
+	// Checking the initial number of factories in state
+	auto factories = state->GetFactories();
+	ASSERT_EQ(factories[0].size(), 0);
+	ASSERT_EQ(factories[1].size(), 0);
+
+	// Making both the villagers try and build at the same position
+	state->CreateFactory(PlayerId::PLAYER1, villager1->GetActorId(),
+	                     Vec2D(2, 0));
+	state->CreateFactory(PlayerId::PLAYER2, villager2->GetActorId(),
+	                     Vec2D(2, 0));
+
+	// Calling state update to check if the build requests have been assigned
+	// properly
+	state->Update();
+
+	// Checking to make sure factory didn't get added into state
+	factories = state->GetFactories();
+	ASSERT_EQ(factories[0].size(), 0);
+	ASSERT_EQ(factories[1].size(), 0);
 }
