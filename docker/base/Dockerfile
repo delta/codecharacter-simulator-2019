@@ -15,6 +15,10 @@ WORKDIR /root
 RUN wget "https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.tar.gz" --no-check-certificate \
 &&  tar xf boost_1_68_0.tar.gz \
 &&  rm boost_1_68_0.tar.gz \
+&&  cd boost_1_68_0 \
+&&  ./bootstrap.sh --prefix=. --with-libraries=system \
+&&  ./b2 cxxstd=14 install \
+&&  cd /root \
 &&  wget "https://cmake.org/files/v3.11/cmake-3.11.1-Linux-x86_64.tar.gz" --no-check-certificate \
 &&  tar xf cmake-3.11.1-Linux-x86_64.tar.gz \
 &&  rm cmake-3.11.1-Linux-x86_64.tar.gz \
