@@ -7,11 +7,15 @@ set(SOURCE_FILES
 
 set(INCLUDE_PATH include)
 
+set (Boost_USE_STATIC_LIBS ON)
+find_package(Boost 1.68.0 REQUIRED COMPONENTS system)
+
 set(EXPORTS_DIR ${CMAKE_BINARY_DIR}/exports)
 set(EXPORTS_FILE_PATH ${EXPORTS_DIR}/game/game_export.h)
 
 add_library(game STATIC ${SOURCE_FILES})
-target_link_libraries(game state logger drivers player_wrapper pthread)
+target_link_libraries(
+	game state logger drivers player_wrapper Boost::system pthread)
 
 generate_export_header(game EXPORT_FILE_NAME ${EXPORTS_FILE_PATH})
 
