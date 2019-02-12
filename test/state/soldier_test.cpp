@@ -163,19 +163,18 @@ TEST_F(SoldierTest, PursuitAndKill) {
 }
 
 TEST_F(SoldierTest, SimultaneousKill) {
-	auto *target_soldier =
-	    new Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
-	                DoubleVec2D(15, 15), gold_manager.get(), path_planner.get(),
-	                10, 10, 10);
+	auto *target_soldier = new Soldier(
+	    2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100, DoubleVec2D(15, 15),
+	    gold_manager.get(), path_planner.get(), 10, 10, 10);
 
 	// Both soldiers attacking each other
 	soldier->Attack(target_soldier);
 	target_soldier->Attack(soldier.get());
 
-
-	// Expecting call to gold manager to reward gold to each soldier for killing the other
+	// Expecting call to gold manager to reward gold to each soldier for killing
+	// the other
 	EXPECT_CALL(*gold_manager, RewardKill(target_soldier));
-	EXPECT_CALL(*gold_manager, RewardKill(soldier.get())); 
+	EXPECT_CALL(*gold_manager, RewardKill(soldier.get()));
 
 	while (target_soldier->GetHp() != 0) {
 		this->soldier->Update();
