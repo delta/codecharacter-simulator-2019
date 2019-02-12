@@ -168,7 +168,7 @@ struct Villager : _Unit {
 	FactoryProduction build_factory_type; // Note: Defaults to villager if unset
 	VillagerState state;
 
-	// Create a new factory
+	// Build a new factory
 	void create(Vec2D p_build_offset, FactoryProduction p_build_factory_type) {
 		build_offset = p_build_offset;
 		build_factory_type = p_build_factory_type;
