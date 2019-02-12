@@ -61,29 +61,6 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	                         ActorId enemy_actor_id) = 0;
 
 	/**
-	 * Handles factory build
-	 *
-	 * @param[in]  player_id     player to act upon
-	 * @param[in]  villager_id   villager to build
-	 * @param[in]  offset        grid location to build the factory
-	 *
-	 * @throw      std::exception  if the operation was not possible
-	 */
-	virtual void MakeFactory(PlayerId player_id, ActorId villager_id,
-	                         Vec2D offset) = 0;
-
-	/**
-	 * Handles all build requests and builds factories given situations
-	 *
-	 * @param[in]  player_id     player to act upon
-	 * @param[in]  villager_id   villager to build
-	 * @param[in]  offset        grid location to build the factory
-	 *
-	 * @throw      std::exception  if the operation was not possible
-	 */
-	virtual void HandleBuildRequests() = 0;
-
-	/**
 	 * Adds mine request which will later be handled by HandleBuildRequests
 	 *
 	 * @param[in]  player_id     player to act upon

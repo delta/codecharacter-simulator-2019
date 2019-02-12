@@ -124,8 +124,36 @@ class STATE_EXPORT State : public ICommandTaker {
 	/**
 	 * Function to check whether the opponent has given a build request at given
 	 * position
+	 *
+	 * @param[in] position		Position which is looked for in the oppenents
+	 * build requests
+	 * @param[in] enemy_id		id of the enemy
+	 *
 	 */
 	bool IsPositionTaken(Vec2D position, int64_t enemy_id);
+
+	/**
+	 * Handles factory build
+	 *
+	 * @param[in]  player_id     player to act upon
+	 * @param[in]  villager_id   villager to build
+	 * @param[in]  offset        grid location to build the factory
+	 *
+	 * @throw      std::exception  if the operation was not possible
+	 */
+	void MakeFactory(PlayerId player_id, ActorId villager_id, Vec2D offset);
+
+	/**
+	 * 	/**
+	 * Handles all build requests and builds factories given situations
+	 *
+	 * @param[in]  player_id     player to act upon
+	 * @param[in]  villager_id   villager to build
+	 * @param[in]  offset        grid location to build the factory
+	 *
+	 * @throw      std::exception  if the operation was not possible
+	 */
+	void HandleBuildRequests();
 
   public:
 	/**
@@ -165,17 +193,6 @@ class STATE_EXPORT State : public ICommandTaker {
 	 */
 	void AttackActor(PlayerId player_id, ActorId unit_id,
 	                 ActorId enemy_actor_id) override;
-
-	/**
-	 * @see ICommandTaker#CreateFactory
-	 */
-	void MakeFactory(PlayerId player_id, ActorId villager_id,
-	                 Vec2D offset) override;
-
-	/**
-	 * @see ICommandTaker#HandleBuildRequests
-	 */
-	void HandleBuildRequests() override;
 
 	/**
 	 * @see ICommandTaker#CreateFactory

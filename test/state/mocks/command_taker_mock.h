@@ -37,7 +37,4 @@ class CommandTakerMock : public ICommandTaker {
 	             void(PlayerId player_id, ActorId factory_id,
 	                  bool should_stop));
 	MOCK_METHOD2(FindActorById, Actor *(PlayerId player_id, ActorId actor_id));
-	MOCK_METHOD3(MakeFactory,
-	             void(PlayerId player_id, ActorId actor_id, Vec2D offset));
-	MOCK_METHOD0(HandleBuildRequests, void());
 };

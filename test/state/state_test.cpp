@@ -102,6 +102,12 @@ class StateTest : public Test {
 		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
 		    10, 10, 10, 10));
 
+		// Player 2 has 1 villager
+		villagers[1].push_back(make_unique<Villager>(
+		    4, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
+		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
+		    10, 10, 10, 10));
+
 		// Player2 has 1 soldier, say..
 		soldiers[1].push_back(
 		    make_unique<Soldier>(2, PlayerId::PLAYER2, ActorType::SOLDIER, 100,
@@ -327,4 +333,31 @@ TEST_F(StateTest, SoldierDeathTest) {
 
 	auto new_soldiers = state->GetSoldiers();
 	ASSERT_EQ(new_soldiers[1].size(), 0);
+}
+
+TEST_F(StateTest, SimultaneousBuild) {
+	// Making both the villager try and build a factory at the same time
+	auto villagers = state->GetVillagers();
+	auto villager1 = villagers[0].front();
+	auto villager2 = villagers[1].front();
+
+	// Checking the initial number of factories in state
+	auto factories = state->GetFactories();
+	ASSERT_EQ(factories[0].size(), 0);
+	ASSERT_EQ(factories[1].size(), 0);
+
+	// Making both the villagers try and build at the same position
+	state->CreateFactory(PlayerId::PLAYER1, villager1->GetActorId(),
+	                     Vec2D(2, 0));
+	state->CreateFactory(PlayerId::PLAYER2, villager2->GetActorId(),
+	                     Vec2D(2, 0));
+
+	// Calling state update to check if the build requests have been assigned
+	// properly
+	state->Update();
+
+	// Checking to make sure factory didn't get added into state
+	factories = state->GetFactories();
+	ASSERT_EQ(factories[0].size(), 0);
+	ASSERT_EQ(factories[1].size(), 0);
 }

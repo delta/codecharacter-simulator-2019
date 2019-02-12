@@ -136,10 +136,11 @@ void State::CreateFactory(PlayerId player_id, ActorId villager_id,
 }
 
 bool State::IsPositionTaken(Vec2D position, int64_t enemy_id) {
-	auto build_reqs = this->build_requests[enemy_id];
-	for (int64_t req_no = 0; req_no < build_reqs.size(); ++req_no) {
-		auto request = build_reqs[req_no];
-		if (request.first == position) {
+	auto &build_reqs =
+	    this->build_requests[enemy_id]; // Mine requests are taken by reference
+	                                    // to avoid wasteful copying by value
+	for (auto &req : build_reqs) {
+		if (req.first == position) {
 			return true;
 		}
 	}
@@ -154,10 +155,9 @@ void State::HandleBuildRequests() {
 		    (id + 1) % static_cast<int64_t>(PlayerId::PLAYER_COUNT);
 
 		// Iterating through each player's build requests
-		for (int64_t req_no = 0; req_no < build_reqs.size(); ++req_no) {
-			auto build_req = build_reqs[req_no];
-			Vec2D build_pos = build_req.first;
-			int64_t villager_id = build_req.second;
+		for (auto &req : build_reqs) {
+			Vec2D build_pos = req.first;
+			int64_t villager_id = req.second;
 
 			bool is_pos_taken = IsPositionTaken(build_pos, enemy_id);
 
