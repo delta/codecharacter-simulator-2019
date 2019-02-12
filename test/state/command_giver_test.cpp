@@ -515,8 +515,9 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	                        this->player_states, ActorType::VILLAGER);
 
 	// Making villager create a factory on water
-	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
-	                                    ErrorType::NO_BUILD_FACTORY_ON_WATER, _));
+	EXPECT_CALL(
+	    *this->logger,
+	    LogError(PlayerId::PLAYER1, ErrorType::NO_BUILD_FACTORY_ON_WATER, _));
 	// (0, 0) is a water tile
 	this->player_states[0].villagers[0].build_position = Vec2D(0, 0);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
