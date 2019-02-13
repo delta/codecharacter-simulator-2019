@@ -164,18 +164,18 @@ inline std::ostream &operator<<(std::ostream &os, Soldier soldier) {
 struct Villager : _Unit {
 	int64_t target_factory_id;
 	Vec2D mine_target;
-	Vec2D build_position;
+	Vec2D build_offset;
 	FactoryProduction build_factory_type; // Note: Defaults to villager if unset
 	VillagerState state;
 
 	// Build a new factory
-	void build(Vec2D p_build_position, FactoryProduction p_build_factory_type) {
-		build_position = p_build_position;
+	void build(Vec2D p_build_offset, FactoryProduction p_build_factory_type) {
+		build_offset = p_build_offset;
 		build_factory_type = p_build_factory_type;
 	}
 
 	// Join build at an existing factory using position
-	void build(Vec2D p_build_position) { build_position = p_build_position; }
+	void build(Vec2D p_build_offset) { build_offset = p_build_offset; }
 
 	// Join build at an existing factory using actor id
 	void build(int64_t p_factory_id) { target_factory_id = p_factory_id; }
@@ -185,7 +185,7 @@ struct Villager : _Unit {
 
 	Villager()
 	    : _Unit(), target_factory_id(-1), mine_target(Vec2D::null),
-	      build_position(Vec2D::null),
+	      build_offset(Vec2D::null),
 	      build_factory_type(FactoryProduction::VILLAGER) {}
 };
 
@@ -199,7 +199,7 @@ inline std::ostream &operator<<(std::ostream &os, Villager villager) {
 	os << "    target: " << villager.target << endl;
 	os << "    target_factory_id: " << villager.target_factory_id << endl;
 	os << "    mine_target: " << villager.mine_target << endl;
-	os << "    build_position: " << villager.build_position << endl;
+	os << "    build_offset: " << villager.build_offset << endl;
 	os << "    build_factory_type: " << villager.build_factory_type << endl;
 	os << "    state: " << villager.state << endl;
 	os << "}";
