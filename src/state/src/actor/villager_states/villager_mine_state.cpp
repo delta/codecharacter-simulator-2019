@@ -53,7 +53,8 @@ std::unique_ptr<IActorState> VillagerMineState::Update() {
 	}
 
 	// Mine gold
-	villager->GetGoldManager()->RewardMineGold(villager->GetPlayerId());
+	villager->GetGoldManager()->AddMineRequest(villager->GetPlayerId(),
+	                                           villager->GetMineTarget());
 
 	return nullptr;
 }

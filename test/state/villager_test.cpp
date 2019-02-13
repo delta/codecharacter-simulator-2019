@@ -3,7 +3,7 @@
 #include "state/actor/factory.h"
 #include "state/actor/soldier.h"
 #include "state/actor/villager.h"
-#include "state/gold_manager/gold_manager.h"
+#include "state/mocks/gold_manager_mock.h"
 #include "gtest/gtest.h"
 
 using namespace std;
@@ -21,13 +21,7 @@ class VillagerTest : public Test {
 	int64_t element_size = 10;
 	unique_ptr<Map> map;
 
-	array<int64_t, 2> player_gold;
-	int64_t soldier_kill_reward_gold;
-	int64_t villager_kill_reward_gold;
-	int64_t factory_kill_reward_gold;
-	int64_t max_gold;
-
-	unique_ptr<GoldManager> gold_manager;
+	unique_ptr<GoldManagerMock> gold_manager;
 	unique_ptr<PathPlanner> path_planner;
 	unique_ptr<Villager> villager;
 
@@ -49,20 +43,7 @@ class VillagerTest : public Test {
 		}};
 
 		map = make_unique<Map>(map_matrix, map_size, element_size);
-		for (int i = 0; i < (int)PlayerId::PLAYER_COUNT; ++i) {
-			player_gold[i] = 5000; // Start balance
-		}
-
-		this->max_gold = 10000;
-		this->soldier_kill_reward_gold = SOLDIER_KILL_REWARD_AMOUNT;
-		this->villager_kill_reward_gold = VILLAGER_KILL_REWARD_AMOUNT;
-		this->factory_kill_reward_gold = FACTORY_KILL_REWARD_AMOUNT;
-
-		this->gold_manager = make_unique<GoldManager>(
-		    player_gold, max_gold, soldier_kill_reward_gold,
-		    villager_kill_reward_gold, factory_kill_reward_gold,
-		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
-		    MINING_REWARD);
+		this->gold_manager = make_unique<GoldManagerMock>();
 
 		this->path_planner = make_unique<PathPlanner>(map.get());
 
@@ -100,6 +81,8 @@ TEST_F(VillagerTest, MoveToDestination) {
 }
 
 TEST_F(VillagerTest, TransitionToMineState) {
+	EXPECT_CALL(*this->gold_manager,
+	            AddMineRequest(PlayerId::PLAYER1, Vec2D(10, 10)));
 	this->villager->Mine(Vec2D(10, 10));
 
 	this->villager->Update();
@@ -129,6 +112,9 @@ TEST_F(VillagerTest, TransitionToDeadState) {
 
 	this->villager->Attack(target_villager.get());
 
+	// GoldManager expects call for villager killing target villager
+	EXPECT_CALL(*gold_manager, RewardKill(target_villager.get()));
+
 	while (target_villager->GetHp() != 0) {
 		this->villager->Update();
 		target_villager->Update();
@@ -140,7 +126,12 @@ TEST_F(VillagerTest, TransitionToDeadState) {
 }
 
 TEST_F(VillagerTest, MoveToMine) {
-	this->villager->SetMineTarget(Vec2D(25, 30));
+	ASSERT_EQ(this->villager->GetState(), VillagerStateName::IDLE);
+	this->villager->SetMineTarget(Vec2D(20, 10));
+
+	// A build request will be added to the gold manager when the villager tries
+	// to mine
+	EXPECT_CALL(*gold_manager, AddMineRequest);
 
 	while (this->villager->GetState() != VillagerStateName::MINE) {
 		this->villager->Update();
@@ -149,12 +140,12 @@ TEST_F(VillagerTest, MoveToMine) {
 
 	ASSERT_EQ(this->villager->IsMineTargetInRange(), true);
 }
-
+// This is a test for gold manager, not for villager
 TEST_F(VillagerTest, VillagerKillReward) {
-	int64_t initial_gold = player_gold[0];
 
 	auto target_villager = MakeTestVillager();
 
+	EXPECT_CALL(*this->gold_manager, RewardKill(target_villager.get()));
 	this->villager->Attack(target_villager.get());
 
 	while (target_villager->GetHp() != 0) {
@@ -163,9 +154,6 @@ TEST_F(VillagerTest, VillagerKillReward) {
 		this->villager->LateUpdate();
 		target_villager->LateUpdate();
 	}
-
-	ASSERT_EQ(gold_manager->GetBalance(PlayerId::PLAYER1),
-	          (initial_gold + villager_kill_reward_gold));
 }
 
 TEST_F(VillagerTest, SimultaneousKill) {
@@ -173,6 +161,11 @@ TEST_F(VillagerTest, SimultaneousKill) {
 
 	villager->Attack(target_villager.get());
 	target_villager->Attack(villager.get());
+
+	// Expecting call to gold manager for rewarding gold to both villagers for
+	// killing each other
+	EXPECT_CALL(*gold_manager, RewardKill(target_villager.get()));
+	EXPECT_CALL(*gold_manager, RewardKill(this->villager.get()));
 
 	while (target_villager->GetHp() != 0) {
 		this->villager->Update();

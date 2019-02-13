@@ -14,7 +14,7 @@ Actor::Actor() {
 }
 
 Actor::Actor(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
-             int64_t max_hp, DoubleVec2D position, GoldManager *gold_manager)
+             int64_t max_hp, DoubleVec2D position, IGoldManager *gold_manager)
     : id(id), player_id(player_id), actor_type(actor_type), hp(hp),
       max_hp(max_hp), position(position), gold_manager(gold_manager) {}
 
@@ -34,7 +34,7 @@ PlayerId Actor::GetPlayerId() { return player_id; }
 
 ActorType Actor::GetActorType() { return actor_type; }
 
-GoldManager *Actor::GetGoldManager() { return gold_manager; }
+IGoldManager *Actor::GetGoldManager() { return gold_manager; }
 
 int64_t Actor::GetHp() { return hp; }
 

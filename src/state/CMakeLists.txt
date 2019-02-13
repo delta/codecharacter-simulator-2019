@@ -13,6 +13,7 @@ set(SOURCE_FILES
 	src/actor/factory.cpp
 	src/map/map.cpp
 	src/gold_manager/gold_manager.cpp
+	src/gold_manager/gold_mine.cpp
 	src/actor/soldier_states/soldier_state.cpp
 	src/actor/soldier_states/soldier_idle_state.cpp
 	src/actor/soldier_states/soldier_attack_state.cpp

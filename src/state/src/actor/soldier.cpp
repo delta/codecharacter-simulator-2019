@@ -16,7 +16,7 @@ Soldier::Soldier() {
 }
 Soldier::Soldier(ActorId id, PlayerId player_id, ActorType actor_type,
                  int64_t hp, int64_t max_hp, DoubleVec2D position,
-                 GoldManager *gold_manager, PathPlanner *path_planner,
+                 IGoldManager *gold_manager, PathPlanner *path_planner,
                  int64_t speed, int64_t attack_range, int64_t attack_damage)
     : Unit(id, player_id, actor_type, hp, max_hp, position, gold_manager,
            path_planner, speed, attack_range, attack_damage),

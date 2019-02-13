@@ -1,6 +1,7 @@
 #include "constants/constants.h"
 #include "logger/logger.h"
 #include "state/mocks/command_taker_mock.h"
+#include "state/mocks/gold_manager_mock.h"
 #include "state/utilities.h"
 #include "gtest/gtest.h"
 #include <sstream>
@@ -21,10 +22,8 @@ class LoggerTest : public testing::Test {
 	std::unique_ptr<CommandTakerMock> state;
 	std::unique_ptr<Logger> logger;
 
-	std::unique_ptr<GoldManager> gold_manager;
+	std::unique_ptr<GoldManagerMock> gold_manager;
 	std::unique_ptr<PathPlanner> path_planner;
-	std::array<int64_t, 2> player_gold;
-	int64_t max_gold;
 
 	std::unique_ptr<Map> map;
 
@@ -36,7 +35,8 @@ class LoggerTest : public testing::Test {
 	      logger(make_unique<Logger>(state.get(), PLAYER_INSTRUCTION_LIMIT_TURN,
 	                                 PLAYER_INSTRUCTION_LIMIT_GAME,
 	                                 SOLDIER_MAX_HP, VILLAGER_MAX_HP,
-	                                 FACTORY_MAX_HP)) {
+	                                 FACTORY_MAX_HP)),
+	      gold_manager(make_unique<GoldManagerMock>()) {
 		auto map_matrix = vector<vector<TerrainType>>{{
 		    {L, L, L, L, L},
 		    {L, L, L, L, L},
@@ -45,15 +45,6 @@ class LoggerTest : public testing::Test {
 		    {W, W, W, W, W},
 		}};
 		map = make_unique<Map>(map_matrix, TEST_MAP_SIZE, ELEMENT_SIZE);
-
-		player_gold[0] = 5000;
-		player_gold[1] = 5000;
-		max_gold = 10000;
-		this->gold_manager = make_unique<GoldManager>(
-		    player_gold, max_gold, SOLDIER_KILL_REWARD_AMOUNT,
-		    VILLAGER_KILL_REWARD_AMOUNT, FACTORY_KILL_REWARD_AMOUNT,
-		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
-		    MINING_REWARD);
 	}
 };
 

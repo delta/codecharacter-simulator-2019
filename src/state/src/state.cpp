@@ -10,7 +10,7 @@
 namespace state {
 
 State::State(std::unique_ptr<Map> map,
-             std::unique_ptr<GoldManager> gold_manager,
+             std::unique_ptr<IGoldManager> gold_manager,
              std::unique_ptr<PathPlanner> path_planner,
              std::array<std::vector<std::unique_ptr<Soldier>>, 2> soldiers,
              std::array<std::vector<std::unique_ptr<Villager>>, 2> villagers,
@@ -233,7 +233,7 @@ const std::array<std::vector<T *>, 2> GetRawPtrsFromUniquePtrs(
 		auto player_actors = std::vector<T *>{};
 		player_actors.reserve(actors[i].size());
 
-		// For each actor,
+		// For each actor
 		for (int j = 0; j < actors[i].size(); ++j) {
 			player_actors.push_back(actors[i][j].get());
 		}
@@ -369,6 +369,9 @@ bool State::IsGameOver(PlayerId &winner) {
 
 	// If no one died, is_game_over is false by default, leave winner alone
 	return is_game_over;
+
+	// Late gold manager update
+	gold_manager->Update();
 }
 
 } // namespace state

@@ -10,6 +10,7 @@ set(SOURCE_FILES
 	state/factory_test.cpp
 	state/state_test.cpp
 	state/path_planner_test.cpp
+	state/gold_manager_test.cpp
 	state/state_syncer_test.cpp
 	state/command_giver_test.cpp
 	logger/logger_test.cpp

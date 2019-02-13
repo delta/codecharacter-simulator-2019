@@ -1,8 +1,10 @@
 #include "constants/gold_manager.h"
 #include "constants/state.h"
 #include "gmock/gmock.h"
+#include "state/mocks/gold_manager_mock.h"
 #include "state/state.h"
 #include "gtest/gtest.h"
+#include <memory>
 
 using namespace std;
 using namespace state;
@@ -28,7 +30,7 @@ class StateTest : public Test {
 	std::vector<std::unique_ptr<Villager>> temp_villager_list;
 	std::vector<std::unique_ptr<Soldier>> temp_soldier_list;
 
-	unique_ptr<GoldManager> gold_manager;
+	GoldManagerMock *gold_manager;
 	unique_ptr<PathPlanner> path_planner;
 	Villager model_villager;
 	Soldier model_soldier;
@@ -61,65 +63,59 @@ class StateTest : public Test {
 		this->villager_kill_reward_gold = VILLAGER_KILL_REWARD_AMOUNT;
 		this->factory_kill_reward_gold = FACTORY_KILL_REWARD_AMOUNT;
 
-		this->gold_manager = make_unique<GoldManager>(
-		    player_gold, max_gold, soldier_kill_reward_gold,
-		    villager_kill_reward_gold, factory_kill_reward_gold,
-		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
-		    MINING_REWARD);
+		auto unique_gold_manager = make_unique<GoldManagerMock>();
+		this->gold_manager = unique_gold_manager.get();
 
 		this->path_planner = make_unique<PathPlanner>(map.get());
 
 		this->model_villager =
 		    Villager(1, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		             DoubleVec2D(10, 10), gold_manager.get(),
-		             path_planner.get(), 10, 10, 10, 10, 10, 10);
+		             DoubleVec2D(10, 10), gold_manager, path_planner.get(), 10,
+		             10, 10, 10, 10, 10);
 
-		this->model_soldier =
-		    Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
-		            DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(),
-		            10, 10, 10);
+		this->model_soldier = Soldier(
+		    2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
+		    DoubleVec2D(10, 10), gold_manager, path_planner.get(), 10, 10, 10);
 
 		int64_t villager_frequency = 5;
 		int64_t soldier_frequency = 10;
 
-		this->model_factory =
-		    Factory(2, PlayerId::PLAYER2, ActorType::FACTORY, 1, 100,
-		            DoubleVec2D(15, 15), gold_manager.get(), 0, 100,
-		            ActorType::VILLAGER, villager_frequency, soldier_frequency,
-		            UnitProductionCallback{});
+		this->model_factory = Factory(
+		    2, PlayerId::PLAYER2, ActorType::FACTORY, 1, 100,
+		    DoubleVec2D(15, 15), gold_manager, 0, 100, ActorType::VILLAGER,
+		    villager_frequency, soldier_frequency, UnitProductionCallback{});
 
 		soldiers = {};
 		villagers = {};
 		factories = {};
 
 		// Player1 has 2 villagers say..
-		villagers[0].push_back(make_unique<Villager>(
-		    1, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
-		    10, 10, 10, 10));
-		villagers[0].push_back(make_unique<Villager>(
-		    3, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
-		    10, 10, 10, 10));
+		villagers[0].push_back(
+		    make_unique<Villager>(1, PlayerId::PLAYER1, ActorType::VILLAGER,
+		                          100, 100, DoubleVec2D(10, 10), gold_manager,
+		                          path_planner.get(), 10, 10, 10, 10, 10, 10));
+		villagers[0].push_back(
+		    make_unique<Villager>(3, PlayerId::PLAYER1, ActorType::VILLAGER,
+		                          100, 100, DoubleVec2D(10, 10), gold_manager,
+		                          path_planner.get(), 10, 10, 10, 10, 10, 10));
 
 		// Player 2 has 1 villager
-		villagers[1].push_back(make_unique<Villager>(
-		    4, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
-		    10, 10, 10, 10));
+		villagers[1].push_back(
+		    make_unique<Villager>(4, PlayerId::PLAYER1, ActorType::VILLAGER,
+		                          100, 100, DoubleVec2D(10, 10), gold_manager,
+		                          path_planner.get(), 10, 10, 10, 10, 10, 10));
 
 		// Player2 has 1 soldier, say..
-		soldiers[1].push_back(
-		    make_unique<Soldier>(2, PlayerId::PLAYER2, ActorType::SOLDIER, 100,
-		                         100, DoubleVec2D(10, 10), gold_manager.get(),
-		                         path_planner.get(), 10, 10, 10));
+		soldiers[1].push_back(make_unique<Soldier>(
+		    2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
+		    DoubleVec2D(10, 10), gold_manager, path_planner.get(), 10, 10, 10));
 
 		Actor::SetActorIdIncrement(4);
 
 		this->state = make_unique<State>(
-		    move(map), move(gold_manager), move(path_planner), move(soldiers),
-		    move(villagers), move(factories), move(model_villager),
-		    move(model_soldier), move(model_factory));
+		    move(map), move(unique_gold_manager), move(path_planner),
+		    move(soldiers), move(villagers), move(factories),
+		    move(model_villager), move(model_soldier), move(model_factory));
 	}
 };
 
@@ -181,6 +177,7 @@ TEST_F(StateTest, SoldierAttackEnemyTest) {
 }
 
 TEST_F(StateTest, CreateFactoryTest) {
+	EXPECT_CALL(*gold_manager, DeductUnitCreateCost);
 	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
@@ -200,13 +197,12 @@ TEST_F(StateTest, CreateFactoryTest) {
 	auto factory = curr_factories[0].front();
 	ASSERT_EQ(curr_factories[0].size(), 1);
 	ASSERT_EQ(factory->GetState(), FactoryStateName::UNBUILT);
-
-	auto gold_manager = villager->GetGoldManager();
-	ASSERT_EQ(gold_manager->GetBalance(PlayerId::PLAYER1), 5000 - FACTORY_COST);
+	ASSERT_EQ(curr_factories[0].front()->GetState(), FactoryStateName::UNBUILT);
 }
 
 TEST_F(StateTest, BuildFactoryTest) {
 	// Repeat CreateFactory as above..
+	EXPECT_CALL(*gold_manager, DeductUnitCreateCost);
 	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
@@ -222,13 +218,20 @@ TEST_F(StateTest, BuildFactoryTest) {
 	// Getting the updated factories from state
 	curr_factories = state->GetFactories();
 	auto factory = curr_factories[0].front();
+
+	// Updating state
+	state->Update();
+
+	// Adding expectation for gold manager as state is updated
+
+	ASSERT_EQ(curr_villagers[0].front()->GetState(), VillagerStateName::BUILD);
 	ASSERT_EQ(curr_factories[0].size(), 1);
 	ASSERT_EQ(factory->GetState(), FactoryStateName::UNBUILT);
 
 	// Test BuildFactory for the same villager..
 	state->BuildFactory(PlayerId::PLAYER1, 1, factory->GetActorId());
 
-	// Updating state again
+	// Updating state
 	state->Update();
 
 	ASSERT_EQ(curr_villagers[0].front()->GetState(), VillagerStateName::BUILD);
@@ -237,6 +240,7 @@ TEST_F(StateTest, BuildFactoryTest) {
 	// Test BuildFactory for the other villager..
 	state->BuildFactory(PlayerId::PLAYER1, 3, factory->GetActorId());
 
+	// Updating state
 	state->Update();
 
 	ASSERT_EQ(curr_villagers[0][1]->GetState(), VillagerStateName::BUILD);
@@ -245,6 +249,7 @@ TEST_F(StateTest, BuildFactoryTest) {
 
 TEST_F(StateTest, FactoryProductionTest) {
 	// Repeat CreateFactory as above..
+	EXPECT_CALL(*gold_manager, DeductUnitCreateCost);
 	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
@@ -254,6 +259,9 @@ TEST_F(StateTest, FactoryProductionTest) {
 	while (villager->GetState() != VillagerStateName::BUILD) {
 		state->Update();
 	}
+
+	// Updating state
+	state->Update();
 
 	ASSERT_EQ(villager->GetState(), VillagerStateName::BUILD);
 
@@ -269,6 +277,7 @@ TEST_F(StateTest, FactoryProductionTest) {
 	state->SetFactoryProduction(PlayerId::PLAYER1, factory->GetActorId(),
 	                            ActorType::SOLDIER);
 
+	// Updating state
 	state->Update();
 
 	ASSERT_EQ(factory->GetProductionState(), ActorType::SOLDIER);
@@ -276,6 +285,7 @@ TEST_F(StateTest, FactoryProductionTest) {
 
 TEST_F(StateTest, FactoryDeathTest) {
 	// Repeat CreateFactory as above..
+	EXPECT_CALL(*gold_manager, DeductUnitCreateCost);
 	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
@@ -286,6 +296,9 @@ TEST_F(StateTest, FactoryDeathTest) {
 	while (villager->GetState() != VillagerStateName::BUILD) {
 		state->Update();
 	}
+
+	// Updating state
+	state->Update();
 
 	ASSERT_EQ(villager->GetState(), VillagerStateName::BUILD);
 
@@ -304,7 +317,9 @@ TEST_F(StateTest, FactoryDeathTest) {
 	ASSERT_EQ(factory->GetState(), FactoryStateName::DEAD);
 	ASSERT_EQ(factory->GetHp(), 0);
 
-	// Updating the state
+	// Kill factory
+	auto curr_factory = curr_factories[0].front();
+	curr_factory->SetHp(0);
 	state->Update();
 
 	auto new_facs = state->GetFactories();

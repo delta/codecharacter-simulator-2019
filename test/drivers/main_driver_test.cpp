@@ -57,7 +57,7 @@ class MainDriverTest : public testing::Test {
 const vector<string> MainDriverTest::shared_memory_names = {"ShmTest1",
                                                             "ShmTest2"};
 const int MainDriverTest::num_turns = pow(10, 4);
-const int MainDriverTest::time_limit_ms = 1000;
+const int MainDriverTest::time_limit_ms = 2000;
 const int MainDriverTest::turn_instruction_limit = 5;
 const int MainDriverTest::game_instruction_limit = 10;
 
