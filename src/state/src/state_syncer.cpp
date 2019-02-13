@@ -221,7 +221,7 @@ void StateSyncer::AssignVillagerAttributes(
 		new_villager.destination = Vec2D::null;
 		new_villager.target_factory_id = -1;
 		new_villager.mine_target = Vec2D::null;
-		new_villager.build_position = Vec2D::null;
+		new_villager.build_offset = Vec2D::null;
 		new_villager.build_factory_type =
 		    player_state::FactoryProduction::VILLAGER;
 

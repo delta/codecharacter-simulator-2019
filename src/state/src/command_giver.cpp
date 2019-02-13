@@ -116,6 +116,18 @@ void CommandGiver::MineLocation(PlayerId player_id, ActorId villager_id,
 	state->MineLocation(player_id, villager_id, mine_location);
 }
 
+DoubleVec2D CommandGiver::FlipPosition(const Map *map, DoubleVec2D position) {
+	auto map_size = map->GetSize();
+	auto map_element_size = map->GetElementSize();
+	return DoubleVec2D(map_size * map_element_size - 1 - position.x,
+	                   map_size * map_element_size - 1 - position.y);
+}
+
+Vec2D CommandGiver::FlipOffset(const Map *map, Vec2D offset) {
+	auto map_size = map->GetSize();
+	return Vec2D(map_size - 1 - offset.x, map_size - 1 - offset.y);
+}
+
 void CommandGiver::RunCommands(
     const std::array<player_state::State, 2> &player_states) {
 
@@ -236,7 +248,7 @@ void CommandGiver::RunCommands(
 			PlayerId Player_id = static_cast<PlayerId>(player_id);
 
 			// Check what the villager wants to perform
-			bool should_create_factory = villager.build_position != Vec2D::null;
+			bool should_create_factory = villager.build_offset != Vec2D::null;
 			bool should_build_factory = villager.target_factory_id != -1;
 			bool should_move = villager.destination != Vec2D::null;
 			bool should_attack = villager.target != -1;
@@ -263,19 +275,19 @@ void CommandGiver::RunCommands(
 
 			else if (should_create_factory) {
 				// If villager is creating a new factory
-				bool is_valid = IsValidPosition(villager.build_position);
+				bool is_valid = IsValidOffset(villager.build_offset);
 				if (is_valid) {
 					if (state_gold[player_id] >= FACTORY_COST) {
 						TerrainType terrain_type =
-						    state_map->GetTerrainTypeByPosition(
-						        villager.build_position.x,
-						        villager.build_position.y);
+						    state_map->GetTerrainTypeByOffset(
+						        villager.build_offset.x,
+						        villager.build_offset.y);
 						switch (terrain_type) {
 						case TerrainType::LAND:
 							if (state_factories[player_id].size() <
 							    MAX_NUM_FACTORIES) {
 								bool is_occupied = IsOccupied(
-								    villager.build_position, state_factories);
+								    villager.build_offset, state_factories);
 								if (is_occupied) {
 									logger->LogError(
 									    Player_id,
@@ -284,8 +296,13 @@ void CommandGiver::RunCommands(
 									    "in a position that is already "
 									    "occupied");
 								} else {
+									auto build_offset = villager.build_offset;
+									if (Player_id == PlayerId::PLAYER2) {
+										build_offset =
+										    FlipOffset(state_map, build_offset);
+									}
 									CreateFactory(Player_id, villager.id,
-									              villager.build_position);
+									              build_offset);
 								}
 
 							} else {
@@ -406,9 +423,20 @@ void CommandGiver::RunCommands(
 					    (state_map->GetTerrainTypeByOffset(
 					         villager.mine_target.x, villager.mine_target.y) ==
 					     TerrainType::GOLD_MINE);
+
+					auto element_size = (int64_t)state_map->GetElementSize();
+					auto location =
+					    Vec2D{villager.mine_target.x * element_size +
+					              (element_size / 2),
+					          villager.mine_target.y * element_size +
+					              (element_size / 2)}
+					        .to_double();
+
+					if (Player_id == PlayerId::PLAYER2) {
+						location = FlipPosition(state_map, location);
+					}
 					if (is_gold_mine) {
-						MineLocation(Player_id, villager.id,
-						             villager.mine_target);
+						MineLocation(Player_id, villager.id, location.to_int());
 					} else {
 						logger->LogError(
 						    Player_id, logger::ErrorType::INVALID_MINE_POSITION,
@@ -447,8 +475,8 @@ void CommandGiver::RunCommands(
 			// Starting or stopping factory production
 			StopOrStartFactory(Player_id, factory.id, factory.stopped);
 
-			// Changing the production state of the factory if changed, else it
-			// stays the same
+			// Changing the production state of the factory if changed, else
+			// it stays the same
 			auto build_factory_type = factory.production_state;
 			if (build_factory_type ==
 			    player_state::FactoryProduction::VILLAGER) {

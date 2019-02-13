@@ -99,6 +99,24 @@ class STATE_EXPORT CommandGiver : public ICommandGiver {
 	bool IsOccupied(Vec2D offset,
 	                std::array<std::vector<Factory *>, 2> state_factories);
 
+	/**
+	 * Helper function to flip a given position
+	 *
+	 * @param map Pointer to map
+	 * @param position Input position
+	 * @return DoubleVec2D Output Player2 position
+	 */
+	DoubleVec2D FlipPosition(const Map *map, DoubleVec2D position);
+
+	/**
+	 * Helper function to flip a given offset
+	 *
+	 * @param map Pointer to map
+	 * @param offset Input offset
+	 * @return Vec2D Output Player2 offset
+	 */
+	Vec2D FlipOffset(const Map *map, Vec2D offset);
+
   public:
 	CommandGiver();
 

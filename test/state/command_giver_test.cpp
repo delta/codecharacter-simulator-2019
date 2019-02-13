@@ -408,7 +408,7 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _));
 	this->player_states[0].villagers[0].target =
 	    this->player_states[0].enemy_soldiers[0].id;
-	this->player_states[0].villagers[0].build_position =
+	this->player_states[0].villagers[0].build_offset =
 	    Vec2D(this->ele_size, this->ele_size);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->player_states, ActorType::VILLAGER);
@@ -443,7 +443,7 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _));
 	this->player_states[0].villagers[0].destination =
 	    Vec2D(this->ele_size, this->ele_size);
-	this->player_states[0].villagers[0].build_position =
+	this->player_states[0].villagers[0].build_offset =
 	    Vec2D(this->ele_size, this->ele_size);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->player_states, ActorType::VILLAGER);
@@ -467,7 +467,7 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _));
 	this->player_states[0].villagers[0].mine_target =
 	    Vec2D(this->ele_size, this->ele_size);
-	this->player_states[0].villagers[0].build_position =
+	this->player_states[0].villagers[0].build_offset =
 	    Vec2D(this->ele_size, this->ele_size);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->player_states, ActorType::VILLAGER);
@@ -490,7 +490,7 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	    *this->logger,
 	    LogError(PlayerId::PLAYER1, ErrorType::NO_MULTIPLE_VILLAGER_TASKS, _));
 	state_factories[0].push_back(state_factory1);
-	this->player_states[0].villagers[0].build_position =
+	this->player_states[0].villagers[0].build_offset =
 	    Vec2D(this->ele_size, this->ele_size);
 	this->player_states[0].villagers[0].target_factory_id =
 	    state_factory1->GetActorId();
@@ -509,7 +509,7 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	// Making villager create a factory outside map
 	EXPECT_CALL(*this->logger, LogError(PlayerId::PLAYER1,
 	                                    ErrorType::INVALID_BUILD_POSITION, _));
-	this->player_states[0].villagers[0].build_position =
+	this->player_states[0].villagers[0].build_offset =
 	    Vec2D(this->map_size * this->ele_size, this->map_size * this->ele_size);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->player_states, ActorType::VILLAGER);
@@ -519,7 +519,7 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	    *this->logger,
 	    LogError(PlayerId::PLAYER1, ErrorType::NO_BUILD_FACTORY_ON_WATER, _));
 	// (0, 0) is a water tile
-	this->player_states[0].villagers[0].build_position = Vec2D(0, 0);
+	this->player_states[0].villagers[0].build_offset = Vec2D(0, 0);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->player_states, ActorType::VILLAGER);
 
@@ -532,8 +532,7 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	EXPECT_CALL(
 	    *this->logger,
 	    LogError(PlayerId::PLAYER1, logger::ErrorType::INSUFFICIENT_FUNDS, _));
-	this->player_states[0].villagers[0].build_position =
-	    Vec2D(this->map_size, 0);
+	this->player_states[0].villagers[0].build_offset = Vec2D(this->map_size, 0);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->player_states, ActorType::VILLAGER);
 
@@ -597,8 +596,7 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 		state_max_factories.push_back(new_factory);
 	}
 	state_factories[0] = state_max_factories;
-	this->player_states[0].villagers[0].build_position =
-	    Vec2D(3 * this->map_size, 0 * this->map_size);
+	this->player_states[0].villagers[0].build_offset = Vec2D(3, 0);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->player_states, ActorType::VILLAGER);
 	state_factories[0].clear();
@@ -686,9 +684,8 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	EXPECT_CALL(*this->command_taker,
 	            CreateFactory(PlayerId::PLAYER1,
 	                          this->player_states[0].villagers[0].id,
-	                          Vec2D(3 * this->map_size, 0 * this->map_size)));
-	this->player_states[0].villagers[0].build_position =
-	    Vec2D(3 * this->map_size, 0 * this->map_size);
+	                          Vec2D(3, 0)));
+	this->player_states[0].villagers[0].build_offset = Vec2D(3, 0);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->player_states, ActorType::VILLAGER);
 
@@ -705,10 +702,13 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	state_factories[0].clear();
 
 	// Villager mine gold
+	auto mine_offset = Vec2D(4, 2);
+	auto mine_position = Vec2D{mine_offset.x * ele_size + (ele_size / 2),
+	                           mine_offset.y * ele_size + (ele_size / 2)};
 	EXPECT_CALL(*this->command_taker,
 	            MineLocation(PlayerId::PLAYER1,
 	                         this->player_states[0].villagers[0].id,
-	                         Vec2D(4, 2)));
+	                         mine_position));
 	this->player_states[0].villagers[0].mine_target = Vec2D(4, 2);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->player_states, ActorType::VILLAGER);
