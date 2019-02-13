@@ -144,7 +144,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	void MakeFactory(PlayerId player_id, ActorId villager_id, Vec2D offset);
 
 	/**
-	 * 	/**
+	 *
 	 * Handles all build requests and builds factories given situations
 	 *
 	 * @param[in]  player_id     player to act upon
@@ -155,6 +155,36 @@ class STATE_EXPORT State : public ICommandTaker {
 	 */
 	void HandleBuildRequests();
 
+	/**
+	 * Was the lead in the last turn held by Player1?
+	 * True if player1 was in the lead
+	 * False if player2 was in the lead
+	 */
+	bool was_player1_in_the_lead;
+
+	/**
+	 * How exciting is this game?
+	 * Increases as players overtake each other
+	 */
+	int64_t interestingness;
+
+	/**
+	 * How much does one player need to overtake another by to trigger an
+	 * increase in interestingness?
+	 */
+	int64_t interest_threshold;
+
+	/**
+	 * The current game scores
+	 */
+	std::array<int64_t, 2> scores;
+
+	/**
+	 * Compute scores for this turn, and record them
+	 * Also update the interestingness factor
+	 */
+	void UpdateScores();
+
   public:
 	/**
 	 * Constructor
@@ -164,8 +194,8 @@ class STATE_EXPORT State : public ICommandTaker {
 	      std::array<std::vector<std::unique_ptr<Soldier>>, 2> soldiers,
 	      std::array<std::vector<std::unique_ptr<Villager>>, 2> villagers,
 	      std::array<std::vector<std::unique_ptr<Factory>>, 2> factories,
-	      Villager model_villager, Soldier model_soldier,
-	      Factory model_factory);
+	      Villager model_villager, Soldier model_soldier, Factory model_factory,
+	      int64_t interest_threshold);
 
 	/**
 	 * @see ICommandTaker#MoveUnit
@@ -247,6 +277,11 @@ class STATE_EXPORT State : public ICommandTaker {
 	 * @see ICommandTaker#GetScores
 	 */
 	const std::array<int64_t, 2> GetScores() override;
+
+	/**
+	 * @see ICommandTaker#GetInterestingness
+	 */
+	int64_t GetInterestingness() override;
 
 	/**
 	 * @see ICommandTaker#IsGameOver

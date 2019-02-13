@@ -90,6 +90,11 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 	 * @see IStateSyncer#GetScores
 	 */
 	std::array<int64_t, 2> GetScores() override;
+
+	/**
+	 * @see IStateSyncer#GetInterestingness
+	 */
+	int64_t GetInterestingness() override;
 };
 
 } // namespace state

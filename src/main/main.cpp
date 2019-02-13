@@ -179,7 +179,7 @@ unique_ptr<State> BuildState() {
 	return make_unique<State>(move(map), move(gold_manager), move(path_planner),
 	                          move(soldiers), move(villagers), move(factories),
 	                          move(model_villager), move(model_soldier),
-	                          move(model_factory));
+	                          move(model_factory), INTEREST_THRESHOLD);
 }
 
 unique_ptr<MainDriver> BuildMainDriver() {

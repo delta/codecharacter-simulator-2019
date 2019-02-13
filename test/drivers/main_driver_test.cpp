@@ -74,8 +74,10 @@ TEST_F(MainDriverTest, CleanRun) {
 	EXPECT_CALL(*state_syncer_mock, IsGameOver(_)).Times(num_turns);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_)).Times(num_turns + 1);
 
-	// EXPECT_CALL(*state_syncer_mock, GetScores())
-	//     .WillOnce(Return(vector<int64_t>(2, 10)));
+	// Expect scores and interestingness calls
+	EXPECT_CALL(*state_syncer_mock, GetScores())
+	    .WillOnce(Return(array<int64_t, 2>{10, 10}));
+	EXPECT_CALL(*state_syncer_mock, GetInterestingness()).WillOnce(Return(69));
 
 	// Declare mock logger and setting expectations
 	unique_ptr<LoggerMock> v_logger(new LoggerMock());
@@ -131,7 +133,10 @@ TEST_F(MainDriverTest, EarlyPlayerExit) {
 	EXPECT_CALL(*state_syncer_mock, IsGameOver(_)).Times(num_turns / 2);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_))
 	    .Times(num_turns / 2 + 1);
-	// EXPECT_CALL(*state_syncer_mock, GetScores()).Times(0);
+
+	// Get Scores and interestingness WILL NOT be called
+	EXPECT_CALL(*state_syncer_mock, GetScores()).Times(0);
+	EXPECT_CALL(*state_syncer_mock, GetInterestingness()).Times(0);
 
 	// Logger called num_turns/2 + 1 times before the driver exits
 	unique_ptr<LoggerMock> v_logger(new LoggerMock());
@@ -181,7 +186,10 @@ TEST_F(MainDriverTest, InstructionLimitReached) {
 	EXPECT_CALL(*state_syncer_mock, IsGameOver(_)).Times(num_turns / 2);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_))
 	    .Times(num_turns / 2 + 1);
-	// EXPECT_CALL(*state_syncer_mock, GetScores()).Times(0);
+
+	// Get Scores and interestingness WILL NOT be called
+	EXPECT_CALL(*state_syncer_mock, GetScores()).Times(0);
+	EXPECT_CALL(*state_syncer_mock, GetInterestingness()).Times(0);
 
 	unique_ptr<LoggerMock> v_logger(new LoggerMock());
 	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER1, _))
@@ -247,7 +255,10 @@ TEST_F(MainDriverTest, Cancellation) {
 	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(1);
 	EXPECT_CALL(*state_syncer_mock, IsGameOver(_)).Times(1);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_)).Times(2);
-	// EXPECT_CALL(*state_syncer_mock, GetScores()).Times(0);
+
+	// Get Scores and interestingness WILL NOT be called
+	EXPECT_CALL(*state_syncer_mock, GetScores()).Times(0);
+	EXPECT_CALL(*state_syncer_mock, GetInterestingness()).Times(0);
 
 	unique_ptr<LoggerMock> v_logger(new LoggerMock());
 	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER1, _)).Times(1);

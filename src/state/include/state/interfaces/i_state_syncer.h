@@ -51,6 +51,11 @@ class STATE_EXPORT IStateSyncer {
 	 * Method to get both players' scores
 	 */
 	virtual std::array<int64_t, 2> GetScores() = 0;
+
+	/**
+	 * Returns game interestingness factor
+	 */
+	virtual int64_t GetInterestingness() = 0;
 };
 
 } // namespace state
