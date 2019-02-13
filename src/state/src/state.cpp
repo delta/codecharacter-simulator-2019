@@ -16,13 +16,14 @@ State::State(std::unique_ptr<Map> map,
              std::array<std::vector<std::unique_ptr<Villager>>, 2> villagers,
              std::array<std::vector<std::unique_ptr<Factory>>, 2> factories,
              Villager model_villager, Soldier model_soldier,
-             Factory model_factory)
+             Factory model_factory, int64_t interest_threshold)
     : map(std::move(map)), gold_manager(std::move(gold_manager)),
       path_planner(std::move(path_planner)), soldiers(std::move(soldiers)),
       villagers(std::move(villagers)), factories(std::move(factories)),
       model_villager(std::move(model_villager)),
       model_soldier(std::move(model_soldier)),
-      model_factory(std::move(model_factory)), was_player1_in_the_lead(false),
+      model_factory(std::move(model_factory)),
+      interest_threshold(interest_threshold), was_player1_in_the_lead(false),
       interestingness(0), scores({0, 0}) {}
 
 /**
@@ -278,8 +279,8 @@ void State::UpdateScores() {
 	auto p2score = scores[1];
 
 	// Check for flips in the score
-	if (was_player1_in_the_lead && (p2score > p1score) ||
-	    !was_player1_in_the_lead && (p1score > p2score)) {
+	if (was_player1_in_the_lead && (p2score > p1score + interest_threshold) ||
+	    !was_player1_in_the_lead && (p1score > p2score + interest_threshold)) {
 
 		// There was a flip. Toggle the last flip bool, and increment interest
 		interestingness++;

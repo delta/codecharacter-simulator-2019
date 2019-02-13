@@ -33,6 +33,7 @@ class StateTest : public Test {
 	Villager model_villager;
 	Soldier model_soldier;
 	Factory model_factory;
+	int64_t interest_threshold;
 
 	std::array<std::vector<std::unique_ptr<Soldier>>, 2> soldiers;
 	std::array<std::vector<std::unique_ptr<Villager>>, 2> villagers;
@@ -81,6 +82,7 @@ class StateTest : public Test {
 
 		int64_t villager_frequency = 5;
 		int64_t soldier_frequency = 10;
+		int64_t interest_threshold = 0;
 
 		this->model_factory =
 		    Factory(2, PlayerId::PLAYER2, ActorType::FACTORY, 1, 100,
@@ -119,7 +121,7 @@ class StateTest : public Test {
 		this->state = make_unique<State>(
 		    move(map), move(gold_manager), move(path_planner), move(soldiers),
 		    move(villagers), move(factories), move(model_villager),
-		    move(model_soldier), move(model_factory));
+		    move(model_soldier), move(model_factory), interest_threshold);
 	}
 };
 

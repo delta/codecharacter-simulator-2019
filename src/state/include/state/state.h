@@ -169,6 +169,12 @@ class STATE_EXPORT State : public ICommandTaker {
 	int64_t interestingness;
 
 	/**
+	 * How much does one player need to overtake another by to trigger an
+	 * increase in interestingness?
+	 */
+	int64_t interest_threshold;
+
+	/**
 	 * The current game scores
 	 */
 	std::array<int64_t, 2> scores;
@@ -188,8 +194,8 @@ class STATE_EXPORT State : public ICommandTaker {
 	      std::array<std::vector<std::unique_ptr<Soldier>>, 2> soldiers,
 	      std::array<std::vector<std::unique_ptr<Villager>>, 2> villagers,
 	      std::array<std::vector<std::unique_ptr<Factory>>, 2> factories,
-	      Villager model_villager, Soldier model_soldier,
-	      Factory model_factory);
+	      Villager model_villager, Soldier model_soldier, Factory model_factory,
+	      int64_t interest_threshold);
 
 	/**
 	 * @see ICommandTaker#MoveUnit
