@@ -115,7 +115,7 @@ const GameResult MainDriver::Run() {
 	    PlayerResult{0, PlayerResult::Status::UNDEFINED}};
 	auto winner = GameResult::Winner::NONE;
 	auto win_type = GameResult::WinType::NONE;
-	auto player_scores = std::vector<int64_t>{0, 0};
+	auto player_scores = std::array<int64_t, 2>{0, 0};
 	auto instruction_count_exceeded = false;
 
 	// Main loop that runs every turn
@@ -134,7 +134,7 @@ const GameResult MainDriver::Run() {
 			if (this->cancel) {
 				this->cancel = false;
 				EndGame();
-				return GameResult{winner, win_type, player_results};
+				return GameResult{winner, win_type, 0, player_results};
 			}
 
 			// Check for instruction counter to see if player has
@@ -164,13 +164,13 @@ const GameResult MainDriver::Run() {
 			EndGame();
 			winner = GetWinnerByInstCountExceeded(player_results);
 			win_type = GameResult::WinType::EXCEEDED_INSTRUCTION_LIMIT;
-			return GameResult{winner, win_type, player_results};
+			return GameResult{winner, win_type, 0, player_results};
 		}
 
 		// If the game timer has expired, the game has to stop
 		if (this->is_game_timed_out) {
 			EndGame();
-			return GameResult{winner, win_type, player_results};
+			return GameResult{winner, win_type, 0, player_results};
 		}
 
 		// If we're here, the game is not yet over
@@ -193,7 +193,8 @@ const GameResult MainDriver::Run() {
 			EndGame();
 			winner = GetWinnerFromPlayerId(player_winner);
 			win_type = GameResult::WinType::DEATHMATCH;
-			return GameResult{winner, win_type, player_results};
+			auto interest = this->state_syncer->GetInterestingness();
+			return GameResult{winner, win_type, interest, player_results};
 		}
 
 		// Write the updated main state back to the player's state
@@ -209,9 +210,9 @@ const GameResult MainDriver::Run() {
 
 	// Done with the game now
 
-	// TODO: Get the players' scores
-	// player_scores = this->state_syncer->GetScores();
-	player_scores = std::vector<int64_t>{10, 10};
+	// Get player scores and interestingness
+	player_scores = this->state_syncer->GetScores();
+	auto interest = this->state_syncer->GetInterestingness();
 
 	// Write the player results
 	for (int i = 0; i < 2; ++i) {
@@ -222,7 +223,7 @@ const GameResult MainDriver::Run() {
 	EndGame();
 	winner = GetWinnerByScore(player_results);
 	win_type = GameResult::WinType::SCORE;
-	return GameResult{winner, win_type, player_results};
+	return GameResult{winner, win_type, interest, player_results};
 }
 
 void MainDriver::Cancel() {

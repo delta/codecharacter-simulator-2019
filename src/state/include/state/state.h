@@ -144,7 +144,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	void MakeFactory(PlayerId player_id, ActorId villager_id, Vec2D offset);
 
 	/**
-	 * 	/**
+	 *
 	 * Handles all build requests and builds factories given situations
 	 *
 	 * @param[in]  player_id     player to act upon
@@ -154,6 +154,30 @@ class STATE_EXPORT State : public ICommandTaker {
 	 * @throw      std::exception  if the operation was not possible
 	 */
 	void HandleBuildRequests();
+
+	/**
+	 * Was the lead in the last turn held by Player1?
+	 * True if player1 was in the lead
+	 * False if player2 was in the lead
+	 */
+	bool was_player1_in_the_lead;
+
+	/**
+	 * How exciting is this game?
+	 * Increases as players overtake each other
+	 */
+	int64_t interestingness;
+
+	/**
+	 * The current game scores
+	 */
+	std::array<int64_t, 2> scores;
+
+	/**
+	 * Compute scores for this turn, and record them
+	 * Also update the interestingness factor
+	 */
+	void UpdateScores();
 
   public:
 	/**
@@ -247,6 +271,11 @@ class STATE_EXPORT State : public ICommandTaker {
 	 * @see ICommandTaker#GetScores
 	 */
 	const std::array<int64_t, 2> GetScores() override;
+
+	/**
+	 * @see ICommandTaker#GetInterestingness
+	 */
+	int64_t GetInterestingness() override;
 
 	/**
 	 * @see ICommandTaker#IsGameOver

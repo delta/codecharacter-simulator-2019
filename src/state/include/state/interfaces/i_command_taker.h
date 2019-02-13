@@ -146,6 +146,13 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	virtual const std::array<int64_t, 2> GetScores() = 0;
 
 	/**
+	 * Get the game Interestingness
+	 *
+	 * @return int64_t
+	 */
+	virtual int64_t GetInterestingness() = 0;
+
+	/**
 	 * Check if the game is over
 	 *
 	 * @param[out] winner If the game is over, who is the winner

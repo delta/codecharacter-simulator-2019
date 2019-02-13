@@ -22,7 +22,8 @@ State::State(std::unique_ptr<Map> map,
       villagers(std::move(villagers)), factories(std::move(factories)),
       model_villager(std::move(model_villager)),
       model_soldier(std::move(model_soldier)),
-      model_factory(std::move(model_factory)) {}
+      model_factory(std::move(model_factory)), was_player1_in_the_lead(false),
+      interestingness(0), scores({0, 0}) {}
 
 /**
  * Helper function to get the enemy player id
@@ -266,9 +267,24 @@ const std::array<int64_t, 2> State::GetGold() {
 	return gold;
 }
 
-const std::array<int64_t, 2> State::GetScores() {
-	// TODO: Implement scores
-	return std::array<int64_t, 2>{0, 0};
+const std::array<int64_t, 2> State::GetScores() { return scores; }
+
+int64_t State::GetInterestingness() { return interestingness; }
+
+void State::UpdateScores() {
+	// TODO: Add score calculation logic here
+
+	auto p1score = scores[0];
+	auto p2score = scores[1];
+
+	// Check for flips in the score
+	if (was_player1_in_the_lead && (p2score > p1score) ||
+	    !was_player1_in_the_lead && (p1score > p2score)) {
+
+		// There was a flip. Toggle the last flip bool, and increment interest
+		interestingness++;
+		was_player1_in_the_lead = !was_player1_in_the_lead;
+	}
 }
 
 void State::Update() {
@@ -337,6 +353,9 @@ void State::Update() {
 
 	// Handling build requests by villagers
 	HandleBuildRequests();
+
+	// Updates scores and interestingness
+	UpdateScores();
 }
 
 bool State::IsGameOver(PlayerId &winner) {

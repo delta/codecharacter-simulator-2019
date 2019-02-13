@@ -75,6 +75,11 @@ struct DRIVERS_EXPORT GameResult {
 	WinType win_type;
 
 	/**
+	 * Metric of how exciting a game is
+	 */
+	int64_t interestingness;
+
+	/**
 	 * Player results from both players
 	 */
 	std::array<PlayerResult, 2> player_results;
@@ -123,8 +128,9 @@ operator<<(std::ostream &os, const GameResult::WinType win_type) {
 DRIVERS_EXPORT inline std::ostream &operator<<(std::ostream &os,
                                                const GameResult game_result) {
 
-	// Write Winner and Win Type
-	os << game_result.winner << " " << game_result.win_type << " ";
+	// Write Winner, Win Type, and Interestingness
+	os << game_result.winner << " " << game_result.win_type << " "
+	   << game_result.interestingness << " ";
 
 	// Write Results
 	auto &pr = game_result.player_results;

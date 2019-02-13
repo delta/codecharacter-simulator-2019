@@ -131,6 +131,10 @@ void StateSyncer::UpdatePlayerStates(
 
 std::array<int64_t, 2> StateSyncer::GetScores() { return state->GetScores(); }
 
+int64_t StateSyncer::GetInterestingness() {
+	return state->GetInterestingness();
+}
+
 DoubleVec2D StateSyncer::FlipPosition(const Map *map, DoubleVec2D position) {
 	auto map_size = map->GetSize();
 	auto map_element_size = map->GetElementSize();
