@@ -139,7 +139,8 @@ void CommandGiver::RunCommands(
 	auto state_gold = state->GetGold();
 
 	// Iterating through the soldiers and assigning soldier tasks
-	// for each player...
+
+	// For each player...
 	for (int player_id = 0; player_id < player_states.size(); ++player_id) {
 
 		// For each soldier...

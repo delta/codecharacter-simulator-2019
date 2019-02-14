@@ -130,14 +130,11 @@ void State::CreateFactory(PlayerId player_id, ActorId villager_id, Vec2D offset,
 	int64_t id = static_cast<int64_t>(player_id);
 
 	// Creating a BuildRequest object
-	BuildRequest request = {villager_id, produce_unit};
-
-	// Creating the (Vec2d, villager_id) pair
-	std::pair<Vec2D, BuildRequest> new_entry = {offset, request};
+	BuildRequest request = {villager_id, produce_unit, offset};
 
 	// Adding a new build request
 	auto &build_reqs = this->build_requests[id];
-	build_reqs.push_back(new_entry);
+	build_reqs.push_back(request);
 }
 
 bool State::IsPositionTaken(Vec2D position, int64_t enemy_id) {
@@ -145,7 +142,7 @@ bool State::IsPositionTaken(Vec2D position, int64_t enemy_id) {
 	    this->build_requests[enemy_id]; // Mine requests are taken by reference
 	                                    // to avoid wasteful copying by value
 	for (auto &req : build_reqs) {
-		if (req.first == position) {
+		if (req.offset == position) {
 			return true;
 		}
 	}
@@ -161,10 +158,9 @@ void State::HandleBuildRequests() {
 
 		// Iterating through each player's build requests
 		for (auto &req : build_reqs) {
-			Vec2D build_pos = req.first;
-			BuildRequest request = req.second;
-			int64_t villager_id = request.villager_id;
-			ActorType production_type = request.prod_type;
+			Vec2D build_pos = req.offset;
+			int64_t villager_id = req.villager_id;
+			ActorType production_type = req.prod_type;
 
 			bool is_pos_taken = IsPositionTaken(build_pos, enemy_id);
 
