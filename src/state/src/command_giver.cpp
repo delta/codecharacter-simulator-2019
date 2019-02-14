@@ -87,8 +87,8 @@ void CommandGiver::AttackActor(PlayerId player_id, ActorId unit_id,
 }
 
 void CommandGiver::CreateFactory(PlayerId player_id, ActorId villager_id,
-                                 Vec2D offset) {
-	state->CreateFactory(player_id, villager_id, offset);
+                                 Vec2D offset, ActorType unit_type) {
+	state->CreateFactory(player_id, villager_id, offset, unit_type);
 }
 
 void CommandGiver::BuildFactory(PlayerId player_id, ActorId villager_id,
@@ -301,12 +301,23 @@ void CommandGiver::RunCommands(
 									    "occupied");
 								} else {
 									auto build_offset = villager.build_offset;
+									ActorType unit_type;
+									switch (villager.build_factory_type) {
+									case player_state::FactoryProduction::
+									    SOLDIER:
+										unit_type = ActorType::SOLDIER;
+										break;
+									case player_state::FactoryProduction::
+									    VILLAGER:
+										unit_type = ActorType::VILLAGER;
+										break;
+									}
 									if (Player_id == PlayerId::PLAYER2) {
 										build_offset =
 										    FlipOffset(state_map, build_offset);
 									}
 									CreateFactory(Player_id, villager.id,
-									              build_offset);
+									              build_offset, unit_type);
 								}
 
 							} else {

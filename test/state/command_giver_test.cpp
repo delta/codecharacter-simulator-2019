@@ -684,8 +684,10 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	EXPECT_CALL(*this->command_taker,
 	            CreateFactory(PlayerId::PLAYER1,
 	                          this->player_states[0].villagers[0].id,
-	                          Vec2D(3, 0)));
+	                          Vec2D(3, 0), ActorType::SOLDIER));
 	this->player_states[0].villagers[0].build_offset = Vec2D(3, 0);
+	this->player_states[0].villagers[0].build_factory_type =
+	    player_state::FactoryProduction::SOLDIER;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->player_states, ActorType::VILLAGER);
 

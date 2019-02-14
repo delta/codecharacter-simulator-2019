@@ -13,8 +13,8 @@ class CommandTakerMock : public ICommandTaker {
 	             void(PlayerId player_id, ActorId actor_id, Vec2D position));
 	MOCK_METHOD3(AttackActor, void(PlayerId player_id, ActorId unit_id,
 	                               PlayerId enemy_actor_id));
-	MOCK_METHOD3(CreateFactory,
-	             void(PlayerId player_id, ActorId actor_id, Vec2D offset));
+	MOCK_METHOD4(CreateFactory, void(PlayerId player_id, ActorId actor_id,
+	                                 Vec2D offset, ActorType unit_type));
 	MOCK_METHOD3(BuildFactory, void(PlayerId player_id, ActorId actor_id,
 	                                ActorId factory_id));
 	MOCK_METHOD3(SetFactoryProduction,
