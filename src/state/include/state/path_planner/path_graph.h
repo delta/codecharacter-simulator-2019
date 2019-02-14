@@ -27,7 +27,16 @@ class PathGraph {
 	 * @param offset Grid location on the map
 	 * @return std::vector<Vec2D> List of neighbour offsets
 	 */
-	std::vector<Vec2D> GetNeighbours(Vec2D offset);
+	std::vector<Vec2D> GetNeighbours(const Vec2D &offset);
+
+	/**
+	 * Helper to check if the given offset is valid and on land
+	 *
+	 * @param offset Offset to check
+	 * @return true If valid
+	 * @return false If not valid
+	 */
+	bool IsValidOffset(const Vec2D &offset);
 
 	/**
 	 * Find a path between the two given offsets
