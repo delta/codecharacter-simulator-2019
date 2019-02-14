@@ -15,7 +15,7 @@ set(EXPORTS_FILE_PATH ${EXPORTS_DIR}/game/game_export.h)
 
 add_library(game STATIC ${SOURCE_FILES})
 target_link_libraries(
-	game state logger drivers player_wrapper Boost::system pthread)
+	game simulator_constants state logger drivers player_wrapper Boost::system pthread)
 
 generate_export_header(game EXPORT_FILE_NAME ${EXPORTS_FILE_PATH})
 

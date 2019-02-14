@@ -12,6 +12,7 @@
 #include "game/game_export.h"
 #include "logger/logger.h"
 #include "physics/vector.hpp"
+#include "simulator_constants/constants.h"
 #include "state/actor/actor.h"
 #include "state/actor/factory.h"
 #include "state/actor/soldier.h"

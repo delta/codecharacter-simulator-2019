@@ -10,7 +10,7 @@ struct BuildRequest {
 
 	/**
 	 * The type of actor that the player wants to factory to produce
-	*/
+	 */
 	state::ActorType prod_type;
 
 	/**

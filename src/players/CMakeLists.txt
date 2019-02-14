@@ -9,6 +9,7 @@ set(INCLUDE_PATH include)
 
 if((NOT BUILD_PROJECT STREQUAL "all") AND (NOT BUILD_PROJECT STREQUAL "no_tests"))
 	include(${CMAKE_INSTALL_PREFIX}/lib/physics_config.cmake)
+	include(${CMAKE_INSTALL_PREFIX}/lib/simulator_constants_config.cmake)
 	include(${CMAKE_INSTALL_PREFIX}/lib/constants_config.cmake)
 	include(${CMAKE_INSTALL_PREFIX}/lib/player_wrapper_config.cmake)
 	include(${CMAKE_INSTALL_PREFIX}/lib/state_config.cmake)
@@ -25,7 +26,7 @@ foreach(PLAYER_ID 1 ${NUM_PLAYERS})
 
 
 	add_executable(${PLAYER_NAME} ${SOURCE_FILES})
-	target_link_libraries(${PLAYER_NAME} physics state drivers player_wrapper ${PLAYER_NAME}_code constants)
+	target_link_libraries(${PLAYER_NAME} physics state drivers player_wrapper ${PLAYER_NAME}_code constants simulator_constants)
 
 	target_include_directories(${PLAYER_NAME} PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${INCLUDE_PATH}>
