@@ -115,7 +115,7 @@ TEST_F(PathPlannerTest, HeavyMapTest) {
 		}
 		count++;
 	}
-	EXPECT_EQ(count, 1244);
+	EXPECT_EQ(count, 1234);
 }
 
 TEST_F(PathPlannerTest, SymmetryTest) {

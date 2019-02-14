@@ -201,10 +201,11 @@ std::vector<Vec2D> PathGraph::GetPath(Vec2D start_offset, Vec2D target_offset) {
 	return std::vector<Vec2D>{};
 }
 
-std::vector<Vec2D> PathGraph::GetNeighbours(Vec2D offset) {
+std::vector<Vec2D> PathGraph::GetNeighbours(const Vec2D &offset) {
 	auto neighbours = std::vector<Vec2D>{};
-	neighbours.reserve(4);
+	neighbours.reserve(8);
 
+	// Add any of the 4 lateral neighbours of the current node if they're valid
 	auto rel_offsets = std::vector<Vec2D>{{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
 	auto current_offset = Vec2D::null;
 
@@ -213,14 +214,37 @@ std::vector<Vec2D> PathGraph::GetNeighbours(Vec2D offset) {
 		current_offset = offset + rel_offset;
 
 		// If the location is within bounds and a valid location...
-		if (current_offset.x >= 0 && current_offset.x < size &&
-		    current_offset.y >= 0 && current_offset.y < size &&
-		    graph[current_offset.x][current_offset.y]) {
+		if (IsValidOffset(current_offset)) {
+			neighbours.push_back(current_offset);
+		}
+	}
+
+	// Add any of the 4 diagonal neighbours of the current node iff they're
+	// valid AND are not flanked by water on either side
+	auto diag_offsets = std::vector<Vec2D>{{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+	current_offset = Vec2D::null;
+
+	// For each of the diagonals...
+	for (const auto &diag_offset : diag_offsets) {
+
+		// Calculate the adjacent cells, we'll check if they're valid
+		current_offset = offset + diag_offset;
+		auto adjacent1 = Vec2D{current_offset.x, offset.y};
+		auto adjacent2 = Vec2D{offset.x, current_offset.y};
+
+		// If the current location and the adjacents are valid...
+		if (IsValidOffset(current_offset) && IsValidOffset(adjacent1) &&
+		    IsValidOffset(adjacent2)) {
 			neighbours.push_back(current_offset);
 		}
 	}
 
 	return neighbours;
+}
+
+bool PathGraph::IsValidOffset(const Vec2D &offset) {
+	return offset.x >= 0 && offset.x < size && offset.y >= 0 &&
+	       offset.y < size && graph[offset.x][offset.y];
 }
 
 } // namespace state
