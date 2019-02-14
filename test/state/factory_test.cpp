@@ -97,7 +97,7 @@ class FactoryTest : public Test {
 	}
 };
 
-TEST_F(FactoryTest, ConstructionTest) {
+TEST_F(FactoryTest, CreateVillagerTest) {
 	ASSERT_EQ(factory->GetState(), FactoryStateName::UNBUILT);
 
 	factory->Update();

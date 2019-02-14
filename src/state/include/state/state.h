@@ -20,7 +20,6 @@
 
 #include <array>
 #include <memory>
-#include <utility>
 #include <vector>
 
 namespace state {
@@ -75,7 +74,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	/**
 	 * An array of queues for handling build requests
 	 */
-	std::array<std::vector<std::pair<Vec2D, BuildRequest>>, 2> build_requests;
+	std::array<std::vector<BuildRequest>, 2> build_requests;
 
 	/**
 	 * Get pointer to Factory given map offset

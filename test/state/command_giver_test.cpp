@@ -680,7 +680,7 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	state_factories[1].clear();
 
 	/// VILLAGERS' OPERATIONS
-	// Villager create factory
+	// Villager create factory which produces soldiers
 	EXPECT_CALL(*this->command_taker,
 	            CreateFactory(PlayerId::PLAYER1,
 	                          this->player_states[0].villagers[0].id,
@@ -688,6 +688,17 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	this->player_states[0].villagers[0].build_offset = Vec2D(3, 0);
 	this->player_states[0].villagers[0].build_factory_type =
 	    player_state::FactoryProduction::SOLDIER;
+	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
+	                        this->player_states, ActorType::VILLAGER);
+
+	// Villager create factory which produces villagers
+	EXPECT_CALL(*this->command_taker,
+	            CreateFactory(PlayerId::PLAYER1,
+	                          this->player_states[0].villagers[0].id,
+	                          Vec2D(3, 0), ActorType::VILLAGER));
+	this->player_states[0].villagers[0].build_offset = Vec2D(3, 0);
+	this->player_states[0].villagers[0].build_factory_type =
+	    player_state::FactoryProduction::VILLAGER;
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->player_states, ActorType::VILLAGER);
 
