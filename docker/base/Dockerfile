@@ -25,7 +25,8 @@ RUN wget "https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.tar
 &&  cp -r cmake-3.11.1-Linux-x86_64/bin/* /usr/local/bin \
 &&  cp -r cmake-3.11.1-Linux-x86_64/doc/* /usr/local/doc \
 &&  cp -r cmake-3.11.1-Linux-x86_64/share/* /usr/local/share \
-&&  cp -r cmake-3.11.1-Linux-x86_64/man/* /usr/local/man
+&&  cp -r cmake-3.11.1-Linux-x86_64/man/* /usr/local/man \
+&&  rm cmake-3.11.1-Linux-x86_64 -rf
 
 # Fetch and install protobuf from source
 RUN wget "https://github.com/google/protobuf/releases/download/v3.5.1/protobuf-cpp-3.5.1.tar.gz" --no-check-certificate \
@@ -33,13 +34,16 @@ RUN wget "https://github.com/google/protobuf/releases/download/v3.5.1/protobuf-c
 &&  rm protobuf-cpp-3.5.1.tar.gz \
 &&  cd protobuf-3.5.1 \
 && ./configure --disable-shared --with-pic --prefix=/root/protobuf \
-&& make -j $(expr $(grep -c '^processor' /proc/cpuinfo) - 1) install
+&& make -j $(expr $(grep -c '^processor' /proc/cpuinfo) - 1) install \
+&& cd .. \
+&& rm -rf protobuf-cpp-3.5.1
 
 # Fetch and install Clang and LLVM 4.0.0 from source
 RUN wget "http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz" \
 && tar xf clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz \
 && rm clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz \
-&& cp -r clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04/* /usr/local
+&& cp -r clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04/* /usr/local \
+&& rm -rf clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04
 
 # Set env
 ENV BOOST_ROOT="/root/boost_1_68_0" \
