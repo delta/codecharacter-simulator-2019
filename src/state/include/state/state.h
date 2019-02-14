@@ -10,6 +10,7 @@
 #include "state/actor/factory.h"
 #include "state/actor/soldier.h"
 #include "state/actor/villager.h"
+#include "state/build_request.h"
 #include "state/gold_manager/gold_manager.h"
 #include "state/interfaces/i_command_taker.h"
 #include "state/interfaces/i_updatable.h"
@@ -74,7 +75,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	/**
 	 * An array of queues for handling build requests
 	 */
-	std::array<std::vector<std::pair<Vec2D, int64_t>>, 2> build_requests;
+	std::array<std::vector<std::pair<Vec2D, BuildRequest>>, 2> build_requests;
 
 	/**
 	 * Get pointer to Factory given map offset
@@ -90,9 +91,11 @@ class STATE_EXPORT State : public ICommandTaker {
 	 *
 	 * @param p_player_id
 	 * @param offset
+	 * @param unit_type 	the type of unit that the factory will produce
 	 * @return std::unique_ptr<Factory>
 	 */
-	std::unique_ptr<Factory> FactoryBuilder(PlayerId p_player_id, Vec2D offset);
+	std::unique_ptr<Factory> FactoryBuilder(PlayerId p_player_id, Vec2D offset,
+	                                        ActorType unit_type);
 
 	/**
 	 * Create a new villager at the given position
@@ -138,10 +141,13 @@ class STATE_EXPORT State : public ICommandTaker {
 	 * @param[in]  player_id     player to act upon
 	 * @param[in]  villager_id   villager to build
 	 * @param[in]  offset        grid location to build the factory
+	 * @param[in]  produce_unit  type of unit that the player is trying to
+	 * produce
 	 *
 	 * @throw      std::exception  if the operation was not possible
 	 */
-	void MakeFactory(PlayerId player_id, ActorId villager_id, Vec2D offset);
+	void MakeFactory(PlayerId player_id, ActorId villager_id, Vec2D offset,
+	                 ActorType produce_unit);
 
 	/**
 	 *
@@ -227,8 +233,8 @@ class STATE_EXPORT State : public ICommandTaker {
 	/**
 	 * @see ICommandTaker#CreateFactory
 	 */
-	void CreateFactory(PlayerId player_id, ActorId villager_id,
-	                   Vec2D offset) override;
+	void CreateFactory(PlayerId player_id, ActorId villager_id, Vec2D offset,
+	                   ActorType produce_unit) override;
 
 	/**
 	 * @see ICommandTaker#BuildFactory

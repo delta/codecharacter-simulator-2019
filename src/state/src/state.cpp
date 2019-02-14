@@ -103,14 +103,14 @@ void State::AttackActor(PlayerId player_id, ActorId unit_id,
 	unit->Attack(enemy_actor);
 }
 
-void State::MakeFactory(PlayerId p_player_id, ActorId villager_id,
-                        Vec2D offset) {
+void State::MakeFactory(PlayerId p_player_id, ActorId villager_id, Vec2D offset,
+                        ActorType produce_unit) {
 	auto player_id = static_cast<int64_t>(p_player_id);
 	auto factory = FindFactoryByOffset(p_player_id, offset);
 
 	// If the factory doesn't exist, create it
 	if (factory == nullptr) {
-		auto new_factory = FactoryBuilder(p_player_id, offset);
+		auto new_factory = FactoryBuilder(p_player_id, offset, produce_unit);
 		factories[player_id].push_back(std::move(new_factory));
 
 		factory = factories[player_id].back().get();
@@ -125,12 +125,15 @@ void State::MakeFactory(PlayerId p_player_id, ActorId villager_id,
 	villager->Build(factory);
 }
 
-void State::CreateFactory(PlayerId player_id, ActorId villager_id,
-                          Vec2D offset) {
+void State::CreateFactory(PlayerId player_id, ActorId villager_id, Vec2D offset,
+                          ActorType produce_unit) {
 	int64_t id = static_cast<int64_t>(player_id);
 
+	// Creating a BuildRequest object
+	BuildRequest request = {villager_id, produce_unit};
+
 	// Creating the (Vec2d, villager_id) pair
-	std::pair<Vec2D, int64_t> new_entry = {offset, villager_id};
+	std::pair<Vec2D, BuildRequest> new_entry = {offset, request};
 
 	// Adding a new build request
 	auto &build_reqs = this->build_requests[id];
@@ -159,7 +162,9 @@ void State::HandleBuildRequests() {
 		// Iterating through each player's build requests
 		for (auto &req : build_reqs) {
 			Vec2D build_pos = req.first;
-			int64_t villager_id = req.second;
+			BuildRequest request = req.second;
+			int64_t villager_id = request.villager_id;
+			ActorType production_type = request.prod_type;
 
 			bool is_pos_taken = IsPositionTaken(build_pos, enemy_id);
 
@@ -171,7 +176,7 @@ void State::HandleBuildRequests() {
 				// Calling MakeFactory for the given player as there are no
 				// build collisions
 				PlayerId player_id = static_cast<PlayerId>(id);
-				MakeFactory(player_id, villager_id, build_pos);
+				MakeFactory(player_id, villager_id, build_pos, production_type);
 			}
 		}
 	}
