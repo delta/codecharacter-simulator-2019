@@ -4,6 +4,7 @@
 #include "drivers/timer.h"
 #include "player_code/player_code.h"
 #include "player_wrapper/player_code_wrapper.h"
+#include "simulator_constants/constants.h"
 
 #include <cstdio>
 #include <cstdlib>

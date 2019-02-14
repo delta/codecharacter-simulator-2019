@@ -34,7 +34,7 @@ add_executable(shm_client drivers/shared_memory/shm_client.cpp)
 
 add_executable(main_driver_test_player drivers/main_driver_test_player)
 
-target_link_libraries(tests physics state drivers logger player_wrapper gtest gmock)
+target_link_libraries(tests physics constants simulator_constants state drivers logger player_wrapper gtest gmock)
 target_link_libraries(tests player_code_test_0 player_code_test_1 player_code_test_2)
 
 target_link_libraries(shm_client state drivers)

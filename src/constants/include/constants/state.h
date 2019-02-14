@@ -76,9 +76,6 @@ const int64_t VILLAGER_BUILD_RANGE = 5;
 // Mine range of the villager
 const int64_t VILLAGER_MINE_RANGE = 5;
 
-// Interestingness threshold
-const int64_t INTEREST_THRESHOLD = 0;
-
 // Player 1 start position
 // Player 2 is the same position flipped
 const auto PLAYER1_START_POSITION = DoubleVec2D{5, 5};

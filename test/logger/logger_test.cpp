@@ -1,5 +1,6 @@
 #include "constants/constants.h"
 #include "logger/logger.h"
+#include "simulator_constants/constants.h"
 #include "state/mocks/command_taker_mock.h"
 #include "state/utilities.h"
 #include "gtest/gtest.h"
