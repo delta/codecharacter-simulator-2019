@@ -32,7 +32,7 @@ bool CommandGiver::IsValidOffset(Vec2D position) const {
 	auto map_size = map->GetSize();
 
 	// Bounds check
-	if ((position.x >= map_size || position.x < 0) &&
+	if ((position.x >= map_size || position.x < 0) ||
 	    (position.y >= map_size || position.y < 0)) {
 		return false;
 	}
@@ -489,5 +489,4 @@ void CommandGiver::RunCommands(
 		}
 	}
 }
-
 } // namespace state
