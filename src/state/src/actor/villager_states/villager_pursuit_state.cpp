@@ -45,7 +45,8 @@ std::unique_ptr<IActorState> VillagerPursuitState::Update() {
 	}
 
 	// Check if the target is dead
-	if (villager->GetAttackTarget()->GetLatestHp() == 0) {
+	auto target = villager->GetAttackTarget();
+	if (target == nullptr || target->GetLatestHp() == 0) {
 		villager->SetAttackTarget(nullptr);
 		return std::make_unique<VillagerIdleState>(villager);
 	}

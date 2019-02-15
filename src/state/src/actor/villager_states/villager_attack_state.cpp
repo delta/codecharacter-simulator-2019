@@ -48,7 +48,8 @@ std::unique_ptr<IActorState> VillagerAttackState::Update() {
 	}
 
 	// Check if the target is dead
-	if (villager->GetAttackTarget()->GetLatestHp() == 0) {
+	auto target = villager->GetAttackTarget();
+	if (target == nullptr || target->GetLatestHp() == 0) {
 		villager->SetAttackTarget(nullptr);
 		return std::make_unique<VillagerIdleState>(villager);
 	}
@@ -60,13 +61,12 @@ std::unique_ptr<IActorState> VillagerAttackState::Update() {
 
 	// Execute attack code
 	// Inflict damage on opponent
-	auto target = villager->GetAttackTarget();
 	target->Damage(villager->GetAttackDamage());
 
 	// Check if opponent is now dead
 	if (target->GetLatestHp() == 0) {
 		// Reward player for kill
-		villager->GetGoldManager()->RewardKill(villager->GetAttackTarget());
+		villager->GetGoldManager()->RewardKill(target);
 	}
 
 	return nullptr;
