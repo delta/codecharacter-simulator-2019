@@ -16,7 +16,8 @@ Actor::Actor() {
 Actor::Actor(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
              int64_t max_hp, DoubleVec2D position, GoldManager *gold_manager)
     : id(id), player_id(player_id), actor_type(actor_type), hp(hp),
-      max_hp(max_hp), position(position), gold_manager(gold_manager) {}
+      max_hp(max_hp), position(position), gold_manager(gold_manager),
+      damage_incurred(0) {}
 
 ActorId Actor::GetActorId() { return id; }
 
@@ -48,6 +49,13 @@ void Actor::SetHp(int64_t hp) {
 		throw std::out_of_range("`hp` cannot be greater than max_hp");
 	}
 	this->hp = hp;
+}
+
+int64_t Actor::GetLatestHp() { return hp - damage_incurred; }
+
+void Actor::Damage(int64_t damage_amount) {
+	this->damage_incurred =
+	    std::min<int64_t>(this->hp, this->damage_incurred + damage_amount);
 }
 
 DoubleVec2D Actor::GetPosition() { return position; }

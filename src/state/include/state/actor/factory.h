@@ -69,12 +69,6 @@ class STATE_EXPORT Factory : public Actor {
 	 */
 	UnitProductionCallback unit_production_callback;
 
-	/**
-	 * Amount of damage the factory incurred in the current turn
-	 * Applied to hp at the end of the turn
-	 */
-	int64_t damage_incurred;
-
   public:
 	Factory();
 
@@ -157,15 +151,6 @@ class STATE_EXPORT Factory : public Actor {
 	void SetProductionState(ActorType production_state);
 
 	/**
-	 * Returns factory's new_hp
-	 *
-	 * @see Actor#GetLatestHp
-	 *
-	 * @return     The factory's new_hp
-	 */
-	int64_t GetLatestHp() override;
-
-	/**
 	 * Get the Villager Frequency
 	 *
 	 * @return int64_t
@@ -185,11 +170,6 @@ class STATE_EXPORT Factory : public Actor {
 	 * @return     Name of current state of type FactoryStateName
 	 */
 	FactoryStateName GetState();
-
-	/**
-	 * @see Actor#Damage
-	 */
-	void Damage(int64_t damage_amount) override;
 
 	/**
 	 * Update function of the Factory

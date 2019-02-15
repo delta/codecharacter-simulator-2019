@@ -69,12 +69,6 @@ class STATE_EXPORT Unit : public Actor {
 	 */
 	bool is_new_position_set;
 
-	/**
-	 * Amount of damage the soldier incurred in the current turn
-	 * Applied to hp at the end of the turn
-	 */
-	int64_t damage_incurred;
-
   public:
 	Unit();
 
@@ -216,20 +210,6 @@ class STATE_EXPORT Unit : public Actor {
 	 * @param[in]     attack_target  The target to attack
 	 */
 	void Attack(Actor *attack_target);
-
-	/**
-	 * Returns soldier's new_hp
-	 *
-	 * @see Actor#GetLatestHp
-	 *
-	 * @return     The soldier's new_hp
-	 */
-	int64_t GetLatestHp() override;
-
-	/**
-	 * @see Actor#Damage
-	 */
-	void Damage(int64_t damage_amount) override;
 
 	/**
 	 * Late Update function of the soldier

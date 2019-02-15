@@ -31,8 +31,9 @@ void Soldier::LateUpdate() {
 		ClearNewPosition();
 	}
 
-	// Update HP
+	// Update HP, and reset damage incurred
 	this->SetHp(this->GetLatestHp());
+	this->damage_incurred = 0;
 
 	// Allow soldier to transition to dead state if it's dead
 	if (this->hp == 0 && state->GetName() != SoldierStateName::DEAD) {

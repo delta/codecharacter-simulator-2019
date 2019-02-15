@@ -54,13 +54,6 @@ void Factory::Stop() { stopped = true; }
 
 void Factory::Start() { stopped = false; }
 
-int64_t Factory::GetLatestHp() { return hp - damage_incurred; }
-
-void Factory::Damage(int64_t damage_amount) {
-	this->damage_incurred =
-	    std::min<int64_t>(this->hp, this->damage_incurred + damage_amount);
-}
-
 int64_t Factory::GetVillagerFrequency() { return this->villager_frequency; }
 
 int64_t Factory::GetSoldierFrequency() { return this->soldier_frequency; }
