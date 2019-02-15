@@ -31,7 +31,8 @@ std::unique_ptr<IActorState> SoldierAttackState::Update() {
 	}
 
 	// Check if the target is dead
-	if (soldier->GetAttackTarget()->GetLatestHp() == 0) {
+	auto target = soldier->GetAttackTarget();
+	if (target == nullptr || target->GetLatestHp() == 0) {
 		soldier->SetAttackTarget(nullptr);
 		return std::make_unique<SoldierIdleState>(soldier);
 	}
@@ -43,17 +44,16 @@ std::unique_ptr<IActorState> SoldierAttackState::Update() {
 
 	// Execute attack code
 	// Inflict damage on opponent
-	auto target = soldier->GetAttackTarget();
 	target->Damage(soldier->GetAttackDamage());
 
 	// Check if opponent is now dead
-	if (soldier->GetAttackTarget()->GetLatestHp() == 0) {
+	if (target->GetLatestHp() == 0) {
 		// Reward player for kill
-		soldier->GetGoldManager()->RewardKill(soldier->GetAttackTarget());
+		soldier->GetGoldManager()->RewardKill(target);
 	}
 
 	return nullptr;
-}
+} // namespace state
 
 void SoldierAttackState::Exit() {}
 } // namespace state

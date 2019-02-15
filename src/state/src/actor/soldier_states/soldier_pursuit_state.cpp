@@ -31,7 +31,8 @@ std::unique_ptr<IActorState> SoldierPursuitState::Update() {
 	}
 
 	// Check if the target is dead
-	if (soldier->GetAttackTarget()->GetLatestHp() == 0) {
+	auto target = soldier->GetAttackTarget();
+	if (target == nullptr || target->GetLatestHp() == 0) {
 		soldier->SetAttackTarget(nullptr);
 		return std::make_unique<SoldierIdleState>(soldier);
 	}
