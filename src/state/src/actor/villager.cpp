@@ -99,6 +99,7 @@ void Villager::LateUpdate() {
 
 	// Update HP
 	this->SetHp(this->GetLatestHp());
+	this->damage_incurred = 0;
 
 	// Allow villager to transition to dead state if it's dead
 	if (this->hp == 0 && state->GetName() != VillagerStateName::DEAD) {

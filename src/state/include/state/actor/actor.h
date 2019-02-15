@@ -60,6 +60,12 @@ class STATE_EXPORT Actor : public IUpdatable {
 	 */
 	GoldManager *gold_manager;
 
+	/**
+	 * Amount of damage the soldier incurred in the current turn
+	 * Applied to hp at the end of the turn
+	 */
+	int64_t damage_incurred;
+
   public:
 	Actor();
 
@@ -140,12 +146,12 @@ class STATE_EXPORT Actor : public IUpdatable {
 	/**
 	 * Gets the latest version of HP
 	 *
-	 * Some Actors may buffer damage accumulated over a turn and apply it at
-	 * the turn's end. This method returns HP after applying buffered damage
+	 * We buffer damage accumulated over a turn and apply it at the turn's end.
+	 * This method returns HP after applying buffered damage
 	 *
 	 * @return     The latest HP
 	 */
-	virtual int64_t GetLatestHp() = 0;
+	int64_t GetLatestHp();
 
 	/**
 	 * Reduces the Actor's HP by the specified amount
@@ -154,7 +160,7 @@ class STATE_EXPORT Actor : public IUpdatable {
 	 *
 	 * @param[in]  damage_amount  The damage amount
 	 */
-	virtual void Damage(int64_t damage_amount) = 0;
+	void Damage(int64_t damage_amount);
 
 	/**
 	 * Get the position of the actor

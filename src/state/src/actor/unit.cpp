@@ -22,7 +22,7 @@ Unit::Unit(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
       speed(speed), attack_range(attack_range), attack_damage(attack_damage),
       path_planner(path_planner), attack_target(nullptr), destination(Vec2D{}),
       is_destination_set(false), new_position(DoubleVec2D{}),
-      is_new_position_set(false), damage_incurred(0) {}
+      is_new_position_set(false) {}
 
 int64_t Unit::GetSpeed() { return speed; }
 
@@ -86,13 +86,6 @@ void Unit::Move(Vec2D destination) {
 void Unit::Attack(Actor *attack_target) {
 	this->attack_target = attack_target;
 	this->is_destination_set = false;
-}
-
-int64_t Unit::GetLatestHp() { return hp - damage_incurred; }
-
-void Unit::Damage(int64_t damage_amount) {
-	this->damage_incurred =
-	    std::min<int64_t>(this->hp, this->damage_incurred + damage_amount);
 }
 
 } // namespace state
