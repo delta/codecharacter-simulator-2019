@@ -52,8 +52,8 @@ State PlayerCode::Update(State state) {
 	// Incrementing tick at every turn
 	++tick;
 
-	// cout << "The timer shows " << tick << endl;
-	// cout << "The number of villagers is " << state.villagers.size() << "\n";
+	cout << "The timer shows " << tick << endl;
+	cout << "The number of villagers is " << state.villagers.size() << "\n";
 
 	// Building soldiers in the beginning rounds in the beginning starts
 	if (tick == 1) {
@@ -120,9 +120,16 @@ State PlayerCode::Update(State state) {
 	}
 
 	// Making the soldiers move around the map randomly
+	// for (auto &soldier : state.soldiers) {
+	// 	soldier.destination = Vec2D(MAP_SIZE * ELEMENT_SIZE / 2 + rand() % 5,
+	// 	                            MAP_SIZE * ELEMENT_SIZE / 2 + rand() % 5);
+	// }
 	for (auto &soldier : state.soldiers) {
-		soldier.destination = Vec2D(MAP_SIZE * ELEMENT_SIZE / 2 + rand() % 5,
-		                            MAP_SIZE * ELEMENT_SIZE / 2 + rand() % 5);
+		if (state.enemy_villagers.size() > 0) {
+			soldier.attack(state.enemy_villagers[0]);
+		} else if (state.enemy_soldiers.size() > 0) {
+			soldier.attack(state.enemy_soldiers[0]);
+		}
 	}
 	return state;
 }

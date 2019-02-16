@@ -1,7 +1,8 @@
 cd /root/codecharacter/build
 
 # Make player libraries
-cmake .. -DBUILD_PROJECT=player_code
+# TODO: FIX THIS! We should be building player_code and not no_tests
+cmake .. -DBUILD_PROJECT=no_tests
 make -j $(expr $(grep -c '^processor' /proc/cpuinfo) - 1) install
 
 # Copy output libraries

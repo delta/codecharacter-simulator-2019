@@ -33,6 +33,7 @@ class StateTest : public Test {
 	Villager model_villager;
 	Soldier model_soldier;
 	Factory model_factory;
+	int64_t interest_threshold;
 
 	std::array<std::vector<std::unique_ptr<Soldier>>, 2> soldiers;
 	std::array<std::vector<std::unique_ptr<Villager>>, 2> villagers;
@@ -81,6 +82,7 @@ class StateTest : public Test {
 
 		int64_t villager_frequency = 5;
 		int64_t soldier_frequency = 10;
+		int64_t interest_threshold = 0;
 
 		this->model_factory =
 		    Factory(2, PlayerId::PLAYER2, ActorType::FACTORY, 1, 100,
@@ -119,7 +121,7 @@ class StateTest : public Test {
 		this->state = make_unique<State>(
 		    move(map), move(gold_manager), move(path_planner), move(soldiers),
 		    move(villagers), move(factories), move(model_villager),
-		    move(model_soldier), move(model_factory));
+		    move(model_soldier), move(model_factory), interest_threshold);
 	}
 };
 
@@ -181,7 +183,7 @@ TEST_F(StateTest, SoldierAttackEnemyTest) {
 }
 
 TEST_F(StateTest, CreateFactoryTest) {
-	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
+	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0), ActorType::SOLDIER);
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
 	auto villager = curr_villagers[0].front();
@@ -207,7 +209,7 @@ TEST_F(StateTest, CreateFactoryTest) {
 
 TEST_F(StateTest, BuildFactoryTest) {
 	// Repeat CreateFactory as above..
-	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
+	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0), ActorType::SOLDIER);
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
 	auto villager = curr_villagers[0].front();
@@ -245,7 +247,7 @@ TEST_F(StateTest, BuildFactoryTest) {
 
 TEST_F(StateTest, FactoryProductionTest) {
 	// Repeat CreateFactory as above..
-	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
+	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0), ActorType::SOLDIER);
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
 	auto villager = curr_villagers[0].front();
@@ -264,7 +266,7 @@ TEST_F(StateTest, FactoryProductionTest) {
 	ASSERT_EQ(factory->GetState(), FactoryStateName::UNBUILT);
 
 	// Test SetFactoryProduction
-	ASSERT_EQ(factory->GetProductionState(), ActorType::VILLAGER);
+	ASSERT_EQ(factory->GetProductionState(), ActorType::SOLDIER);
 
 	state->SetFactoryProduction(PlayerId::PLAYER1, factory->GetActorId(),
 	                            ActorType::SOLDIER);
@@ -276,7 +278,7 @@ TEST_F(StateTest, FactoryProductionTest) {
 
 TEST_F(StateTest, FactoryDeathTest) {
 	// Repeat CreateFactory as above..
-	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0));
+	state->CreateFactory(PlayerId::PLAYER1, 1, Vec2D(0, 0), ActorType::SOLDIER);
 	auto curr_villagers = state->GetVillagers();
 	auto curr_factories = state->GetFactories();
 	ASSERT_EQ(curr_factories[0].size(), 0);
@@ -348,9 +350,9 @@ TEST_F(StateTest, SimultaneousBuild) {
 
 	// Making both the villagers try and build at the same position
 	state->CreateFactory(PlayerId::PLAYER1, villager1->GetActorId(),
-	                     Vec2D(2, 0));
+	                     Vec2D(2, 0), ActorType::SOLDIER);
 	state->CreateFactory(PlayerId::PLAYER2, villager2->GetActorId(),
-	                     Vec2D(2, 0));
+	                     Vec2D(2, 0), ActorType::SOLDIER);
 
 	// Calling state update to check if the build requests have been assigned
 	// properly

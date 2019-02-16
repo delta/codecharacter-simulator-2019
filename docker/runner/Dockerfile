@@ -10,6 +10,10 @@ WORKDIR /root/codecharacter/build
 RUN cmake .. -DBUILD_PROJECT=no_tests -DCMAKE_INSTALL_PREFIX="/root/simulator" \
 && make -j $(expr $(grep -c '^processor' /proc/cpuinfo) - 1) install
 
+# Delete Simulator source
+WORKDIR /root
+RUN rm -rf /root/codecharacter
+
 # Copy runner script
 COPY docker/runner/runner.sh /root
 

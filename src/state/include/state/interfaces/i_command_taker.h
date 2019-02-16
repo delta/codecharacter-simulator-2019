@@ -70,7 +70,7 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	 * @throw      std::exception  if the operation was not possible
 	 */
 	virtual void CreateFactory(PlayerId player_id, ActorId villager_id,
-	                           Vec2D offset) = 0;
+	                           Vec2D offset, ActorType produce_unit) = 0;
 
 	/**
 	 *
@@ -144,6 +144,13 @@ class STATE_EXPORT ICommandTaker : public IUpdatable {
 	 * @return scores
 	 */
 	virtual const std::array<int64_t, 2> GetScores() = 0;
+
+	/**
+	 * Get the game Interestingness
+	 *
+	 * @return int64_t
+	 */
+	virtual int64_t GetInterestingness() = 0;
 
 	/**
 	 * Check if the game is over

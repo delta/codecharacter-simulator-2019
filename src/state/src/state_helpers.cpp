@@ -23,7 +23,8 @@ inline Vec2D GetTilePositionFromOffset(Vec2D offset, int64_t element_size) {
 }
 
 std::unique_ptr<Factory> State::FactoryBuilder(PlayerId p_player_id,
-                                               Vec2D offset) {
+                                               Vec2D offset,
+                                               ActorType produce_unit) {
 	// Convert the given offset into a position centered at that offset
 	auto position =
 	    GetTilePositionFromOffset(offset, map->GetElementSize()).to_double();
@@ -38,8 +39,7 @@ std::unique_ptr<Factory> State::FactoryBuilder(PlayerId p_player_id,
 	    Actor::GetNextActorId(), p_player_id, model_factory.GetActorType(),
 	    model_factory.GetHp(), model_factory.GetMaxHp(), position,
 	    gold_manager.get(), model_factory.GetConstructionCompletion(),
-	    model_factory.GetTotalConstructionCompletion(),
-	    model_factory.GetProductionState(),
+	    model_factory.GetTotalConstructionCompletion(), produce_unit,
 	    model_factory.GetVillagerFrequency(),
 	    model_factory.GetSoldierFrequency(), unit_production_callback);
 
@@ -62,10 +62,10 @@ std::unique_ptr<Villager> State::VillagerBuilder(PlayerId p_player_id,
 std::unique_ptr<Soldier> State::SoldierBuilder(PlayerId p_player_id,
                                                DoubleVec2D position) {
 	auto new_soldier = std::make_unique<Soldier>(
-	    Actor::GetNextActorId(), p_player_id, model_villager.GetActorType(),
-	    model_villager.GetHp(), model_villager.GetMaxHp(), position,
-	    gold_manager.get(), path_planner.get(), model_villager.GetSpeed(),
-	    model_villager.GetAttackRange(), model_villager.GetAttackDamage());
+	    Actor::GetNextActorId(), p_player_id, model_soldier.GetActorType(),
+	    model_soldier.GetHp(), model_soldier.GetMaxHp(), position,
+	    gold_manager.get(), path_planner.get(), model_soldier.GetSpeed(),
+	    model_soldier.GetAttackRange(), model_soldier.GetAttackDamage());
 
 	return new_soldier;
 }

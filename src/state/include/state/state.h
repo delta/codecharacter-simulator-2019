@@ -10,6 +10,7 @@
 #include "state/actor/factory.h"
 #include "state/actor/soldier.h"
 #include "state/actor/villager.h"
+#include "state/build_request.h"
 #include "state/gold_manager/gold_manager.h"
 #include "state/interfaces/i_command_taker.h"
 #include "state/interfaces/i_updatable.h"
@@ -19,7 +20,6 @@
 
 #include <array>
 #include <memory>
-#include <utility>
 #include <vector>
 
 namespace state {
@@ -74,7 +74,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	/**
 	 * An array of queues for handling build requests
 	 */
-	std::array<std::vector<std::pair<Vec2D, int64_t>>, 2> build_requests;
+	std::array<std::vector<BuildRequest>, 2> build_requests;
 
 	/**
 	 * Get pointer to Factory given map offset
@@ -90,9 +90,11 @@ class STATE_EXPORT State : public ICommandTaker {
 	 *
 	 * @param p_player_id
 	 * @param offset
+	 * @param unit_type 	the type of unit that the factory will produce
 	 * @return std::unique_ptr<Factory>
 	 */
-	std::unique_ptr<Factory> FactoryBuilder(PlayerId p_player_id, Vec2D offset);
+	std::unique_ptr<Factory> FactoryBuilder(PlayerId p_player_id, Vec2D offset,
+	                                        ActorType unit_type);
 
 	/**
 	 * Create a new villager at the given position
@@ -138,13 +140,16 @@ class STATE_EXPORT State : public ICommandTaker {
 	 * @param[in]  player_id     player to act upon
 	 * @param[in]  villager_id   villager to build
 	 * @param[in]  offset        grid location to build the factory
+	 * @param[in]  produce_unit  type of unit that the player is trying to
+	 * produce
 	 *
 	 * @throw      std::exception  if the operation was not possible
 	 */
-	void MakeFactory(PlayerId player_id, ActorId villager_id, Vec2D offset);
+	void MakeFactory(PlayerId player_id, ActorId villager_id, Vec2D offset,
+	                 ActorType produce_unit);
 
 	/**
-	 * 	/**
+	 *
 	 * Handles all build requests and builds factories given situations
 	 *
 	 * @param[in]  player_id     player to act upon
@@ -155,6 +160,36 @@ class STATE_EXPORT State : public ICommandTaker {
 	 */
 	void HandleBuildRequests();
 
+	/**
+	 * Was the lead in the last turn held by Player1?
+	 * True if player1 was in the lead
+	 * False if player2 was in the lead
+	 */
+	bool was_player1_in_the_lead;
+
+	/**
+	 * How exciting is this game?
+	 * Increases as players overtake each other
+	 */
+	int64_t interestingness;
+
+	/**
+	 * How much does one player need to overtake another by to trigger an
+	 * increase in interestingness?
+	 */
+	int64_t interest_threshold;
+
+	/**
+	 * The current game scores
+	 */
+	std::array<int64_t, 2> scores;
+
+	/**
+	 * Compute scores for this turn, and record them
+	 * Also update the interestingness factor
+	 */
+	void UpdateScores();
+
   public:
 	/**
 	 * Constructor
@@ -164,8 +199,8 @@ class STATE_EXPORT State : public ICommandTaker {
 	      std::array<std::vector<std::unique_ptr<Soldier>>, 2> soldiers,
 	      std::array<std::vector<std::unique_ptr<Villager>>, 2> villagers,
 	      std::array<std::vector<std::unique_ptr<Factory>>, 2> factories,
-	      Villager model_villager, Soldier model_soldier,
-	      Factory model_factory);
+	      Villager model_villager, Soldier model_soldier, Factory model_factory,
+	      int64_t interest_threshold);
 
 	/**
 	 * @see ICommandTaker#MoveUnit
@@ -197,8 +232,8 @@ class STATE_EXPORT State : public ICommandTaker {
 	/**
 	 * @see ICommandTaker#CreateFactory
 	 */
-	void CreateFactory(PlayerId player_id, ActorId villager_id,
-	                   Vec2D offset) override;
+	void CreateFactory(PlayerId player_id, ActorId villager_id, Vec2D offset,
+	                   ActorType produce_unit) override;
 
 	/**
 	 * @see ICommandTaker#BuildFactory
@@ -247,6 +282,11 @@ class STATE_EXPORT State : public ICommandTaker {
 	 * @see ICommandTaker#GetScores
 	 */
 	const std::array<int64_t, 2> GetScores() override;
+
+	/**
+	 * @see ICommandTaker#GetInterestingness
+	 */
+	int64_t GetInterestingness() override;
 
 	/**
 	 * @see ICommandTaker#IsGameOver

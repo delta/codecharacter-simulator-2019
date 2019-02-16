@@ -87,8 +87,8 @@ void CommandGiver::AttackActor(PlayerId player_id, ActorId unit_id,
 }
 
 void CommandGiver::CreateFactory(PlayerId player_id, ActorId villager_id,
-                                 Vec2D offset) {
-	state->CreateFactory(player_id, villager_id, offset);
+                                 Vec2D offset, ActorType unit_type) {
+	state->CreateFactory(player_id, villager_id, offset, unit_type);
 }
 
 void CommandGiver::BuildFactory(PlayerId player_id, ActorId villager_id,
@@ -175,6 +175,7 @@ void CommandGiver::RunCommands(
 				if (is_attacking) {
 					// Checking if the target is an enemy
 					ActorType self_target_type;
+
 					bool found = false;
 					bool valid_target = IsValidTarget(player_id, soldier.target,
 					                                  self_target_type, found);
@@ -194,7 +195,6 @@ void CommandGiver::RunCommands(
 								    "Soldier is attacking his own villager");
 								break;
 							case ActorType::FACTORY:
-
 								logger->LogError(
 								    Player_Id,
 								    logger::ErrorType::NO_ATTACK_SELF_FACTORY,
@@ -215,11 +215,16 @@ void CommandGiver::RunCommands(
 
 				else if (is_moving) {
 					// Checking if the destination is valid
-					bool is_valid_destination =
-					    IsValidPosition(soldier.destination);
+					// Flipping the position for player 2
+					Vec2D location = soldier.destination;
+					if (Player_Id == PlayerId::PLAYER2) {
+						location = FlipPosition(state_map, location.to_double())
+						               .to_int();
+					}
+					bool is_valid_destination = IsValidPosition(location);
 
 					if (is_valid_destination) {
-						MoveUnit(Player_Id, soldier.id, soldier.destination);
+						MoveUnit(Player_Id, soldier.id, location);
 					} else {
 						logger->LogError(
 						    Player_Id, logger::ErrorType::INVALID_MOVE_POSITION,
@@ -297,12 +302,23 @@ void CommandGiver::RunCommands(
 									    "occupied");
 								} else {
 									auto build_offset = villager.build_offset;
+									ActorType unit_type;
+									switch (villager.build_factory_type) {
+									case player_state::FactoryProduction::
+									    SOLDIER:
+										unit_type = ActorType::SOLDIER;
+										break;
+									case player_state::FactoryProduction::
+									    VILLAGER:
+										unit_type = ActorType::VILLAGER;
+										break;
+									}
 									if (Player_id == PlayerId::PLAYER2) {
 										build_offset =
 										    FlipOffset(state_map, build_offset);
 									}
 									CreateFactory(Player_id, villager.id,
-									              build_offset);
+									              build_offset, unit_type);
 								}
 
 							} else {
@@ -410,7 +426,6 @@ void CommandGiver::RunCommands(
 						                 "Invalid target id");
 					}
 				}
-
 				AttackActor(Player_id, villager.id, villager.target);
 			}
 

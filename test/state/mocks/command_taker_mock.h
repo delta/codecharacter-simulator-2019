@@ -13,8 +13,8 @@ class CommandTakerMock : public ICommandTaker {
 	             void(PlayerId player_id, ActorId actor_id, Vec2D position));
 	MOCK_METHOD3(AttackActor, void(PlayerId player_id, ActorId unit_id,
 	                               PlayerId enemy_actor_id));
-	MOCK_METHOD3(CreateFactory,
-	             void(PlayerId player_id, ActorId actor_id, Vec2D offset));
+	MOCK_METHOD4(CreateFactory, void(PlayerId player_id, ActorId actor_id,
+	                                 Vec2D offset, ActorType unit_type));
 	MOCK_METHOD3(BuildFactory, void(PlayerId player_id, ActorId actor_id,
 	                                ActorId factory_id));
 	MOCK_METHOD3(SetFactoryProduction,
@@ -26,6 +26,7 @@ class CommandTakerMock : public ICommandTaker {
 	MOCK_METHOD0(GetGold, const std::array<int64_t, 2>());
 	MOCK_METHOD0(GetMap, Map *());
 	MOCK_METHOD0(GetScores, const std::array<int64_t, 2>());
+	MOCK_METHOD0(GetInterestingness, int64_t());
 	MOCK_METHOD1(IsGameOver, bool(PlayerId &player_id));
 	MOCK_METHOD3(AttackActor, void(PlayerId player_id, ActorId unit_id,
 	                               ActorId enemy_actor_id));

@@ -45,7 +45,8 @@ class STATE_EXPORT CommandGiver : public ICommandGiver {
 	/**
 	 * Helper method that validates input and calls BuildFactory
 	 */
-	void CreateFactory(PlayerId player_id, ActorId villager_id, Vec2D offset);
+	void CreateFactory(PlayerId player_id, ActorId villager_id, Vec2D offset,
+	                   ActorType unit_type);
 
 	/**
 	 * Helper method that validates input and calls BuildFactory
