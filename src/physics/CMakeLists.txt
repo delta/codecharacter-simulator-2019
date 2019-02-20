@@ -16,4 +16,4 @@ install(TARGETS physics EXPORT physics_config
 )
 
 install(EXPORT physics_config DESTINATION lib)
-install(DIRECTORY include DESTINATION include)
+install(DIRECTORY include/ DESTINATION include)

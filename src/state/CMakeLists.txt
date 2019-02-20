@@ -45,7 +45,7 @@ set(EXPORTS_DIR ${CMAKE_BINARY_DIR}/exports)
 set(EXPORTS_FILE_PATH ${EXPORTS_DIR}/state/state_export.h)
 
 add_library(state STATIC ${SOURCE_FILES})
-target_link_libraries(state physics constants logger)
+target_link_libraries(state physics constants)
 
 generate_export_header(state EXPORT_FILE_NAME ${EXPORTS_FILE_PATH})
 
@@ -54,6 +54,16 @@ target_include_directories(state PUBLIC
 	$<BUILD_INTERFACE:${EXPORTS_DIR}>
 	$<INSTALL_INTERFACE:include>
 )
+
+if((NOT BUILD_PROJECT STREQUAL "all") AND (NOT BUILD_PROJECT STREQUAL "no_tests"))
+	target_include_directories(state PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
+	)
+else()
+	target_include_directories(state PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/logger/include>
+	)
+endif()
 
 install(TARGETS state EXPORT state_config
 	ARCHIVE DESTINATION lib

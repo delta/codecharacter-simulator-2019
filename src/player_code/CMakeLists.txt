@@ -15,8 +15,13 @@ set(EXPORTS_FILE_PATH ${EXPORTS_DIR}/player_code/player_code_export.h)
 
 if((NOT BUILD_PROJECT STREQUAL "all") AND (NOT BUILD_PROJECT STREQUAL "no_tests"))
 	include(${CMAKE_INSTALL_PREFIX}/lib/physics_config.cmake)
+	include(${CMAKE_INSTALL_PREFIX}/lib/constants_config.cmake)
+	include(${CMAKE_INSTALL_PREFIX}/lib/simulator_constants_config.cmake)
 	include(${CMAKE_INSTALL_PREFIX}/lib/state_config.cmake)
+	include(${CMAKE_INSTALL_PREFIX}/lib/logger_config.cmake)
 	include(${CMAKE_INSTALL_PREFIX}/lib/player_wrapper_config.cmake)
+	include(${CMAKE_INSTALL_PREFIX}/lib/drivers_config.cmake)
+	include(${CMAKE_INSTALL_PREFIX}/lib/game_config.cmake)
 endif()
 
 if(BUILD_PROJECT STREQUAL "player_code")
