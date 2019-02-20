@@ -1,5 +1,3 @@
-cd /root/codecharacter/build
-
 # Copy input libraries
 cp /root/input_libs/libplayer_1_code.so /root/simulator/lib/
 cp /root/input_libs/libplayer_2_code.so /root/simulator/lib/

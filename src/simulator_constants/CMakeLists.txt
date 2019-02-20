@@ -16,4 +16,4 @@ install(TARGETS simulator_constants EXPORT simulator_constants_config
 )
 
 install(EXPORT simulator_constants_config DESTINATION lib)
-install(DIRECTORY include DESTINATION include)
+install(DIRECTORY include/ DESTINATION include)

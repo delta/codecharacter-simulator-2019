@@ -16,4 +16,4 @@ install(TARGETS constants EXPORT constants_config
 )
 
 install(EXPORT constants_config DESTINATION lib)
-install(DIRECTORY include DESTINATION include)
+install(DIRECTORY include/ DESTINATION include)
