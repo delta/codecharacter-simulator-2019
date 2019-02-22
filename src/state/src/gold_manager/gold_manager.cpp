@@ -48,7 +48,7 @@ void GoldManager::Decrease(PlayerId player_id, int64_t amount) {
 		throw std::out_of_range(
 		    "The amount of descrese in gold must be positive");
 	}
-	if (amount >= players_gold[current_player_id]) {
+	if (amount > players_gold[current_player_id]) {
 		throw std::out_of_range(
 		    "The decrease in gold is greater than current balance");
 	}

@@ -32,7 +32,7 @@ bool CommandGiver::IsValidOffset(Vec2D position) const {
 	auto map_size = map->GetSize();
 
 	// Bounds check
-	if ((position.x >= map_size || position.x < 0) &&
+	if ((position.x >= map_size || position.x < 0) ||
 	    (position.y >= map_size || position.y < 0)) {
 		return false;
 	}
@@ -415,7 +415,7 @@ void CommandGiver::RunCommands(
 							logger->LogError(
 							    Player_id,
 							    logger::ErrorType::NO_ATTACK_SELF_FACTORY,
-							    "Villager is attacking his own soldier");
+							    "Villager is attacking his own factory");
 							break;
 						}
 

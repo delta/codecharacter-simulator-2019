@@ -532,7 +532,7 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	EXPECT_CALL(
 	    *this->logger,
 	    LogError(PlayerId::PLAYER1, logger::ErrorType::INSUFFICIENT_FUNDS, _));
-	this->player_states[0].villagers[0].build_offset = Vec2D(this->map_size, 0);
+	this->player_states[0].villagers[0].build_offset = Vec2D(3, 0);
 	ManageActorExpectations(state_soldiers, state_villagers, state_factories,
 	                        this->player_states, ActorType::VILLAGER);
 
