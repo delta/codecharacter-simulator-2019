@@ -60,7 +60,9 @@ std::unique_ptr<IActorState> VillagerMoveToMineState::Update() {
 	auto next_position =
 	    path_planner->GetNextPosition(current_position, destination, speed);
 
-	villager->SetNewPosition(next_position);
+	if (next_position != DoubleVec2D::null) {
+		villager->SetNewPosition(next_position);
+	}
 
 	return nullptr;
 }
