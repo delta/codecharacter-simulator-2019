@@ -66,7 +66,21 @@ void Factory::SetProductionState(ActorType production_state) {
 
 FactoryStateName Factory::GetState() { return state->GetName(); }
 
-void Factory::LateUpdate() {}
+void Factory::LateUpdate() {
+	// Update HP, and reset damage incurred
+	this->SetHp(this->GetLatestHp());
+	this->damage_incurred = 0;
+
+	// Allow factory to transition to dead state if it's dead
+	if (this->hp == 0 && state->GetName() != FactoryStateName::DEAD) {
+		auto new_state = state->Update();
+		state->Exit();
+		state = std::unique_ptr<FactoryState>(
+		    static_cast<FactoryState *>(new_state.release()));
+		state->Enter();
+		state->Update();
+	}
+}
 
 void Factory::Update() {
 	auto new_state = state->Update();
