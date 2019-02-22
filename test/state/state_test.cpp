@@ -44,11 +44,11 @@ class StateTest : public Test {
   public:
 	StateTest() {
 		auto map_matrix = vector<vector<TerrainType>>{{
+		    {L, L, L, W, W},
+		    {L, L, L, L, W},
 		    {L, L, L, L, L},
-		    {L, L, L, L, L},
-		    {G, G, G, G, G},
-		    {W, W, W, W, W},
-		    {W, W, W, W, W},
+		    {W, L, L, L, L},
+		    {W, W, L, L, L},
 		}};
 
 		map = make_unique<Map>(map_matrix, map_size, element_size);
@@ -97,17 +97,17 @@ class StateTest : public Test {
 		// Player1 has 2 villagers say..
 		villagers[0].push_back(make_unique<Villager>(
 		    1, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
+		    DoubleVec2D(0, 0), gold_manager.get(), path_planner.get(), 10, 10,
 		    10, 10, 10, 10));
 		villagers[0].push_back(make_unique<Villager>(
 		    3, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
+		    DoubleVec2D(0, 0), gold_manager.get(), path_planner.get(), 10, 10,
 		    10, 10, 10, 10));
 
 		// Player 2 has 1 villager
 		villagers[1].push_back(make_unique<Villager>(
 		    4, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		    DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(), 10, 10,
+		    DoubleVec2D(49, 49), gold_manager.get(), path_planner.get(), 10, 10,
 		    10, 10, 10, 10));
 
 		// Player2 has 1 soldier, say..
@@ -362,4 +362,127 @@ TEST_F(StateTest, SimultaneousBuild) {
 	factories = state->GetFactories();
 	ASSERT_EQ(factories[0].size(), 0);
 	ASSERT_EQ(factories[1].size(), 0);
+}
+
+TEST_F(StateTest, SimultanousGameOverByDeathMatch) {
+	// Kill all soldiers and villagers
+	auto current_soldiers = state->GetSoldiers();
+	for (auto &player_soldiers : current_soldiers)
+		for (auto &soldier : player_soldiers)
+			soldier->SetHp(0);
+
+	auto current_villagers = state->GetVillagers();
+	for (auto &player_villagers : current_villagers)
+		for (auto &villager : player_villagers)
+			villager->SetHp(0);
+
+	// Call update
+	state->Update();
+
+	PlayerId winner;
+	auto is_game_over = state->IsGameOver(winner);
+
+	ASSERT_TRUE(is_game_over);
+	ASSERT_EQ(winner, PlayerId::PLAYER_NULL);
+}
+
+TEST_F(StateTest, Player1GameOverByDeathMatch) {
+	// Kill all of Player2's soldiers and villagers
+	auto player2_soldiers = state->GetSoldiers()[1];
+	for (auto &soldier : player2_soldiers)
+		soldier->SetHp(0);
+
+	auto player2_villagers = state->GetVillagers()[1];
+	for (auto &villager : player2_villagers)
+		villager->SetHp(0);
+
+	// Call update
+	state->Update();
+
+	PlayerId winner;
+	auto is_game_over = state->IsGameOver(winner);
+
+	ASSERT_TRUE(is_game_over);
+	ASSERT_EQ(winner, PlayerId::PLAYER1);
+}
+
+TEST_F(StateTest, Player2GameOverByDeathMatch) {
+	// Kill all of Player2's soldiers and villagers
+	auto player2_soldiers = state->GetSoldiers()[0];
+	for (auto &soldier : player2_soldiers)
+		soldier->SetHp(0);
+
+	auto player2_villagers = state->GetVillagers()[0];
+	for (auto &villager : player2_villagers)
+		villager->SetHp(0);
+
+	// Call update
+	state->Update();
+
+	PlayerId winner;
+	auto is_game_over = state->IsGameOver(winner);
+
+	ASSERT_TRUE(is_game_over);
+	ASSERT_EQ(winner, PlayerId::PLAYER2);
+}
+
+TEST_F(StateTest, SimultaneousAttackAndGameOver) {
+	// Kill the second villager in player1 and the soldier in player2
+	auto soldiers = state->GetSoldiers();
+	auto villagers = state->GetVillagers();
+
+	villagers[0][1]->SetHp(0);
+	soldiers[1][0]->SetHp(0);
+
+	state->Update();
+
+	soldiers = state->GetSoldiers();
+	villagers = state->GetVillagers();
+
+	// Now we should just have a villager on each team
+	ASSERT_EQ(soldiers[0].size(), 0);
+	ASSERT_EQ(soldiers[1].size(), 0);
+	ASSERT_EQ(villagers[0].size(), 1);
+	ASSERT_EQ(villagers[1].size(), 1);
+
+	// Make them attack each other
+	auto villager1 = villagers[0][0];
+	auto villager2 = villagers[1][0];
+
+	villager1->SetAttackTarget(villager2);
+	villager2->SetAttackTarget(villager1);
+	state->Update();
+
+	// Ensure that both villagers snap into pursuit and move towards each other
+	while (villager1->GetState() == VillagerStateName::PURSUIT) {
+		ASSERT_EQ(villager2->GetState(), VillagerStateName::PURSUIT);
+		state->Update();
+	}
+
+	// Now, both villagers should have switched to attack
+	ASSERT_EQ(villager1->GetState(), VillagerStateName::ATTACK);
+	ASSERT_EQ(villager2->GetState(), VillagerStateName::ATTACK);
+
+	while (villager1->GetState() == VillagerStateName::ATTACK) {
+		ASSERT_EQ(villager2->GetState(), VillagerStateName::ATTACK);
+		state->Update();
+
+		// If at any point they die,
+		villagers = state->GetVillagers();
+		if (!(villagers[0].size() || villagers[1].size())) {
+			break;
+		}
+	}
+
+	// Now, both villagers should be dead
+	villagers = state->GetVillagers();
+	ASSERT_EQ(villagers[0].size(), 0);
+	ASSERT_EQ(villagers[1].size(), 0);
+
+	// The game should be over
+	PlayerId winner;
+	auto is_game_over = state->IsGameOver(winner);
+
+	ASSERT_TRUE(is_game_over);
+	ASSERT_EQ(winner, PlayerId::PLAYER_NULL);
 }
