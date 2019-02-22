@@ -106,7 +106,7 @@ State PlayerCode::Update(State state) {
 		auto &villager = state.villagers[0];
 
 		// Creating a new factory
-		villager.create(base_factory, FactoryProduction::VILLAGER);
+		villager.build(base_factory, FactoryProduction::VILLAGER);
 
 		// Incrementing create factory number
 		created_facs++;
@@ -120,15 +120,14 @@ State PlayerCode::Update(State state) {
 	}
 
 	// Making the soldiers move around the map randomly
-	// for (auto &soldier : state.soldiers) {
-	// 	soldier.destination = Vec2D(MAP_SIZE * ELEMENT_SIZE / 2 + rand() % 5,
-	// 	                            MAP_SIZE * ELEMENT_SIZE / 2 + rand() % 5);
-	// }
 	for (auto &soldier : state.soldiers) {
 		if (state.enemy_villagers.size() > 0) {
 			soldier.attack(state.enemy_villagers[0]);
 		} else if (state.enemy_soldiers.size() > 0) {
 			soldier.attack(state.enemy_soldiers[0]);
+		}
+		else if(state.enemy_factories.size() > 0){
+			soldier.attack(state.enemy_factories[0]);
 		}
 	}
 	return state;
