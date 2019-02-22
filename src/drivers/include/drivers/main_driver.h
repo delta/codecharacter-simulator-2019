@@ -104,6 +104,13 @@ class DRIVERS_EXPORT MainDriver {
 	std::atomic_bool cancel;
 
 	/**
+	 * Return the game scores from the state syncer as a PlayerResults array
+	 *
+	 * @return std::array<PlayerResult, 2> PlayerResults
+	 */
+	std::array<PlayerResult, 2> GetPlayerResults();
+
+	/**
 	 * Write final game parameters and stop the timer
 	 */
 	void EndGame();

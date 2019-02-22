@@ -43,6 +43,19 @@ void MainDriver::/*Avengers:*/ EndGame() {
 	this->game_timer.Cancel();
 }
 
+std::array<PlayerResult, 2> MainDriver::GetPlayerResults() {
+	auto player_scores = this->state_syncer->GetScores();
+	auto player_results = std::array<PlayerResult, 2>{};
+
+	// Write the player results
+	for (int i = 0; i < 2; ++i) {
+		player_results[i] =
+		    PlayerResult{player_scores[i], PlayerResult::Status::NORMAL};
+	}
+
+	return player_results;
+}
+
 const GameResult MainDriver::Start() {
 	// Initialize contents of shared memory
 	for (int cur_player_id = 0; cur_player_id < 2; ++cur_player_id) {
@@ -190,6 +203,7 @@ const GameResult MainDriver::Run() {
 		// End the game as a deathmatch
 		state::PlayerId player_winner;
 		if (this->state_syncer->IsGameOver(player_winner)) {
+			player_results = GetPlayerResults();
 			EndGame();
 			winner = GetWinnerFromPlayerId(player_winner);
 			win_type = GameResult::WinType::DEATHMATCH;
@@ -210,17 +224,12 @@ const GameResult MainDriver::Run() {
 
 	// Done with the game now
 
-	// Get player scores and interestingness
-	player_scores = this->state_syncer->GetScores();
-	auto interest = this->state_syncer->GetInterestingness();
-
-	// Write the player results
-	for (int i = 0; i < 2; ++i) {
-		player_results[i] =
-		    PlayerResult{player_scores[i], PlayerResult::Status::NORMAL};
-	}
-
+	// Write scores and complete game
+	player_results = GetPlayerResults();
 	EndGame();
+
+	// Set result parameters
+	auto interest = this->state_syncer->GetInterestingness();
 	winner = GetWinnerByScore(player_results);
 	win_type = GameResult::WinType::SCORE;
 	return GameResult{winner, win_type, interest, player_results};
