@@ -50,7 +50,9 @@ std::unique_ptr<IActorState> SoldierPursuitState::Update() {
 	auto next_position =
 	    path_planner->GetNextPosition(current_position, destination, speed);
 
-	soldier->SetNewPosition(next_position);
+	if (next_position != DoubleVec2D::null) {
+		soldier->SetNewPosition(next_position);
+	}
 
 	return nullptr;
 }
