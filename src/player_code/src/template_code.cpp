@@ -1,5 +1,5 @@
-#include "constants/gold_manager.h"
 #include "player_code/player_code.h"
+#include "constants/gold_manager.h"
 #include <algorithm>
 #include <iostream>
 #include <stdlib.h>
@@ -16,10 +16,8 @@ Vec2D closest_mine1, closest_mine2 = Vec2D::null;
 Vec2D base_factory1, base_factory2 = Vec2D::null;
 bool beg_strat = true;
 int64_t spacing1, spacing2 = 2;
-int64_t created_facs = 0;
 int64_t build_villager_index = 0;
-int64_t built_facs = 0;
-int64_t enemy_count = -1;
+int64_t assinged_villager_count = NUM_VILLAGERS_START;
 player_state::Soldier enemy_soldier;
 
 // Function to find closest gold mine location to a given position
@@ -47,8 +45,8 @@ State PlayerCode::Update(State state) {
 	// Incrementing tick at every turn
 	++tick;
 
-	cout << "The timer shows " << tick << endl;
-	cout << "The number of villagers is " << state.factories.size() << "\n";
+	//	cout << "The timer shows " << tick << endl;
+	// cout << "The number of villagers is " << state.factories.size() << "\n";
 
 	// Building soldiers in the beginning rounds in the beginning starts
 	if (tick == 1) {
@@ -93,7 +91,7 @@ State PlayerCode::Update(State state) {
 	}
 
 	// // Creating factories whenever money is available
-	if (state.gold >= FACTORY_COST &&
+	if (state.gold >= FACTORY_COST && state.villagers.size() > 0 &&
 	    build_villager_index < state.villagers.size() * 0.5) {
 		// Making the last villager go to create a factory
 		auto &villager = state.villagers[build_villager_index++];
@@ -124,12 +122,49 @@ State PlayerCode::Update(State state) {
 		}
 
 		// Creating a new factory
-		villager.create(new_position, prod_type);
+		villager.build(new_position, prod_type);
+	}
+
+	// When new villagers are created, assign them tasks
+	if (state.villagers.size() > assinged_villager_count) {
+		//	cout << "Here\n";
+		// Choosing the new villager
+		auto &villager = state.villagers[assinged_villager_count++];
+		bool build = false;
+
+		// Iterating through factories and chekcing if they are built properly
+		// for (auto &factory : state.factories) {
+		// 	// If any factory is not built
+		// 	if (factory.build_percent == 100) {
+		// 		cout << "Building\n";
+		// 		villager.build(factory.id);
+		// 		break;
+		// 	}
+		// }
+
+		// If all the factories have been built, assigning the villager to mine
+		// some new mine
+		if (not build) {
+			int64_t start, end;
+			start = rand() % (state.gold_mine_locations.size() / 2);
+			end = rand() % (state.gold_mine_locations.size() / 2) +
+			      (state.gold_mine_locations.size() / 2);
+
+			// Random gold mines
+			vector<Vec2D> other_mines;
+			for (; start <= end; ++start) {
+				Vec2D position = state.gold_mine_locations[start];
+				other_mines.push_back(position);
+			}
+			Vec2D closest =
+			    ClosestGoldMine(villager.position, other_mines, MAP_SIZE);
+			villager.mine(closest);
+		}
 	}
 
 	// // As soon as the soldiers appear, start attacking enemy villagers
 	int soldier_index = 0;
-	for (; soldier_index < state.soldiers.size() / 2; ++soldier_index) {
+	for (; soldier_index < state.soldiers.size() * 0.5; ++soldier_index) {
 		auto &soldier = state.soldiers[soldier_index];
 		if (state.enemy_soldiers.size() > 0) {
 			soldier.attack(state.enemy_soldiers[0]);
@@ -137,12 +172,22 @@ State PlayerCode::Update(State state) {
 			break;
 		}
 	}
-	for (; soldier_index < state.soldiers.size(); ++soldier_index) {
-		auto &soldier = state.soldiers[soldier_index];
-		if (state.enemy_villagers.size() > 0) {
-			soldier.attack(state.enemy_villagers[0]);
-		}
-	}
+	// for (; soldier_index < state.soldiers.size() * 0.75; ++soldier_index) {
+	// 	auto &soldier = state.soldiers[soldier_index];
+	// 	if (state.enemy_villagers.size() > 0) {
+	// 		soldier.attack(state.enemy_villagers[0]);
+	// 	} else {
+	// 		break;
+	// 	}
+	// }
+	// for (; soldier_index < state.soldiers.size(); ++soldier_index) {
+	// 	auto &soldier = state.soldiers[soldier_index];
+	// 	if (state.enemy_factories.size() > 0) {
+	// 		soldier.attack(state.enemy_factories[0]);
+	// 	} else {
+	// 		break;
+	// 	}
+	// }
 	return state;
 }
 } // namespace player_code
