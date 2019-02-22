@@ -132,8 +132,10 @@ void Logger::LogState() {
 				t_factory->set_y((int)factory->GetPosition().y);
 				t_factory->set_state(GetProtoFactoryState(
 				    factory->GetState(), factory->GetProductionState()));
-				t_factory->set_build_percent(
-				    (int)factory->GetConstructionCompletion());
+				auto current = (double)factory->GetConstructionCompletion();
+				auto total = (double)factory->GetTotalConstructionCompletion();
+				int build_percent = floor((current / total) * 100);
+				t_factory->set_build_percent(build_percent);
 				player_factory_log_entry.push_back(
 				    {(int)factory->GetActorId(), factory->GetHp(),
 				     (int)factory->GetConstructionCompletion(),
@@ -165,20 +167,23 @@ void Logger::LogState() {
 					FactoryState curr_factory_state =
 					    GetFactoryState(curr_factory->GetState(),
 					                    curr_factory->GetProductionState());
+					auto current =
+					    (double)curr_factory->GetConstructionCompletion();
+					auto total =
+					    (double)curr_factory->GetTotalConstructionCompletion();
+					int build_percent = floor((current / total) * 100);
 
 					// If it does, check if it's stats have changed
 					if (curr_log.hp != curr_factory->GetHp() ||
 					    curr_log.state != curr_factory_state ||
-					    curr_log.build_percent !=
-					        (int)curr_factory->GetConstructionCompletion()) {
+					    curr_log.build_percent != build_percent) {
 
 						// An existing factory's stats have changed. Log it
 						auto *t_factory = game_state->add_factories();
 						t_factory->set_id((int)curr_factory->GetActorId());
 						t_factory->set_player_id(i);
 						t_factory->set_hp(curr_factory->GetHp());
-						t_factory->set_build_percent(
-						    (int)curr_factory->GetConstructionCompletion());
+						t_factory->set_build_percent(build_percent);
 						t_factory->set_state(GetProtoFactoryState(
 						    curr_factory->GetState(),
 						    curr_factory->GetProductionState()));
@@ -186,8 +191,7 @@ void Logger::LogState() {
 						// Update the factory log as well
 						factory_logs[i][log_ptr].hp = curr_factory->GetHp();
 						factory_logs[i][log_ptr].state = curr_factory_state;
-						factory_logs[i][log_ptr].build_percent =
-						    (int)curr_factory->GetConstructionCompletion();
+						factory_logs[i][log_ptr].build_percent = build_percent;
 					}
 
 					log_ptr++;
@@ -231,6 +235,11 @@ void Logger::LogState() {
 			// Remaining factories in the main list are newly built
 			while (factory_ptr < factories[i].size()) {
 				auto *curr_factory = factories[i][factory_ptr];
+				auto current =
+				    (double)curr_factory->GetConstructionCompletion();
+				auto total =
+				    (double)curr_factory->GetTotalConstructionCompletion();
+				int build_percent = floor((current / total) * 100);
 
 				// A newly built factory. Log it.
 				auto *t_factory = game_state->add_factories();
@@ -242,11 +251,10 @@ void Logger::LogState() {
 				t_factory->set_state(
 				    GetProtoFactoryState(curr_factory->GetState(),
 				                         curr_factory->GetProductionState()));
-				t_factory->set_build_percent(
-				    (int)curr_factory->GetConstructionCompletion());
+				t_factory->set_build_percent(build_percent);
 				factory_logs[i].push_back(
 				    {(int)curr_factory->GetActorId(), curr_factory->GetHp(),
-				     (int)curr_factory->GetConstructionCompletion(),
+				     build_percent,
 				     GetFactoryState(curr_factory->GetState(),
 				                     curr_factory->GetProductionState())});
 				factory_ptr++;
