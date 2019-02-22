@@ -61,7 +61,7 @@ const int MainDriverTest::time_limit_ms = 1000;
 const int MainDriverTest::turn_instruction_limit = 5;
 const int MainDriverTest::game_instruction_limit = 10;
 
-TEST_F(MainDriverTest, CleanRun) {
+TEST_F(MainDriverTest, CleanRunByScore) {
 	// Expect a lock-free atomic_bool as only they will definitely work in shm.
 	// TODO: find some way to use atomic_flag, or something else that's fast and
 	// lock-free.
@@ -117,6 +117,210 @@ TEST_F(MainDriverTest, CleanRun) {
 	// normally
 	EXPECT_EQ(game_result.winner, GameResult::Winner::TIE);
 	EXPECT_EQ(game_result.win_type, GameResult::WinType::SCORE);
+	for (auto const &result : game_result.player_results) {
+		EXPECT_EQ(result.score, 10);
+		EXPECT_EQ(result.status, PlayerResult::Status::NORMAL);
+	}
+}
+
+TEST_F(MainDriverTest, Player1WinByDeathmatch) {
+	// Declaring mock state syncer and setting expectations
+	unique_ptr<StateSyncerMock> state_syncer_mock(new StateSyncerMock());
+
+	// The game will end halfway in, with IsGameOver returning true
+	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns / 2);
+	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_)).Times(num_turns / 2);
+
+	EXPECT_CALL(*state_syncer_mock, IsGameOver(_))
+	    .Times(1)
+	    .WillRepeatedly(
+	        DoAll(SetArgReferee<0>(PlayerId::PLAYER1), Return(true)))
+	    .RetiresOnSaturation();
+
+	EXPECT_CALL(*state_syncer_mock, IsGameOver(_))
+	    .Times((num_turns / 2) - 1)
+	    .WillRepeatedly(Return(false))
+	    .RetiresOnSaturation();
+
+	// Expect scores and interestingness calls
+	EXPECT_CALL(*state_syncer_mock, GetScores())
+	    .WillOnce(Return(array<int64_t, 2>{10, 10}));
+	EXPECT_CALL(*state_syncer_mock, GetInterestingness()).WillOnce(Return(69));
+
+	// Declare mock logger and setting expectations
+	unique_ptr<LoggerMock> v_logger(new LoggerMock());
+
+	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER1, _))
+	    .Times(num_turns / 2);
+	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER2, _))
+	    .Times(num_turns / 2);
+	EXPECT_CALL(*v_logger, LogFinalGameParams()).Times(1);
+	EXPECT_CALL(*v_logger, WriteGame(_)).Times(1);
+
+	driver = CreateMockMainDriver(move(state_syncer_mock), move(v_logger));
+
+	// Start main driver on new thread
+	GameResult game_result;
+	thread main_runner([this, &game_result] { game_result = driver->Start(); });
+
+	vector<thread> player_runners;
+	for (int i = 0; i < 2; ++i) {
+		ostringstream command_stream;
+		command_stream << "./main_driver_test_player " << shared_memory_names[i]
+		               << ' ' << time_limit_ms << ' ' << num_turns << ' '
+		               << turn_instruction_limit;
+		string command = command_stream.str();
+		player_runners.emplace_back(
+		    [command] { EXPECT_EQ(system(command.c_str()), 0); });
+	}
+
+	// Wait for player processes to wrap up
+	for (auto &runner : player_runners) {
+		runner.join();
+	}
+	// Wait for main driver to wrap up
+	main_runner.join();
+
+	// Everyone gets a score of 10 and status is normal as game finished
+	// normally
+	EXPECT_EQ(game_result.winner, GameResult::Winner::PLAYER1);
+	EXPECT_EQ(game_result.win_type, GameResult::WinType::DEATHMATCH);
+	for (auto const &result : game_result.player_results) {
+		EXPECT_EQ(result.score, 10);
+		EXPECT_EQ(result.status, PlayerResult::Status::NORMAL);
+	}
+}
+
+TEST_F(MainDriverTest, Player2WinByDeathmatch) {
+	// Declaring mock state syncer and setting expectations
+	unique_ptr<StateSyncerMock> state_syncer_mock(new StateSyncerMock());
+
+	// The game will end halfway in, with IsGameOver returning true
+	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns / 2);
+	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_)).Times(num_turns / 2);
+
+	EXPECT_CALL(*state_syncer_mock, IsGameOver(_))
+	    .Times(1)
+	    .WillRepeatedly(
+	        DoAll(SetArgReferee<0>(PlayerId::PLAYER2), Return(true)))
+	    .RetiresOnSaturation();
+
+	EXPECT_CALL(*state_syncer_mock, IsGameOver(_))
+	    .Times((num_turns / 2) - 1)
+	    .WillRepeatedly(Return(false))
+	    .RetiresOnSaturation();
+
+	// Expect scores and interestingness calls
+	EXPECT_CALL(*state_syncer_mock, GetScores())
+	    .WillOnce(Return(array<int64_t, 2>{10, 10}));
+	EXPECT_CALL(*state_syncer_mock, GetInterestingness()).WillOnce(Return(69));
+
+	// Declare mock logger and setting expectations
+	unique_ptr<LoggerMock> v_logger(new LoggerMock());
+
+	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER1, _))
+	    .Times(num_turns / 2);
+	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER2, _))
+	    .Times(num_turns / 2);
+	EXPECT_CALL(*v_logger, LogFinalGameParams()).Times(1);
+	EXPECT_CALL(*v_logger, WriteGame(_)).Times(1);
+
+	driver = CreateMockMainDriver(move(state_syncer_mock), move(v_logger));
+
+	// Start main driver on new thread
+	GameResult game_result;
+	thread main_runner([this, &game_result] { game_result = driver->Start(); });
+
+	vector<thread> player_runners;
+	for (int i = 0; i < 2; ++i) {
+		ostringstream command_stream;
+		command_stream << "./main_driver_test_player " << shared_memory_names[i]
+		               << ' ' << time_limit_ms << ' ' << num_turns << ' '
+		               << turn_instruction_limit;
+		string command = command_stream.str();
+		player_runners.emplace_back(
+		    [command] { EXPECT_EQ(system(command.c_str()), 0); });
+	}
+
+	// Wait for player processes to wrap up
+	for (auto &runner : player_runners) {
+		runner.join();
+	}
+	// Wait for main driver to wrap up
+	main_runner.join();
+
+	// Everyone gets a score of 10 and status is normal as game finished
+	// normally
+	EXPECT_EQ(game_result.winner, GameResult::Winner::PLAYER2);
+	EXPECT_EQ(game_result.win_type, GameResult::WinType::DEATHMATCH);
+	for (auto const &result : game_result.player_results) {
+		EXPECT_EQ(result.score, 10);
+		EXPECT_EQ(result.status, PlayerResult::Status::NORMAL);
+	}
+}
+
+TEST_F(MainDriverTest, TieByDeathmatch) {
+	// Declaring mock state syncer and setting expectations
+	unique_ptr<StateSyncerMock> state_syncer_mock(new StateSyncerMock());
+
+	// The game will end halfway in, with IsGameOver returning true
+	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns / 2);
+	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_)).Times(num_turns / 2);
+
+	EXPECT_CALL(*state_syncer_mock, IsGameOver(_))
+	    .Times(1)
+	    .WillRepeatedly(
+	        DoAll(SetArgReferee<0>(PlayerId::PLAYER_NULL), Return(true)))
+	    .RetiresOnSaturation();
+
+	EXPECT_CALL(*state_syncer_mock, IsGameOver(_))
+	    .Times((num_turns / 2) - 1)
+	    .WillRepeatedly(Return(false))
+	    .RetiresOnSaturation();
+
+	// Expect scores and interestingness calls
+	EXPECT_CALL(*state_syncer_mock, GetScores())
+	    .WillOnce(Return(array<int64_t, 2>{10, 10}));
+	EXPECT_CALL(*state_syncer_mock, GetInterestingness()).WillOnce(Return(69));
+
+	// Declare mock logger and setting expectations
+	unique_ptr<LoggerMock> v_logger(new LoggerMock());
+
+	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER1, _))
+	    .Times(num_turns / 2);
+	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER2, _))
+	    .Times(num_turns / 2);
+	EXPECT_CALL(*v_logger, LogFinalGameParams()).Times(1);
+	EXPECT_CALL(*v_logger, WriteGame(_)).Times(1);
+
+	driver = CreateMockMainDriver(move(state_syncer_mock), move(v_logger));
+
+	// Start main driver on new thread
+	GameResult game_result;
+	thread main_runner([this, &game_result] { game_result = driver->Start(); });
+
+	vector<thread> player_runners;
+	for (int i = 0; i < 2; ++i) {
+		ostringstream command_stream;
+		command_stream << "./main_driver_test_player " << shared_memory_names[i]
+		               << ' ' << time_limit_ms << ' ' << num_turns << ' '
+		               << turn_instruction_limit;
+		string command = command_stream.str();
+		player_runners.emplace_back(
+		    [command] { EXPECT_EQ(system(command.c_str()), 0); });
+	}
+
+	// Wait for player processes to wrap up
+	for (auto &runner : player_runners) {
+		runner.join();
+	}
+	// Wait for main driver to wrap up
+	main_runner.join();
+
+	// Everyone gets a score of 10 and status is normal as game finished
+	// normally
+	EXPECT_EQ(game_result.winner, GameResult::Winner::TIE);
+	EXPECT_EQ(game_result.win_type, GameResult::WinType::DEATHMATCH);
 	for (auto const &result : game_result.player_results) {
 		EXPECT_EQ(result.score, 10);
 		EXPECT_EQ(result.status, PlayerResult::Status::NORMAL);
@@ -219,7 +423,8 @@ TEST_F(MainDriverTest, InstructionLimitReached) {
 		runner.join();
 	}
 
-	// Simulating just being under instruction limit on n/2 turn by all players
+	// Simulating just being under instruction limit on n/2 turn by all
+	// players
 	for (const auto &shm_name : shared_memory_names) {
 		SharedMemoryPlayer shm_player(shm_name);
 		SharedBuffer *buf = shm_player.GetBuffer();
