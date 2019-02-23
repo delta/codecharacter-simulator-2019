@@ -49,8 +49,10 @@ class STATE_EXPORT IStateSyncer {
 
 	/**
 	 * Method to get both players' scores
+	 *
+	 * @param game_over Signal that the game is over
 	 */
-	virtual std::array<int64_t, 2> GetScores() = 0;
+	virtual std::array<int64_t, 2> GetScores(bool game_over) = 0;
 
 	/**
 	 * Returns game interestingness factor

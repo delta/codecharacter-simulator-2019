@@ -27,6 +27,7 @@ class SoldierTest : public Test {
 	int64_t max_gold;
 
 	unique_ptr<GoldManager> gold_manager;
+	unique_ptr<ScoreManager> score_manager;
 	unique_ptr<PathPlanner> path_planner;
 	unique_ptr<Soldier> soldier;
 
@@ -56,19 +57,21 @@ class SoldierTest : public Test {
 		    villager_kill_reward_gold, factory_kill_reward_gold,
 		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
 		    MINING_REWARD);
+		this->score_manager = make_unique<ScoreManager>();
 		this->path_planner = make_unique<PathPlanner>(map.get());
 
-		this->soldier =
-		    make_unique<Soldier>(1, PlayerId::PLAYER1, ActorType::SOLDIER, 100,
-		                         100, DoubleVec2D(10, 10), gold_manager.get(),
-		                         path_planner.get(), 10, 10, 10);
+		this->soldier = make_unique<Soldier>(
+		    1, PlayerId::PLAYER1, ActorType::SOLDIER, 100, 100,
+		    DoubleVec2D(10, 10), gold_manager.get(), score_manager.get(),
+		    path_planner.get(), 10, 10, 10);
 	}
 };
 
 TEST_F(SoldierTest, MoveToAttackState) {
-	auto *target_soldier = new Soldier(
-	    2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100, DoubleVec2D(15, 15),
-	    gold_manager.get(), path_planner.get(), 10, 10, 10);
+	auto *target_soldier =
+	    new Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
+	                DoubleVec2D(15, 15), gold_manager.get(),
+	                score_manager.get(), path_planner.get(), 10, 10, 10);
 
 	this->soldier->Attack(target_soldier);
 
@@ -95,10 +98,10 @@ TEST_F(SoldierTest, DecreaseHpOnAttack) {
 	int64_t initial_hp = 100;
 	int64_t attack_damage = 10;
 
-	auto *target_soldier =
-	    new Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, initial_hp, 100,
-	                DoubleVec2D(15, 15), gold_manager.get(), path_planner.get(),
-	                10, 10, attack_damage);
+	auto *target_soldier = new Soldier(
+	    2, PlayerId::PLAYER2, ActorType::SOLDIER, initial_hp, 100,
+	    DoubleVec2D(15, 15), gold_manager.get(), score_manager.get(),
+	    path_planner.get(), 10, 10, attack_damage);
 
 	this->soldier->Attack(target_soldier);
 
@@ -114,10 +117,10 @@ TEST_F(SoldierTest, MoveToDeadState) {
 	int64_t initial_hp = 100;
 	int64_t attack_damage = 10;
 
-	auto *target_soldier =
-	    new Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, initial_hp, 100,
-	                DoubleVec2D(15, 15), gold_manager.get(), path_planner.get(),
-	                10, 10, attack_damage);
+	auto *target_soldier = new Soldier(
+	    2, PlayerId::PLAYER2, ActorType::SOLDIER, initial_hp, 100,
+	    DoubleVec2D(15, 15), gold_manager.get(), score_manager.get(),
+	    path_planner.get(), 10, 10, attack_damage);
 
 	this->soldier->Attack(target_soldier);
 
@@ -136,10 +139,10 @@ TEST_F(SoldierTest, SoldierKillReward) {
 	int64_t attack_damage = 10;
 	int64_t initial_gold = player_gold[0];
 
-	auto *target_soldier =
-	    new Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, initial_hp, 100,
-	                DoubleVec2D(15, 15), gold_manager.get(), path_planner.get(),
-	                10, 10, attack_damage);
+	auto *target_soldier = new Soldier(
+	    2, PlayerId::PLAYER2, ActorType::SOLDIER, initial_hp, 100,
+	    DoubleVec2D(15, 15), gold_manager.get(), score_manager.get(),
+	    path_planner.get(), 10, 10, attack_damage);
 
 	this->soldier->Attack(target_soldier);
 
@@ -158,10 +161,10 @@ TEST_F(SoldierTest, PursuitAndKill) {
 	int64_t initial_hp = 100;
 	int64_t attack_damage = 10;
 
-	auto *target_soldier =
-	    new Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, initial_hp, 100,
-	                DoubleVec2D(10, 40), gold_manager.get(), path_planner.get(),
-	                10, 10, attack_damage);
+	auto *target_soldier = new Soldier(
+	    2, PlayerId::PLAYER2, ActorType::SOLDIER, initial_hp, 100,
+	    DoubleVec2D(10, 40), gold_manager.get(), score_manager.get(),
+	    path_planner.get(), 10, 10, attack_damage);
 
 	this->soldier->SetAttackTarget(target_soldier);
 
@@ -178,7 +181,8 @@ TEST_F(SoldierTest, PursuitAndKill) {
 TEST_F(SoldierTest, SimultaneousKill) {
 	auto target_soldier = make_unique<Soldier>(
 	    2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100, DoubleVec2D(35, 45),
-	    gold_manager.get(), path_planner.get(), 10, 10, 10);
+	    gold_manager.get(), score_manager.get(), path_planner.get(), 10, 10,
+	    10);
 
 	soldier->Attack(target_soldier.get());
 	target_soldier->Attack(soldier.get());

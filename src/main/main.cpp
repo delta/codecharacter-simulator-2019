@@ -98,54 +98,68 @@ unique_ptr<GoldManager> BuildGoldManager() {
 	    SOLDIER_COST, FACTORY_COST, MINING_REWARD);
 }
 
+unique_ptr<ScoreManager> BuildScoreManager() {
+	using namespace score_constants;
+	return make_unique<ScoreManager>(
+	    std::array<int64_t, 2>{0, 0}, VILLAGER_KILL_REWARD, SOLDIER_KILL_REWARD,
+	    FACTORY_KILL_REWARD, FACTORY_CONSTRUCTION_REWARD, UNIT_AGE_LEVELS,
+	    VILLAGER_AGE_REWARDS, SOLDIER_AGE_REWARDS, FACTORY_AGE_LEVELS,
+	    FACTORY_AGE_REWARDS, GOLD_REWARD_RATIO);
+}
+
 unique_ptr<PathPlanner> BuildPathPlanner(Map *map) {
 	return make_unique<PathPlanner>(map);
 }
 
 unique_ptr<Soldier> BuildSoldier(PlayerId player_id, PathPlanner *path_planner,
-                                 GoldManager *gold_manager) {
+                                 GoldManager *gold_manager,
+                                 ScoreManager *score_manager) {
 	return make_unique<Soldier>(
 	    Actor::GetNextActorId(), player_id, ActorType::SOLDIER, SOLDIER_MAX_HP,
 	    SOLDIER_MAX_HP, ACTOR_START_POSITIONS[static_cast<size_t>(player_id)],
-	    gold_manager, path_planner, SOLDIER_SPEED, SOLDIER_ATTACK_RANGE,
-	    SOLDIER_ATTACK_DAMAGE);
+	    gold_manager, score_manager, path_planner, SOLDIER_SPEED,
+	    SOLDIER_ATTACK_RANGE, SOLDIER_ATTACK_DAMAGE);
 }
 
-Soldier BuildModelSoldier(PathPlanner *path_planner,
-                          GoldManager *gold_manager) {
+Soldier BuildModelSoldier(PathPlanner *path_planner, GoldManager *gold_manager,
+                          ScoreManager *score_manager) {
 	return Soldier(0, PlayerId::PLAYER1, ActorType::SOLDIER, SOLDIER_MAX_HP,
 	               SOLDIER_MAX_HP, ACTOR_START_POSITIONS[0], gold_manager,
-	               path_planner, SOLDIER_SPEED, SOLDIER_ATTACK_RANGE,
-	               SOLDIER_ATTACK_DAMAGE);
+	               score_manager, path_planner, SOLDIER_SPEED,
+	               SOLDIER_ATTACK_RANGE, SOLDIER_ATTACK_DAMAGE);
 }
 
 unique_ptr<Villager> BuildVillager(PlayerId player_id,
                                    PathPlanner *path_planner,
-                                   GoldManager *gold_manager) {
+                                   GoldManager *gold_manager,
+                                   ScoreManager *score_manager) {
 	return make_unique<Villager>(
 	    Actor::GetNextActorId(), player_id, ActorType::VILLAGER,
 	    VILLAGER_MAX_HP, VILLAGER_MAX_HP,
 	    ACTOR_START_POSITIONS[static_cast<size_t>(player_id)], gold_manager,
-	    path_planner, VILLAGER_SPEED, VILLAGER_ATTACK_RANGE,
+	    score_manager, path_planner, VILLAGER_SPEED, VILLAGER_ATTACK_RANGE,
 	    VILLAGER_ATTACK_DAMAGE, VILLAGER_BUILD_EFFORT, VILLAGER_BUILD_RANGE,
 	    VILLAGER_MINE_RANGE);
 }
 
 Villager BuildModelVillager(PathPlanner *path_planner,
-                            GoldManager *gold_manager) {
+                            GoldManager *gold_manager,
+                            ScoreManager *score_manager) {
 	return Villager(0, PlayerId::PLAYER1, ActorType::VILLAGER, VILLAGER_MAX_HP,
 	                VILLAGER_MAX_HP, ACTOR_START_POSITIONS[0], gold_manager,
-	                path_planner, VILLAGER_SPEED, VILLAGER_ATTACK_RANGE,
-	                VILLAGER_ATTACK_DAMAGE, VILLAGER_BUILD_EFFORT,
-	                VILLAGER_BUILD_RANGE, VILLAGER_MINE_RANGE);
+	                score_manager, path_planner, VILLAGER_SPEED,
+	                VILLAGER_ATTACK_RANGE, VILLAGER_ATTACK_DAMAGE,
+	                VILLAGER_BUILD_EFFORT, VILLAGER_BUILD_RANGE,
+	                VILLAGER_MINE_RANGE);
 }
 
-Factory BuildModelFactory(GoldManager *gold_manager) {
+Factory BuildModelFactory(GoldManager *gold_manager,
+                          ScoreManager *score_manager) {
 	return Factory(0, PlayerId::PLAYER1, ActorType::FACTORY, FACTORY_BASE_HP,
-	               FACTORY_MAX_HP, ACTOR_START_POSITIONS[0], gold_manager, 0,
-	               FACTORY_CONSTRUCTION_TOTAL, ActorType::VILLAGER,
-	               FACTORY_VILLAGER_FREQUENCY, FACTORY_SOLDIER_FREQUENCY,
-	               UnitProductionCallback{});
+	               FACTORY_MAX_HP, ACTOR_START_POSITIONS[0], gold_manager,
+	               score_manager, 0, FACTORY_CONSTRUCTION_TOTAL,
+	               ActorType::VILLAGER, FACTORY_VILLAGER_FREQUENCY,
+	               FACTORY_SOLDIER_FREQUENCY, UnitProductionCallback{});
 }
 
 unique_ptr<State> BuildState() {
@@ -154,12 +168,14 @@ unique_ptr<State> BuildState() {
 	auto map = BuildMap();
 	auto path_planner = BuildPathPlanner(map.get());
 	auto gold_manager = BuildGoldManager();
+	auto score_manager = BuildScoreManager();
 
-	auto model_factory = BuildModelFactory(gold_manager.get());
-	auto model_villager =
-	    BuildModelVillager(path_planner.get(), gold_manager.get());
-	auto model_soldier =
-	    BuildModelSoldier(path_planner.get(), gold_manager.get());
+	auto model_factory =
+	    BuildModelFactory(gold_manager.get(), score_manager.get());
+	auto model_villager = BuildModelVillager(
+	    path_planner.get(), gold_manager.get(), score_manager.get());
+	auto model_soldier = BuildModelSoldier(
+	    path_planner.get(), gold_manager.get(), score_manager.get());
 
 	auto soldiers = array<vector<unique_ptr<Soldier>>, 2>{};
 	auto factories = array<vector<unique_ptr<Factory>>, 2>{};
@@ -171,16 +187,16 @@ unique_ptr<State> BuildState() {
 		player_villagers.reserve(NUM_VILLAGERS_START);
 
 		for (int i = 0; i < NUM_VILLAGERS_START; ++i) {
-			player_villagers.push_back(
-			    BuildVillager(static_cast<PlayerId>(player_id),
-			                  path_planner.get(), gold_manager.get()));
+			player_villagers.push_back(BuildVillager(
+			    static_cast<PlayerId>(player_id), path_planner.get(),
+			    gold_manager.get(), score_manager.get()));
 		}
 	}
 
-	return make_unique<State>(move(map), move(gold_manager), move(path_planner),
-	                          move(soldiers), move(villagers), move(factories),
-	                          move(model_villager), move(model_soldier),
-	                          move(model_factory), INTEREST_THRESHOLD);
+	return make_unique<State>(
+	    move(map), move(gold_manager), move(score_manager), move(path_planner),
+	    move(soldiers), move(villagers), move(factories), move(model_villager),
+	    move(model_soldier), move(model_factory), INTEREST_THRESHOLD);
 }
 
 unique_ptr<MainDriver> BuildMainDriver() {

@@ -89,7 +89,7 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 	/**
 	 * @see IStateSyncer#GetScores
 	 */
-	std::array<int64_t, 2> GetScores() override;
+	std::array<int64_t, 2> GetScores(bool game_over = false) override;
 
 	/**
 	 * @see IStateSyncer#GetInterestingness

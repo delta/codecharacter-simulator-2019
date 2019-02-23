@@ -16,6 +16,7 @@
 #include "state/interfaces/i_updatable.h"
 #include "state/map/map.h"
 #include "state/path_planner/path_planner.h"
+#include "state/score_manager/score_manager.h"
 #include "state/utilities.h"
 
 #include <array>
@@ -35,6 +36,11 @@ class STATE_EXPORT State : public ICommandTaker {
 	 * Gold Manager instance to maintain player gold
 	 */
 	std::unique_ptr<GoldManager> gold_manager;
+
+	/**
+	 * Score Manager instance to maintain player score
+	 */
+	std::unique_ptr<ScoreManager> score_manager;
 
 	/**
 	 * Path Planner instance
@@ -195,6 +201,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	 * Constructor
 	 */
 	State(std::unique_ptr<Map> map, std::unique_ptr<GoldManager> gold_manager,
+	      std::unique_ptr<ScoreManager> score_manager,
 	      std::unique_ptr<PathPlanner> path_planner,
 	      std::array<std::vector<std::unique_ptr<Soldier>>, 2> soldiers,
 	      std::array<std::vector<std::unique_ptr<Villager>>, 2> villagers,
@@ -281,7 +288,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	/**
 	 * @see ICommandTaker#GetScores
 	 */
-	const std::array<int64_t, 2> GetScores() override;
+	const std::array<int64_t, 2> GetScores(bool game_over = false) override;
 
 	/**
 	 * @see ICommandTaker#GetInterestingness

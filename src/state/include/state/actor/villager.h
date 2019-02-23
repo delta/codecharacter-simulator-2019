@@ -63,9 +63,9 @@ class STATE_EXPORT Villager : public Unit {
 
 	Villager(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
 	         int64_t max_hp, DoubleVec2D position, GoldManager *gold_manager,
-	         PathPlanner *path_planner, int64_t speed, int64_t attack_range,
-	         int64_t attack_damage, int64_t build_effort, int64_t build_range,
-	         int64_t mine_range);
+	         ScoreManager *score_manager, PathPlanner *path_planner,
+	         int64_t speed, int64_t attack_range, int64_t attack_damage,
+	         int64_t build_effort, int64_t build_range, int64_t mine_range);
 
 	/**
 	 * Get the villager's build range

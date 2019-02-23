@@ -8,6 +8,7 @@
 #include "physics/vector.hpp"
 #include "state/gold_manager/gold_manager.h"
 #include "state/interfaces/i_updatable.h"
+#include "state/score_manager/score_manager.h"
 #include "state/state_export.h"
 #include "state/utilities.h"
 #include <cstdint>
@@ -61,6 +62,11 @@ class STATE_EXPORT Actor : public IUpdatable {
 	GoldManager *gold_manager;
 
 	/**
+	 * Score manager instance to update the player score
+	 */
+	ScoreManager *score_manager;
+
+	/**
 	 * Amount of damage the soldier incurred in the current turn
 	 * Applied to hp at the end of the turn
 	 */
@@ -75,7 +81,8 @@ class STATE_EXPORT Actor : public IUpdatable {
 	Actor();
 
 	Actor(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
-	      int64_t max_hp, DoubleVec2D position, GoldManager *gold_manager);
+	      int64_t max_hp, DoubleVec2D position, GoldManager *gold_manager,
+	      ScoreManager *score_manager);
 
 	virtual ~Actor() {}
 
@@ -130,6 +137,13 @@ class STATE_EXPORT Actor : public IUpdatable {
 	 * @return     gold_manager  Unit's GoldManager Pointer
 	 */
 	GoldManager *GetGoldManager();
+
+	/**
+	 * Get the unit's ScoreManager Pointer
+	 *
+	 * @return     score_manager  Unit's ScoreManager Pointer
+	 */
+	ScoreManager *GetScoreManager();
 
 	/**
 	 * Get the maximum hp of the actor

@@ -23,6 +23,7 @@ class FactoryTest : public Test {
 	Villager model_villager;
 
 	unique_ptr<GoldManager> gold_manager;
+	unique_ptr<ScoreManager> score_manager;
 	unique_ptr<PathPlanner> path_planner;
 	unique_ptr<Factory> factory;
 
@@ -53,22 +54,23 @@ class FactoryTest : public Test {
 	std::unique_ptr<Villager> MakeTestVillager() {
 		return std::make_unique<Villager>(
 		    2, PlayerId::PLAYER2, ActorType::VILLAGER, 100, 100,
-		    DoubleVec2D(15, 15), gold_manager.get(), path_planner.get(), 10, 10,
-		    10, 10, 10, 10);
+		    DoubleVec2D(15, 15), gold_manager.get(), score_manager.get(),
+		    path_planner.get(), 10, 10, 10, 10, 10, 10);
 	}
 
 	FactoryTest() {
 
 		player_gold[0] = player_gold[1] = 5000;
 
-		model_villager =
-		    Villager(2, PlayerId::PLAYER2, ActorType::VILLAGER, 100, 100,
-		             DoubleVec2D(15, 15), gold_manager.get(),
-		             path_planner.get(), 10, 10, 10, 10, 10, 10);
+		model_villager = Villager(2, PlayerId::PLAYER2, ActorType::VILLAGER,
+		                          100, 100, DoubleVec2D(15, 15),
+		                          gold_manager.get(), score_manager.get(),
+		                          path_planner.get(), 10, 10, 10, 10, 10, 10);
 
-		model_soldier = Soldier(1, PlayerId::PLAYER1, ActorType::SOLDIER, 100,
-		                        100, DoubleVec2D(10, 10), gold_manager.get(),
-		                        path_planner.get(), 10, 10, 10);
+		model_soldier =
+		    Soldier(1, PlayerId::PLAYER1, ActorType::SOLDIER, 100, 100,
+		            DoubleVec2D(10, 10), gold_manager.get(),
+		            score_manager.get(), path_planner.get(), 10, 10, 10);
 
 		this->max_gold = 10000;
 		this->soldier_kill_reward_gold = SOLDIER_KILL_REWARD_AMOUNT;
@@ -80,6 +82,7 @@ class FactoryTest : public Test {
 		    villager_kill_reward_gold, factory_kill_reward_gold,
 		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
 		    MINING_REWARD);
+		this->score_manager = make_unique<ScoreManager>();
 
 		villager_list = std::vector<std::unique_ptr<Villager>>{};
 		soldier_list = std::vector<std::unique_ptr<Soldier>>{};
@@ -91,8 +94,8 @@ class FactoryTest : public Test {
 		// We always initialize a factory with 1 HP
 		this->factory = std::make_unique<Factory>(
 		    2, PlayerId::PLAYER2, ActorType::FACTORY, 1, 100,
-		    DoubleVec2D(15, 15), gold_manager.get(), 0, 100,
-		    ActorType::VILLAGER, villager_frequency, soldier_frequency,
+		    DoubleVec2D(15, 15), gold_manager.get(), score_manager.get(), 0,
+		    100, ActorType::VILLAGER, villager_frequency, soldier_frequency,
 		    unit_production_callback);
 	}
 };

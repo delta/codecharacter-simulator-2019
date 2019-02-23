@@ -16,9 +16,10 @@ Unit::Unit() {
 
 Unit::Unit(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
            int64_t max_hp, DoubleVec2D position, GoldManager *gold_manager,
-           PathPlanner *path_planner, int64_t speed, int64_t attack_range,
-           int64_t attack_damage)
-    : Actor(id, player_id, actor_type, hp, max_hp, position, gold_manager),
+           ScoreManager *score_manager, PathPlanner *path_planner,
+           int64_t speed, int64_t attack_range, int64_t attack_damage)
+    : Actor(id, player_id, actor_type, hp, max_hp, position, gold_manager,
+            score_manager),
       speed(speed), attack_range(attack_range), attack_damage(attack_damage),
       path_planner(path_planner), attack_target(nullptr), destination(Vec2D{}),
       is_destination_set(false), new_position(DoubleVec2D{}),

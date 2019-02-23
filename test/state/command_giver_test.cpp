@@ -24,34 +24,38 @@ Vec2D FlipPosition(Vec2D position, int map_size, int ele_size) {
 
 // Helper functions to create state objects
 Soldier *CreateStateSoldier(int64_t actor_id, int hp, GoldManager *gold_manager,
+                            ScoreManager *score_manager,
                             PathPlanner *path_planner, DoubleVec2D position) {
 	vector<Soldier *> soldiers;
-	auto soldier =
-	    new Soldier(actor_id, PlayerId::PLAYER1, ActorType::SOLDIER, hp, 100,
-	                position, gold_manager, path_planner, 5, 5, 40);
+	auto soldier = new Soldier(actor_id, PlayerId::PLAYER1, ActorType::SOLDIER,
+	                           hp, 100, position, gold_manager, score_manager,
+	                           path_planner, 5, 5, 40);
 
 	return soldier;
 }
 
 Villager *CreateStateVillager(int64_t actor_id, int hp,
                               GoldManager *gold_manager,
+                              ScoreManager *score_manager,
                               PathPlanner *path_planner, DoubleVec2D position) {
 	vector<Villager *> villagers;
-	auto villager =
-	    new Villager(actor_id, PlayerId::PLAYER1, ActorType::VILLAGER, hp, 100,
-	                 position, gold_manager, path_planner, 2, 5, 20, 5, 5, 5);
+	auto villager = new Villager(
+	    actor_id, PlayerId::PLAYER1, ActorType::VILLAGER, hp, 100, position,
+	    gold_manager, score_manager, path_planner, 2, 5, 20, 5, 5, 5);
 
 	return villager;
 }
 
 Factory *CreateStateFactory(int64_t actor_id, int hp, GoldManager *gold_manager,
+                            ScoreManager *score_manager,
                             PathPlanner *path_planner, DoubleVec2D position,
                             ActorType actor_type) {
 	vector<Factory *> factories;
 	ActorType actor;
-	auto factory = new Factory(actor_id, PlayerId::PLAYER1, ActorType::FACTORY,
-	                           hp, 500, position, gold_manager, 100, 100,
-	                           actor_type, 5, 5, UnitProductionCallback{});
+	auto factory =
+	    new Factory(actor_id, PlayerId::PLAYER1, ActorType::FACTORY, hp, 500,
+	                position, gold_manager, score_manager, 100, 100, actor_type,
+	                5, 5, UnitProductionCallback{});
 
 	return factory;
 }
@@ -62,6 +66,7 @@ class CommandGiverTest : public Test {
 	unique_ptr<CommandTakerMock> command_taker;
 	unique_ptr<CommandGiver> command_giver;
 	unique_ptr<GoldManager> gold_manager;
+	unique_ptr<ScoreManager> score_manager;
 	unique_ptr<PathPlanner> path_planner;
 	unique_ptr<LoggerMock> logger;
 	unique_ptr<Map> map;
@@ -166,6 +171,7 @@ class CommandGiverTest : public Test {
 		this->map = make_unique<Map>(dummy_map, this->map_size, this->ele_size);
 		this->path_planner = make_unique<PathPlanner>(this->map.get());
 		this->gold_manager = make_unique<GoldManager>();
+		this->score_manager = make_unique<ScoreManager>();
 		this->logger = make_unique<LoggerMock>();
 		this->command_giver = make_unique<CommandGiver>(
 		    this->command_taker.get(), this->logger.get());
@@ -230,32 +236,34 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 
 	// Make soldiers
 	auto state_soldier1 = CreateStateSoldier(
-	    0, 100, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(this->ele_size, this->ele_size));
+	    0, 100, this->gold_manager.get(), this->score_manager.get(),
+	    this->path_planner.get(), DoubleVec2D(this->ele_size, this->ele_size));
 	auto state_soldier2 = CreateStateSoldier(
-	    1, 100, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(this->ele_size, this->ele_size));
+	    1, 100, this->gold_manager.get(), this->score_manager.get(),
+	    this->path_planner.get(), DoubleVec2D(this->ele_size, this->ele_size));
 	array<vector<Soldier *>, 2> state_soldiers = {
 	    {{state_soldier1}, {state_soldier2}}};
 
 	// Make villagers
 	auto state_villager1 = CreateStateVillager(
-	    2, 100, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(this->ele_size, this->ele_size));
+	    2, 100, this->gold_manager.get(), this->score_manager.get(),
+	    this->path_planner.get(), DoubleVec2D(this->ele_size, this->ele_size));
 	auto state_villager2 = CreateStateVillager(
-	    3, 100, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(this->ele_size, this->ele_size));
+	    3, 100, this->gold_manager.get(), this->score_manager.get(),
+	    this->path_planner.get(), DoubleVec2D(this->ele_size, this->ele_size));
 	array<vector<Villager *>, 2> state_villagers = {
 	    {{state_villager1}, {state_villager2}}};
 
 	// Make soldiers
 	// Used ONLY during Factory tests
 	auto state_factory1 = CreateStateFactory(
-	    4, 500, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(this->ele_size, this->ele_size), ActorType::VILLAGER);
+	    4, 500, this->gold_manager.get(), this->score_manager.get(),
+	    this->path_planner.get(), DoubleVec2D(this->ele_size, this->ele_size),
+	    ActorType::VILLAGER);
 	auto state_factory2 = CreateStateFactory(
-	    5, 100, this->gold_manager.get(), this->path_planner.get(),
-	    DoubleVec2D(this->ele_size, this->ele_size), ActorType::SOLDIER);
+	    5, 100, this->gold_manager.get(), this->score_manager.get(),
+	    this->path_planner.get(), DoubleVec2D(this->ele_size, this->ele_size),
+	    ActorType::SOLDIER);
 	// NO Factories by default
 	array<vector<Factory *>, 2> state_factories = {};
 
@@ -591,7 +599,8 @@ TEST_F(CommandGiverTest, CommandExecutionTest) {
 	vector<Factory *> state_max_factories;
 	for (int i = 0; i < MAX_NUM_FACTORIES; ++i) {
 		auto new_factory = CreateStateFactory(
-		    4, 500, this->gold_manager.get(), this->path_planner.get(),
+		    4, 500, this->gold_manager.get(), this->score_manager.get(),
+		    this->path_planner.get(),
 		    DoubleVec2D(this->ele_size, this->ele_size), ActorType::FACTORY);
 		state_max_factories.push_back(new_factory);
 	}

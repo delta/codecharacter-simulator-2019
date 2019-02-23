@@ -25,7 +25,7 @@ class CommandTakerMock : public ICommandTaker {
 	                  bool should_stop));
 	MOCK_METHOD0(GetGold, const std::array<int64_t, 2>());
 	MOCK_METHOD0(GetMap, Map *());
-	MOCK_METHOD0(GetScores, const std::array<int64_t, 2>());
+	MOCK_METHOD1(GetScores, const std::array<int64_t, 2>(bool game_over));
 	MOCK_METHOD0(GetInterestingness, int64_t());
 	MOCK_METHOD1(IsGameOver, bool(PlayerId &player_id));
 	MOCK_METHOD3(AttackActor, void(PlayerId player_id, ActorId unit_id,

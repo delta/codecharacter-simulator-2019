@@ -44,7 +44,8 @@ void MainDriver::/*Avengers:*/ EndGame() {
 }
 
 std::array<PlayerResult, 2> MainDriver::GetPlayerResults() {
-	auto player_scores = this->state_syncer->GetScores();
+	// Get the scores, with the game_over parameter set to true
+	auto player_scores = this->state_syncer->GetScores(true);
 	auto player_results = std::array<PlayerResult, 2>{};
 
 	// Write the player results

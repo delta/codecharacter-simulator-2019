@@ -11,6 +11,7 @@ namespace state {
 
 State::State(std::unique_ptr<Map> map,
              std::unique_ptr<GoldManager> gold_manager,
+             std::unique_ptr<ScoreManager> score_manager,
              std::unique_ptr<PathPlanner> path_planner,
              std::array<std::vector<std::unique_ptr<Soldier>>, 2> soldiers,
              std::array<std::vector<std::unique_ptr<Villager>>, 2> villagers,
@@ -18,6 +19,7 @@ State::State(std::unique_ptr<Map> map,
              Villager model_villager, Soldier model_soldier,
              Factory model_factory, int64_t interest_threshold)
     : map(std::move(map)), gold_manager(std::move(gold_manager)),
+      score_manager(std::move(score_manager)),
       path_planner(std::move(path_planner)), soldiers(std::move(soldiers)),
       villagers(std::move(villagers)), factories(std::move(factories)),
       model_villager(std::move(model_villager)),
@@ -269,12 +271,47 @@ const std::array<int64_t, 2> State::GetGold() {
 	return gold;
 }
 
-const std::array<int64_t, 2> State::GetScores() { return scores; }
+const std::array<int64_t, 2> State::GetScores(bool game_over) {
+	if (game_over) {
+		// If the game is over, we need to add the gold wealth bonus
+		for (int i = 0; i < 2; ++i) {
+			auto player_id = static_cast<PlayerId>(i);
+			score_manager->ScoreWealth(player_id,
+			                           gold_manager->GetBalance(player_id));
+		}
+	}
+
+	return this->score_manager->GetScores();
+}
 
 int64_t State::GetInterestingness() { return interestingness; }
 
+/**
+ * Helpers to issue calls for age score rewards
+ *
+ * @tparam T Actor
+ * @param score_manager ScoreManager instance
+ * @param actors Array of Vector of UniquePtrs of Actors
+ */
+template <typename T>
+void IssueScoreBonuses(ScoreManager *score_manager,
+                       std::array<std::vector<std::unique_ptr<T>>, 2> &actors) {
+	for (auto const &player_actors : actors) {
+		for (auto const &actor : player_actors) {
+			score_manager->ScoreActorAge(
+			    actor->GetPlayerId(), actor->GetActorType(), actor->GetAge());
+		}
+	}
+}
+
 void State::UpdateScores() {
-	// TODO: Add score calculation logic here
+	IssueScoreBonuses(score_manager.get(), villagers);
+	IssueScoreBonuses(score_manager.get(), soldiers);
+	IssueScoreBonuses(score_manager.get(), factories);
+
+	PlayerId winner;
+
+	// Set interestingness
 
 	auto p1score = scores[0];
 	auto p2score = scores[1];
@@ -286,6 +323,15 @@ void State::UpdateScores() {
 		// There was a flip. Toggle the last flip bool, and increment interest
 		interestingness++;
 		was_player1_in_the_lead = !was_player1_in_the_lead;
+	}
+
+	// If the game is over at this point, add the end gold reward to the score
+	if (IsGameOver(winner)) {
+		for (int i = 0; i < 2; ++i) {
+			auto player_id = static_cast<PlayerId>(i);
+			score_manager->ScoreWealth(player_id,
+			                           gold_manager->GetBalance(player_id));
+		}
 	}
 }
 

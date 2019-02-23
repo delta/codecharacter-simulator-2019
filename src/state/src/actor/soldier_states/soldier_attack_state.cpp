@@ -50,6 +50,10 @@ std::unique_ptr<IActorState> SoldierAttackState::Update() {
 	if (target->GetLatestHp() == 0) {
 		// Reward player for kill
 		soldier->GetGoldManager()->RewardKill(target);
+
+		// Reward player score for kill
+		soldier->GetScoreManager()->ScoreActorKill(soldier->GetPlayerId(),
+		                                           target->GetActorType());
 	}
 
 	return nullptr;

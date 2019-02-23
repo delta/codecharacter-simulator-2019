@@ -18,12 +18,13 @@ Villager::Villager() {
 }
 Villager::Villager(ActorId id, PlayerId player_id, ActorType actor_type,
                    int64_t hp, int64_t max_hp, DoubleVec2D position,
-                   GoldManager *gold_manager, PathPlanner *path_planner,
-                   int64_t speed, int64_t attack_range, int64_t attack_damage,
+                   GoldManager *gold_manager, ScoreManager *score_manager,
+                   PathPlanner *path_planner, int64_t speed,
+                   int64_t attack_range, int64_t attack_damage,
                    int64_t build_effort, int64_t build_range,
                    int64_t mine_range)
     : Unit(id, player_id, actor_type, hp, max_hp, position, gold_manager,
-           path_planner, speed, attack_range, attack_damage),
+           score_manager, path_planner, speed, attack_range, attack_damage),
       state(std::make_unique<VillagerIdleState>(this)),
       build_range(build_range), build_effort(build_effort),
       build_target(nullptr), mine_target(Vec2D{}), mine_target_set(false),

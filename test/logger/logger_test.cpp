@@ -23,6 +23,7 @@ class LoggerTest : public testing::Test {
 	std::unique_ptr<Logger> logger;
 
 	std::unique_ptr<GoldManager> gold_manager;
+	std::unique_ptr<ScoreManager> score_manager;
 	std::unique_ptr<PathPlanner> path_planner;
 	std::array<int64_t, 2> player_gold;
 	int64_t max_gold;
@@ -55,6 +56,8 @@ class LoggerTest : public testing::Test {
 		    VILLAGER_KILL_REWARD_AMOUNT, FACTORY_KILL_REWARD_AMOUNT,
 		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
 		    MINING_REWARD);
+
+		this->score_manager = make_unique<ScoreManager>();
 	}
 };
 
@@ -62,14 +65,16 @@ TEST_F(LoggerTest, WriteReadTest) {
 	Actor::SetActorIdIncrement(0);
 
 	// Creating one soldier for each player
-	auto *soldier = new Soldier(
-	    Actor::GetNextActorId(), state::PlayerId::PLAYER1,
-	    state::ActorType::SOLDIER, SOLDIER_MAX_HP, SOLDIER_MAX_HP,
-	    DoubleVec2D(1, 1), gold_manager.get(), path_planner.get(), 10, 10, 10);
-	auto *soldier2 = new Soldier(
-	    Actor::GetNextActorId(), state::PlayerId::PLAYER2,
-	    state::ActorType::SOLDIER, SOLDIER_MAX_HP, SOLDIER_MAX_HP,
-	    DoubleVec2D(2, 2), gold_manager.get(), path_planner.get(), 10, 10, 10);
+	auto *soldier =
+	    new Soldier(Actor::GetNextActorId(), state::PlayerId::PLAYER1,
+	                state::ActorType::SOLDIER, SOLDIER_MAX_HP, SOLDIER_MAX_HP,
+	                DoubleVec2D(1, 1), gold_manager.get(), score_manager.get(),
+	                path_planner.get(), 10, 10, 10);
+	auto *soldier2 =
+	    new Soldier(Actor::GetNextActorId(), state::PlayerId::PLAYER2,
+	                state::ActorType::SOLDIER, SOLDIER_MAX_HP, SOLDIER_MAX_HP,
+	                DoubleVec2D(2, 2), gold_manager.get(), score_manager.get(),
+	                path_planner.get(), 10, 10, 10);
 
 	std::array<vector<Soldier *>, 2> soldiers;
 	vector<Soldier *> player_soldiers;
@@ -83,11 +88,11 @@ TEST_F(LoggerTest, WriteReadTest) {
 	auto *villager = new Villager(
 	    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::VILLAGER,
 	    VILLAGER_MAX_HP, VILLAGER_MAX_HP, DoubleVec2D(1, 2), gold_manager.get(),
-	    path_planner.get(), 10, 10, 10, 10, 10, 10);
+	    score_manager.get(), path_planner.get(), 10, 10, 10, 10, 10, 10);
 	auto *villager2 = new Villager(
 	    Actor::GetNextActorId(), PlayerId::PLAYER2, ActorType::VILLAGER,
 	    VILLAGER_MAX_HP, VILLAGER_MAX_HP, DoubleVec2D(2, 3), gold_manager.get(),
-	    path_planner.get(), 10, 10, 10, 10, 10, 10);
+	    score_manager.get(), path_planner.get(), 10, 10, 10, 10, 10, 10);
 
 	std::array<vector<Villager *>, 2> villagers;
 	vector<Villager *> player_villagers;
@@ -98,16 +103,16 @@ TEST_F(LoggerTest, WriteReadTest) {
 	villagers[1] = player_villagers2;
 
 	// Creating one factory for each player
-	auto *factory = new Factory(Actor::GetNextActorId(), PlayerId::PLAYER1,
-	                            ActorType::FACTORY, 1, FACTORY_MAX_HP,
-	                            DoubleVec2D(1, 1), gold_manager.get(), 0, 100,
-	                            ActorType::VILLAGER, villager_frequency,
-	                            soldier_frequency, UnitProductionCallback());
-	auto *factory2 = new Factory(Actor::GetNextActorId(), PlayerId::PLAYER2,
-	                             ActorType::FACTORY, 1, FACTORY_MAX_HP,
-	                             DoubleVec2D(3, 3), gold_manager.get(), 0, 100,
-	                             ActorType::VILLAGER, villager_frequency,
-	                             soldier_frequency, UnitProductionCallback());
+	auto *factory = new Factory(
+	    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::FACTORY, 1,
+	    FACTORY_MAX_HP, DoubleVec2D(1, 1), gold_manager.get(),
+	    score_manager.get(), 0, 100, ActorType::VILLAGER, villager_frequency,
+	    soldier_frequency, UnitProductionCallback());
+	auto *factory2 = new Factory(
+	    Actor::GetNextActorId(), PlayerId::PLAYER2, ActorType::FACTORY, 1,
+	    FACTORY_MAX_HP, DoubleVec2D(3, 3), gold_manager.get(),
+	    score_manager.get(), 0, 100, ActorType::VILLAGER, villager_frequency,
+	    soldier_frequency, UnitProductionCallback());
 
 	std::array<vector<Factory *>, 2> factories;
 	vector<Factory *> player_factories;
@@ -118,16 +123,16 @@ TEST_F(LoggerTest, WriteReadTest) {
 	factories[1] = player_factories2;
 
 	// Two new factories for Player1
-	auto *factory3 = new Factory(Actor::GetNextActorId(), PlayerId::PLAYER1,
-	                             ActorType::FACTORY, 1, FACTORY_MAX_HP,
-	                             DoubleVec2D(1, 2), gold_manager.get(), 0, 100,
-	                             ActorType::VILLAGER, villager_frequency,
-	                             soldier_frequency, UnitProductionCallback());
-	auto *factory4 = new Factory(Actor::GetNextActorId(), PlayerId::PLAYER1,
-	                             ActorType::FACTORY, 1, FACTORY_MAX_HP,
-	                             DoubleVec2D(3, 4), gold_manager.get(), 0, 100,
-	                             ActorType::VILLAGER, villager_frequency,
-	                             soldier_frequency, UnitProductionCallback());
+	auto *factory3 = new Factory(
+	    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::FACTORY, 1,
+	    FACTORY_MAX_HP, DoubleVec2D(1, 2), gold_manager.get(),
+	    score_manager.get(), 0, 100, ActorType::VILLAGER, villager_frequency,
+	    soldier_frequency, UnitProductionCallback());
+	auto *factory4 = new Factory(
+	    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::FACTORY, 1,
+	    FACTORY_MAX_HP, DoubleVec2D(3, 4), gold_manager.get(),
+	    score_manager.get(), 0, 100, ActorType::VILLAGER, villager_frequency,
+	    soldier_frequency, UnitProductionCallback());
 
 	std::array<vector<Factory *>, 2> factories2 = factories;
 	factories2[0].push_back(factory3);
@@ -148,11 +153,11 @@ TEST_F(LoggerTest, WriteReadTest) {
 
 	// SIMULTANEOUS FACTORY BUILD AND DESTROY CASE
 	// Make another copy, destroy both player1 factories and add a new factory
-	auto *factory5 = new Factory(Actor::GetNextActorId(), PlayerId::PLAYER1,
-	                             ActorType::FACTORY, 1, FACTORY_MAX_HP,
-	                             DoubleVec2D(1, 4), gold_manager.get(), 0, 100,
-	                             ActorType::VILLAGER, villager_frequency,
-	                             soldier_frequency, UnitProductionCallback());
+	auto *factory5 = new Factory(
+	    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::FACTORY, 1,
+	    FACTORY_MAX_HP, DoubleVec2D(1, 4), gold_manager.get(),
+	    score_manager.get(), 0, 100, ActorType::VILLAGER, villager_frequency,
+	    soldier_frequency, UnitProductionCallback());
 	std::array<vector<Factory *>, 2> factories6 = factories3;
 	factories6[0].erase(factories6[0].begin(), factories6[0].begin() + 2);
 	factories6[0].push_back(factory5);
