@@ -35,10 +35,11 @@ MainDriver::MainDriver(
 	this->transfer_states[1] = &shared_buffers[1]->transfer_state;
 }
 
-void MainDriver::/*Avengers:*/ EndGame() {
+void MainDriver::/*Avengers:*/ EndGame(state::PlayerId player_id,
+                                       bool was_deathmatch) {
 	std::ofstream log_file(log_file_name, std::ios::out | std::ios::binary);
 
-	logger->LogFinalGameParams();
+	logger->LogFinalGameParams(player_id, was_deathmatch);
 	logger->WriteGame(log_file);
 	this->game_timer.Cancel();
 }
@@ -120,6 +121,17 @@ GetWinnerByScore(std::array<PlayerResult, 2> player_results) {
 		return GameResult::Winner::PLAYER2;
 	}
 	return GameResult::Winner::TIE;
+}
+
+state::PlayerId GetPlayerIdFromWinner(GameResult::Winner winner) {
+	switch (winner) {
+	case GameResult::Winner::PLAYER1:
+		return state::PlayerId::PLAYER1;
+	case GameResult::Winner::PLAYER2:
+		return state::PlayerId::PLAYER2;
+	case GameResult::Winner::TIE:
+		return state::PlayerId::PLAYER_NULL;
+	}
 }
 
 const GameResult MainDriver::Run() {
@@ -222,7 +234,7 @@ const GameResult MainDriver::Run() {
 			}
 
 			player_results = GetPlayerResults();
-			EndGame();
+			EndGame(player_winner, true);
 			winner = GetWinnerFromPlayerId(player_winner);
 			win_type = GameResult::WinType::DEATHMATCH;
 			auto interest = this->state_syncer->GetInterestingness();
@@ -234,12 +246,16 @@ const GameResult MainDriver::Run() {
 
 	// Write scores and complete game
 	player_results = GetPlayerResults();
-	EndGame();
 
 	// Set result parameters
 	auto interest = this->state_syncer->GetInterestingness();
 	winner = GetWinnerByScore(player_results);
 	win_type = GameResult::WinType::SCORE;
+
+	// Log the winner
+	auto winner_player_id = GetPlayerIdFromWinner(winner);
+	EndGame(winner_player_id, false);
+
 	return GameResult{winner, win_type, interest, player_results};
 }
 

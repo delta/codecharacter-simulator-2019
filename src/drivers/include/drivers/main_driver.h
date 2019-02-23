@@ -112,8 +112,12 @@ class DRIVERS_EXPORT MainDriver {
 
 	/**
 	 * Write final game parameters and stop the timer
+	 *
+	 * @param player_id of the winner
+	 * @param was_deathmatch True if this game ended by deathmatch
 	 */
-	void EndGame();
+	void EndGame(state::PlayerId player_id = state::PlayerId::PLAYER1,
+	             bool was_deathmatch = false);
 
   public:
 	/**

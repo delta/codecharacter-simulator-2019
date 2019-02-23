@@ -51,7 +51,8 @@ class LOGGER_EXPORT ILogger {
 	 * Logs final game parameters, should be called once, right before logging
 	 * state to stream (i.e before calling WriteGame)
 	 */
-	virtual void LogFinalGameParams() = 0;
+	virtual void LogFinalGameParams(state::PlayerId player_id,
+	                                bool was_deathmatch) = 0;
 
 	/**
 	 * Writes the complete serialized logs to stream

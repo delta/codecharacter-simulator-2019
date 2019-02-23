@@ -399,11 +399,25 @@ void Logger::LogError(state::PlayerId player_id, ErrorType error_type,
 	errors[(int)player_id].push_back(error_code);
 }
 
-void Logger::LogFinalGameParams() {
+void Logger::LogFinalGameParams(PlayerId player_id, bool was_deathmatch) {
 	// Write the error mapping to logs
 	// Flip the mapping, int error_code -> string message
 	for (auto element : error_map) {
 		(*logs->mutable_error_map())[element.second] = element.first;
+	}
+
+	// Write the winner and game type
+	logs->set_was_deathmatch(was_deathmatch);
+	switch (player_id) {
+	case PlayerId::PLAYER1:
+		logs->set_winner(proto::PLAYER1);
+		break;
+	case PlayerId::PLAYER2:
+		logs->set_winner(proto::PLAYER2);
+		break;
+	case PlayerId::PLAYER_NULL:
+		logs->set_winner(proto::TIE);
+		break;
 	}
 }
 

@@ -134,7 +134,8 @@ class LOGGER_EXPORT Logger : public ILogger {
 	/**
 	 * @see ILogger#LogFinalGameParams
 	 */
-	void LogFinalGameParams() override;
+	void LogFinalGameParams(state::PlayerId player_id,
+	                        bool was_deathmatch) override;
 
 	/**
 	 * @see ILogger#WriteGame
