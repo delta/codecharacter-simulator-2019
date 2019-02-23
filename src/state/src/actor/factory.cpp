@@ -83,6 +83,7 @@ void Factory::LateUpdate() {
 }
 
 void Factory::Update() {
+	age++;
 	auto new_state = state->Update();
 
 	while (new_state != nullptr) {

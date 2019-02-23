@@ -159,6 +159,7 @@ void StateSyncer::AssignSoldierAttributes(
 		new_soldier.destination = Vec2D::null;
 		new_soldier.target = -1;
 		new_soldier.hp = state_soldiers[id][i]->GetHp();
+		new_soldier.age = state_soldiers[id][i]->GetAge();
 
 		// Assigning the soldier state
 		switch (state_soldiers[id][i]->GetState()) {
@@ -219,6 +220,7 @@ void StateSyncer::AssignVillagerAttributes(
 		player_state::Villager new_villager;
 		new_villager.id = state_villagers[id][i]->GetActorId();
 		new_villager.hp = state_villagers[id][i]->GetHp();
+		new_villager.age = state_villagers[id][i]->GetAge();
 
 		// Assigning default values for other attributes
 		new_villager.target = -1;
@@ -292,6 +294,7 @@ void StateSyncer::AssignFactoryAttributes(
 		player_state::Factory new_factory;
 		new_factory.id = state_factory->GetActorId();
 		new_factory.hp = state_factory->GetHp();
+		new_factory.age = state_factory->GetAge();
 
 		// Get construction details
 		auto current = (double)state_factory->GetConstructionCompletion();

@@ -201,3 +201,13 @@ TEST_F(VillagerTest, BuildFactory) {
 
 	ASSERT_EQ(target_factory->IsConstructionComplete(), true);
 }
+
+TEST_F(VillagerTest, VillagerAge) {
+	const auto AGE = 20;
+	for (int i = 0; i < AGE; ++i) {
+		this->villager->Update();
+		this->villager->LateUpdate();
+	}
+
+	ASSERT_EQ(villager->GetAge(), AGE);
+}

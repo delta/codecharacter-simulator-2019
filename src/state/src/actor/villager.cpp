@@ -113,6 +113,7 @@ void Villager::LateUpdate() {
 }
 
 void Villager::Update() {
+	age++;
 	auto new_state = state->Update();
 
 	while (new_state != nullptr) {

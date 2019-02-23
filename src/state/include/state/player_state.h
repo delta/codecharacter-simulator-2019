@@ -122,8 +122,9 @@ struct _Actor {
 	int64_t id;
 	Vec2D position;
 	int64_t hp;
+	int64_t age;
 
-	_Actor() : id(0), position(Vec2D{0, 0}), hp(100) {}
+	_Actor() : id(0), position(Vec2D{0, 0}), hp(100), age(0) {}
 };
 
 struct _Unit : _Actor {
@@ -153,6 +154,7 @@ inline std::ostream &operator<<(std::ostream &os, Soldier soldier) {
 	os << "Soldier(id: " << soldier.id << ") {" << endl;
 	os << "    position: " << soldier.position << endl;
 	os << "    hp: " << soldier.hp << endl;
+	os << "    age: " << soldier.age << endl;
 	os << "    destination: " << soldier.destination << endl;
 	os << "    target: " << soldier.target << endl;
 	os << "    state: " << soldier.state << endl;
@@ -195,6 +197,7 @@ inline std::ostream &operator<<(std::ostream &os, Villager villager) {
 	os << "Villager(id: " << villager.id << ") {" << endl;
 	os << "    position: " << villager.position << endl;
 	os << "    hp: " << villager.hp << endl;
+	os << "    age: " << villager.age << endl;
 	os << "    destination: " << villager.destination << endl;
 	os << "    target: " << villager.target << endl;
 	os << "    target_factory_id: " << villager.target_factory_id << endl;
@@ -243,6 +246,7 @@ inline std::ostream &operator<<(std::ostream &os, Factory factory) {
 	os << "Factory(id: " << factory.id << ") {" << endl;
 	os << "    position: " << factory.position << endl;
 	os << "    hp: " << factory.hp << endl;
+	os << "    age: " << factory.age << endl;
 	os << "    build_percent: " << factory.build_percent << endl;
 	os << "    stopped: " << factory.stopped << endl;
 	os << "    production_state: " << factory.production_state << endl;
