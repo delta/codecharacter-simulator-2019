@@ -38,7 +38,7 @@ class STATE_EXPORT State : public ICommandTaker {
 	std::unique_ptr<GoldManager> gold_manager;
 
 	/**
-	 * Score Manager instance to main plauer score
+	 * Score Manager instance to maintain player score
 	 */
 	std::unique_ptr<ScoreManager> score_manager;
 
