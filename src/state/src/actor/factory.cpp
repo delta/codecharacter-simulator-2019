@@ -14,11 +14,13 @@ Factory::Factory() {}
 
 Factory::Factory(ActorId id, PlayerId player_id, ActorType actor_type,
                  int64_t hp, int64_t max_hp, DoubleVec2D position,
-                 GoldManager *gold_manager, int64_t construction_complete,
-                 int64_t construction_total, ActorType production_state,
-                 int64_t villager_frequency, int64_t soldier_frequency,
+                 GoldManager *gold_manager, ScoreManager *score_manager,
+                 int64_t construction_complete, int64_t construction_total,
+                 ActorType production_state, int64_t villager_frequency,
+                 int64_t soldier_frequency,
                  UnitProductionCallback unit_production_callback)
-    : Actor(id, player_id, actor_type, hp, max_hp, position, gold_manager),
+    : Actor(id, player_id, actor_type, hp, max_hp, position, gold_manager,
+            score_manager),
       construction_complete(construction_complete),
       construction_total(construction_total),
       production_state(production_state), stopped(false),

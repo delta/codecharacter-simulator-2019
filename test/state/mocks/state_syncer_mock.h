@@ -13,7 +13,7 @@ class StateSyncerMock : public state::IStateSyncer {
 
 	MOCK_METHOD1(IsGameOver, bool(PlayerId &winner));
 
-	MOCK_METHOD0(GetScores, std::array<int64_t, 2>());
+	MOCK_METHOD1(GetScores, std::array<int64_t, 2>(bool game_over));
 
 	MOCK_METHOD0(GetInterestingness, int64_t());
 };

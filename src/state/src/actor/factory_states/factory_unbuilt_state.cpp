@@ -27,6 +27,12 @@ std::unique_ptr<IActorState> FactoryUnbuiltState::Update() {
 	// Replenish factory HP to full
 	if (factory->IsConstructionComplete()) {
 		factory->SetHp(factory->GetMaxHp());
+
+		// Reward score for completing a factory
+		auto player_id = factory->GetPlayerId();
+		auto score_manager = factory->GetScoreManager();
+		score_manager->ScoreFactoryConstructionCompletion(player_id);
+
 		return std::make_unique<FactoryIdleState>(factory);
 	}
 

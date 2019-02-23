@@ -75,7 +75,7 @@ TEST_F(MainDriverTest, CleanRunByScore) {
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_)).Times(num_turns + 1);
 
 	// Expect scores and interestingness calls
-	EXPECT_CALL(*state_syncer_mock, GetScores())
+	EXPECT_CALL(*state_syncer_mock, GetScores(_))
 	    .WillOnce(Return(array<int64_t, 2>{10, 10}));
 	EXPECT_CALL(*state_syncer_mock, GetInterestingness()).WillOnce(Return(69));
 
@@ -143,7 +143,7 @@ TEST_F(MainDriverTest, Player1WinByDeathmatch) {
 	    .RetiresOnSaturation();
 
 	// Expect scores and interestingness calls
-	EXPECT_CALL(*state_syncer_mock, GetScores())
+	EXPECT_CALL(*state_syncer_mock, GetScores(_))
 	    .WillOnce(Return(array<int64_t, 2>{10, 10}));
 	EXPECT_CALL(*state_syncer_mock, GetInterestingness()).WillOnce(Return(69));
 
@@ -211,7 +211,7 @@ TEST_F(MainDriverTest, Player2WinByDeathmatch) {
 	    .RetiresOnSaturation();
 
 	// Expect scores and interestingness calls
-	EXPECT_CALL(*state_syncer_mock, GetScores())
+	EXPECT_CALL(*state_syncer_mock, GetScores(_))
 	    .WillOnce(Return(array<int64_t, 2>{10, 10}));
 	EXPECT_CALL(*state_syncer_mock, GetInterestingness()).WillOnce(Return(69));
 
@@ -279,7 +279,7 @@ TEST_F(MainDriverTest, TieByDeathmatch) {
 	    .RetiresOnSaturation();
 
 	// Expect scores and interestingness calls
-	EXPECT_CALL(*state_syncer_mock, GetScores())
+	EXPECT_CALL(*state_syncer_mock, GetScores(_))
 	    .WillOnce(Return(array<int64_t, 2>{10, 10}));
 	EXPECT_CALL(*state_syncer_mock, GetInterestingness()).WillOnce(Return(69));
 
@@ -339,7 +339,7 @@ TEST_F(MainDriverTest, EarlyPlayerExit) {
 	    .Times(num_turns / 2 + 1);
 
 	// Get Scores and interestingness WILL NOT be called
-	EXPECT_CALL(*state_syncer_mock, GetScores()).Times(0);
+	EXPECT_CALL(*state_syncer_mock, GetScores(_)).Times(0);
 	EXPECT_CALL(*state_syncer_mock, GetInterestingness()).Times(0);
 
 	// Logger called num_turns/2 + 1 times before the driver exits
@@ -392,7 +392,7 @@ TEST_F(MainDriverTest, InstructionLimitReached) {
 	    .Times(num_turns / 2 + 1);
 
 	// Get Scores and interestingness WILL NOT be called
-	EXPECT_CALL(*state_syncer_mock, GetScores()).Times(0);
+	EXPECT_CALL(*state_syncer_mock, GetScores(_)).Times(0);
 	EXPECT_CALL(*state_syncer_mock, GetInterestingness()).Times(0);
 
 	unique_ptr<LoggerMock> v_logger(new LoggerMock());
@@ -462,7 +462,7 @@ TEST_F(MainDriverTest, Cancellation) {
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_)).Times(2);
 
 	// Get Scores and interestingness WILL NOT be called
-	EXPECT_CALL(*state_syncer_mock, GetScores()).Times(0);
+	EXPECT_CALL(*state_syncer_mock, GetScores(_)).Times(0);
 	EXPECT_CALL(*state_syncer_mock, GetInterestingness()).Times(0);
 
 	unique_ptr<LoggerMock> v_logger(new LoggerMock());

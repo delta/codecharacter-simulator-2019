@@ -38,7 +38,8 @@ std::unique_ptr<Factory> State::FactoryBuilder(PlayerId p_player_id,
 	auto factory = std::make_unique<Factory>(
 	    Actor::GetNextActorId(), p_player_id, model_factory.GetActorType(),
 	    model_factory.GetHp(), model_factory.GetMaxHp(), position,
-	    gold_manager.get(), model_factory.GetConstructionCompletion(),
+	    gold_manager.get(), score_manager.get(),
+	    model_factory.GetConstructionCompletion(),
 	    model_factory.GetTotalConstructionCompletion(), produce_unit,
 	    model_factory.GetVillagerFrequency(),
 	    model_factory.GetSoldierFrequency(), unit_production_callback);
@@ -51,10 +52,10 @@ std::unique_ptr<Villager> State::VillagerBuilder(PlayerId p_player_id,
 	auto new_villager = std::make_unique<Villager>(
 	    Actor::GetNextActorId(), p_player_id, model_villager.GetActorType(),
 	    model_villager.GetHp(), model_villager.GetMaxHp(), position,
-	    gold_manager.get(), path_planner.get(), model_villager.GetSpeed(),
-	    model_villager.GetAttackRange(), model_villager.GetAttackDamage(),
-	    model_villager.GetBuildEffort(), model_villager.GetBuildRange(),
-	    model_villager.GetMineRange());
+	    gold_manager.get(), score_manager.get(), path_planner.get(),
+	    model_villager.GetSpeed(), model_villager.GetAttackRange(),
+	    model_villager.GetAttackDamage(), model_villager.GetBuildEffort(),
+	    model_villager.GetBuildRange(), model_villager.GetMineRange());
 
 	return new_villager;
 }
@@ -64,8 +65,9 @@ std::unique_ptr<Soldier> State::SoldierBuilder(PlayerId p_player_id,
 	auto new_soldier = std::make_unique<Soldier>(
 	    Actor::GetNextActorId(), p_player_id, model_soldier.GetActorType(),
 	    model_soldier.GetHp(), model_soldier.GetMaxHp(), position,
-	    gold_manager.get(), path_planner.get(), model_soldier.GetSpeed(),
-	    model_soldier.GetAttackRange(), model_soldier.GetAttackDamage());
+	    gold_manager.get(), score_manager.get(), path_planner.get(),
+	    model_soldier.GetSpeed(), model_soldier.GetAttackRange(),
+	    model_soldier.GetAttackDamage());
 
 	return new_soldier;
 }

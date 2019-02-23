@@ -67,6 +67,10 @@ std::unique_ptr<IActorState> VillagerAttackState::Update() {
 	if (target->GetLatestHp() == 0) {
 		// Reward player for kill
 		villager->GetGoldManager()->RewardKill(target);
+
+		// Reward player score for kill
+		villager->GetScoreManager()->ScoreActorKill(villager->GetPlayerId(),
+		                                            target->GetActorType());
 	}
 
 	return nullptr;

@@ -49,6 +49,9 @@ class StateSyncerTest : public Test {
 	// Creating a gold manager
 	unique_ptr<GoldManager> gold_manager;
 
+	// Creating a score manager
+	unique_ptr<ScoreManager> score_manager;
+
 	StateSyncerTest() {
 		// Creating 2 player states
 		auto *player_state1 = new player_state::State;
@@ -115,6 +118,9 @@ class StateSyncerTest : public Test {
 		// Creating path planner instance
 		this->path_planner = make_unique<PathPlanner>(map.get());
 
+		this->gold_manager = make_unique<GoldManager>();
+		this->score_manager = make_unique<ScoreManager>();
+
 		// Creating soldiers for player 1
 		Soldier *model_soldier1;
 		vector<Soldier *> player1_soldiers;
@@ -122,7 +128,8 @@ class StateSyncerTest : public Test {
 			model_soldier1 = new Soldier(
 			    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::SOLDIER,
 			    100, 100, DoubleVec2D(this->ele_size, 0),
-			    this->gold_manager.get(), this->path_planner.get(), 5, 5, 40);
+			    this->gold_manager.get(), this->score_manager.get(),
+			    this->path_planner.get(), 5, 5, 40);
 			player1_soldiers.push_back(model_soldier1);
 		}
 
@@ -135,7 +142,8 @@ class StateSyncerTest : public Test {
 			    100, 100,
 			    DoubleVec2D((this->map_size - 1) * this->ele_size - 1,
 			                this->map_size * this->ele_size - 1),
-			    this->gold_manager.get(), this->path_planner.get(), 5, 5, 40);
+			    this->gold_manager.get(), this->score_manager.get(),
+			    this->path_planner.get(), 5, 5, 40);
 			player2_soldiers.push_back(model_soldier2);
 		}
 
@@ -165,8 +173,8 @@ class StateSyncerTest : public Test {
 			model_villager1 = new Villager(
 			    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::VILLAGER,
 			    100, 100, DoubleVec2D(0, this->ele_size * this->map_size - 1),
-			    this->gold_manager.get(), this->path_planner.get(), 2, 5, 20, 5,
-			    5, 5);
+			    this->gold_manager.get(), this->score_manager.get(),
+			    this->path_planner.get(), 2, 5, 20, 5, 5, 5);
 			player1_villagers.push_back(model_villager1);
 		}
 
@@ -177,8 +185,8 @@ class StateSyncerTest : public Test {
 			model_villager2 = new Villager(
 			    Actor::GetNextActorId(), PlayerId::PLAYER2, ActorType::VILLAGER,
 			    100, 100, DoubleVec2D(this->ele_size * this->map_size - 1, 0),
-			    this->gold_manager.get(), this->path_planner.get(), 2, 5, 20, 5,
-			    5, 5);
+			    this->gold_manager.get(), this->score_manager.get(),
+			    this->path_planner.get(), 2, 5, 20, 5, 5, 5);
 			player2_villagers.push_back(model_villager2);
 		}
 
@@ -200,29 +208,31 @@ class StateSyncerTest : public Test {
 		// Initializing factories for the state
 		auto factory1_soldier = new Factory(
 		    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::FACTORY, 500,
-		    500, DoubleVec2D(this->ele_size, 0), this->gold_manager.get(), 100,
-		    100, ActorType::SOLDIER, 5, 5, UnitProductionCallback{});
+		    500, DoubleVec2D(this->ele_size, 0), this->gold_manager.get(),
+		    this->score_manager.get(), 100, 100, ActorType::SOLDIER, 5, 5,
+		    UnitProductionCallback{});
 
 		auto factory1_villager = new Factory(
 		    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::FACTORY, 500,
-		    500, DoubleVec2D(0, this->ele_size), this->gold_manager.get(), 100,
-		    100, ActorType::VILLAGER, 5, 5, UnitProductionCallback{});
+		    500, DoubleVec2D(0, this->ele_size), this->gold_manager.get(),
+		    this->score_manager.get(), 100, 100, ActorType::VILLAGER, 5, 5,
+		    UnitProductionCallback{});
 
-		auto factory2_soldier =
-		    new Factory(Actor::GetNextActorId(), PlayerId::PLAYER2,
-		                ActorType::FACTORY, 500, 500,
-		                DoubleVec2D(this->ele_size * (this->map_size - 1) - 1,
-		                            this->ele_size * this->map_size - 1),
-		                this->gold_manager.get(), 100, 100, ActorType::SOLDIER,
-		                5, 5, UnitProductionCallback{});
+		auto factory2_soldier = new Factory(
+		    Actor::GetNextActorId(), PlayerId::PLAYER2, ActorType::FACTORY, 500,
+		    500,
+		    DoubleVec2D(this->ele_size * (this->map_size - 1) - 1,
+		                this->ele_size * this->map_size - 1),
+		    this->gold_manager.get(), this->score_manager.get(), 100, 100,
+		    ActorType::SOLDIER, 5, 5, UnitProductionCallback{});
 
-		auto factory2_villager =
-		    new Factory(Actor::GetNextActorId(), PlayerId::PLAYER2,
-		                ActorType::FACTORY, 500, 500,
-		                DoubleVec2D(this->ele_size * this->map_size - 1,
-		                            this->ele_size * (this->map_size - 1) - 1),
-		                this->gold_manager.get(), 100, 100, ActorType::VILLAGER,
-		                5, 5, UnitProductionCallback{});
+		auto factory2_villager = new Factory(
+		    Actor::GetNextActorId(), PlayerId::PLAYER2, ActorType::FACTORY, 500,
+		    500,
+		    DoubleVec2D(this->ele_size * this->map_size - 1,
+		                this->ele_size * (this->map_size - 1) - 1),
+		    this->gold_manager.get(), this->score_manager.get(), 100, 100,
+		    ActorType::VILLAGER, 5, 5, UnitProductionCallback{});
 
 		// Pushing the factories into the state
 		vector<Factory *> player1_factories;
@@ -257,8 +267,8 @@ TEST_F(StateSyncerTest, UpdationTest) {
 	Factory *factory2 = new Factory(
 	    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::VILLAGER, 500,
 	    500, DoubleVec2D(this->ele_size, this->ele_size),
-	    this->gold_manager.get(), 100, 100, ActorType::VILLAGER, 5, 5,
-	    UnitProductionCallback{});
+	    this->gold_manager.get(), this->score_manager.get(), 100, 100,
+	    ActorType::VILLAGER, 5, 5, UnitProductionCallback{});
 
 	factories2[0].push_back(factory2);
 

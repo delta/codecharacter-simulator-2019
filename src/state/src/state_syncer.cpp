@@ -129,7 +129,9 @@ void StateSyncer::UpdatePlayerStates(
 	logger->LogState();
 }
 
-std::array<int64_t, 2> StateSyncer::GetScores() { return state->GetScores(); }
+std::array<int64_t, 2> StateSyncer::GetScores(bool game_over) {
+	return state->GetScores(game_over);
+}
 
 int64_t StateSyncer::GetInterestingness() {
 	return state->GetInterestingness();

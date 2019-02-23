@@ -29,6 +29,7 @@ class StateTest : public Test {
 	std::vector<std::unique_ptr<Soldier>> temp_soldier_list;
 
 	unique_ptr<GoldManager> gold_manager;
+	unique_ptr<ScoreManager> score_manager;
 	unique_ptr<PathPlanner> path_planner;
 	Villager model_villager;
 	Soldier model_soldier;
@@ -68,27 +69,29 @@ class StateTest : public Test {
 		    FACTORY_SUICIDE_PENALTY, VILLAGER_COST, SOLDIER_COST, FACTORY_COST,
 		    MINING_REWARD);
 
+		this->score_manager = make_unique<ScoreManager>();
+
 		this->path_planner = make_unique<PathPlanner>(map.get());
 
-		this->model_villager =
-		    Villager(1, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		             DoubleVec2D(10, 10), gold_manager.get(),
-		             path_planner.get(), 10, 10, 10, 10, 10, 10);
+		this->model_villager = Villager(
+		    1, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
+		    DoubleVec2D(10, 10), gold_manager.get(), score_manager.get(),
+		    path_planner.get(), 10, 10, 10, 10, 10, 10);
 
 		this->model_soldier =
 		    Soldier(2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
-		            DoubleVec2D(10, 10), gold_manager.get(), path_planner.get(),
-		            10, 10, 10);
+		            DoubleVec2D(10, 10), gold_manager.get(),
+		            score_manager.get(), path_planner.get(), 10, 10, 10);
 
 		int64_t villager_frequency = 5;
 		int64_t soldier_frequency = 10;
 		int64_t interest_threshold = 0;
 
-		this->model_factory =
-		    Factory(2, PlayerId::PLAYER2, ActorType::FACTORY, 1, 100,
-		            DoubleVec2D(15, 15), gold_manager.get(), 0, 100,
-		            ActorType::VILLAGER, villager_frequency, soldier_frequency,
-		            UnitProductionCallback{});
+		this->model_factory = Factory(
+		    2, PlayerId::PLAYER2, ActorType::FACTORY, 1, 100,
+		    DoubleVec2D(15, 15), gold_manager.get(), score_manager.get(), 0,
+		    100, ActorType::VILLAGER, villager_frequency, soldier_frequency,
+		    UnitProductionCallback{});
 
 		soldiers = {};
 		villagers = {};
@@ -97,31 +100,32 @@ class StateTest : public Test {
 		// Player1 has 2 villagers say..
 		villagers[0].push_back(make_unique<Villager>(
 		    1, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		    DoubleVec2D(0, 0), gold_manager.get(), path_planner.get(), 10, 10,
-		    10, 10, 10, 10));
+		    DoubleVec2D(0, 0), gold_manager.get(), score_manager.get(),
+		    path_planner.get(), 10, 10, 10, 10, 10, 10));
 		villagers[0].push_back(make_unique<Villager>(
 		    3, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		    DoubleVec2D(0, 0), gold_manager.get(), path_planner.get(), 10, 10,
-		    10, 10, 10, 10));
+		    DoubleVec2D(0, 0), gold_manager.get(), score_manager.get(),
+		    path_planner.get(), 10, 10, 10, 10, 10, 10));
 
 		// Player 2 has 1 villager
 		villagers[1].push_back(make_unique<Villager>(
 		    4, PlayerId::PLAYER1, ActorType::VILLAGER, 100, 100,
-		    DoubleVec2D(49, 49), gold_manager.get(), path_planner.get(), 10, 10,
-		    10, 10, 10, 10));
+		    DoubleVec2D(49, 49), gold_manager.get(), score_manager.get(),
+		    path_planner.get(), 10, 10, 10, 10, 10, 10));
 
 		// Player2 has 1 soldier, say..
-		soldiers[1].push_back(
-		    make_unique<Soldier>(2, PlayerId::PLAYER2, ActorType::SOLDIER, 100,
-		                         100, DoubleVec2D(10, 10), gold_manager.get(),
-		                         path_planner.get(), 10, 10, 10));
+		soldiers[1].push_back(make_unique<Soldier>(
+		    2, PlayerId::PLAYER2, ActorType::SOLDIER, 100, 100,
+		    DoubleVec2D(10, 10), gold_manager.get(), score_manager.get(),
+		    path_planner.get(), 10, 10, 10));
 
 		Actor::SetActorIdIncrement(4);
 
 		this->state = make_unique<State>(
-		    move(map), move(gold_manager), move(path_planner), move(soldiers),
-		    move(villagers), move(factories), move(model_villager),
-		    move(model_soldier), move(model_factory), interest_threshold);
+		    move(map), move(gold_manager), move(score_manager),
+		    move(path_planner), move(soldiers), move(villagers),
+		    move(factories), move(model_villager), move(model_soldier),
+		    move(model_factory), interest_threshold);
 	}
 };
 
