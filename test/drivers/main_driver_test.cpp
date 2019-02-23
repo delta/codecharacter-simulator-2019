@@ -129,7 +129,8 @@ TEST_F(MainDriverTest, Player1WinByDeathmatch) {
 
 	// The game will end halfway in, with IsGameOver returning true
 	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns / 2);
-	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_)).Times(num_turns / 2);
+	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_))
+	    .Times(num_turns / 2 + 1);
 
 	EXPECT_CALL(*state_syncer_mock, IsGameOver(_))
 	    .Times(1)
@@ -197,7 +198,8 @@ TEST_F(MainDriverTest, Player2WinByDeathmatch) {
 
 	// The game will end halfway in, with IsGameOver returning true
 	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns / 2);
-	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_)).Times(num_turns / 2);
+	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_))
+	    .Times(num_turns / 2 + 1);
 
 	EXPECT_CALL(*state_syncer_mock, IsGameOver(_))
 	    .Times(1)
@@ -265,7 +267,8 @@ TEST_F(MainDriverTest, TieByDeathmatch) {
 
 	// The game will end halfway in, with IsGameOver returning true
 	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns / 2);
-	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_)).Times(num_turns / 2);
+	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_))
+	    .Times(num_turns / 2 + 1);
 
 	EXPECT_CALL(*state_syncer_mock, IsGameOver(_))
 	    .Times(1)

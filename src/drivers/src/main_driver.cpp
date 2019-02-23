@@ -202,6 +202,16 @@ const GameResult MainDriver::Run() {
 		}
 		this->state_syncer->UpdateMainState(this->player_states);
 
+		// Write the updated main state back to the player's state
+		// copies
+		this->state_syncer->UpdatePlayerStates(this->player_states);
+
+		// Convert these player states back into transfer states
+		for (int i = 0; i < 2; ++i) {
+			*(transfer_states[i]) =
+			    transfer_state::ConvertToTransferState(player_states[i]);
+		}
+
 		// If the game is over now, some player had all units killed
 		// End the game as a deathmatch
 		state::PlayerId player_winner;
@@ -217,16 +227,6 @@ const GameResult MainDriver::Run() {
 			win_type = GameResult::WinType::DEATHMATCH;
 			auto interest = this->state_syncer->GetInterestingness();
 			return GameResult{winner, win_type, interest, player_results};
-		}
-
-		// Write the updated main state back to the player's state
-		// copies
-		this->state_syncer->UpdatePlayerStates(this->player_states);
-
-		// Convert these player states back into transfer states
-		for (int i = 0; i < 2; ++i) {
-			*(transfer_states[i]) =
-			    transfer_state::ConvertToTransferState(player_states[i]);
 		}
 	}
 
