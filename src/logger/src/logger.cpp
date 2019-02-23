@@ -95,6 +95,7 @@ void Logger::LogState() {
 	auto villagers = state->GetVillagers();
 	auto factories = state->GetFactories();
 	auto money = state->GetGold();
+	auto scores = state->GetScores(false);
 
 	// Things set only during the first turn.
 	if (turn_count == 1) {
@@ -352,6 +353,11 @@ void Logger::LogState() {
 	// Log player money
 	for (auto player_money : money) {
 		game_state->add_gold(player_money);
+	}
+
+	// Log player scores
+	for (auto player_score : scores) {
+		game_state->add_scores(player_score);
 	}
 
 	// Log instruction counts and reset temp counts to 0
