@@ -19,7 +19,8 @@ class LoggerMock : public ILogger {
 	MOCK_METHOD0(LogState, void());
 	MOCK_METHOD2(LogInstructionCount, void(PlayerId, int64_t));
 	MOCK_METHOD3(LogError, void(PlayerId, ErrorType, string));
-	MOCK_METHOD2(LogFinalGameParams,
-	             void(PlayerId player_id, bool was_deathmatch));
+	MOCK_METHOD3(LogFinalGameParams,
+	             void(PlayerId player_id, bool was_deathmatch,
+	                  std::array<int64_t, 2> final_scores));
 	MOCK_METHOD1(WriteGame, void(std::ostream &));
 };

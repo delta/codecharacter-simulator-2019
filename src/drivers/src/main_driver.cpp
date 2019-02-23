@@ -36,10 +36,11 @@ MainDriver::MainDriver(
 }
 
 void MainDriver::/*Avengers:*/ EndGame(state::PlayerId player_id,
-                                       bool was_deathmatch) {
+                                       bool was_deathmatch,
+                                       std::array<int64_t, 2> final_scores) {
 	std::ofstream log_file(log_file_name, std::ios::out | std::ios::binary);
 
-	logger->LogFinalGameParams(player_id, was_deathmatch);
+	logger->LogFinalGameParams(player_id, was_deathmatch, final_scores);
 	logger->WriteGame(log_file);
 	this->game_timer.Cancel();
 }
@@ -234,7 +235,8 @@ const GameResult MainDriver::Run() {
 			}
 
 			player_results = GetPlayerResults();
-			EndGame(player_winner, true);
+			EndGame(player_winner, true,
+			        {player_results[0].score, player_results[1].score});
 			winner = GetWinnerFromPlayerId(player_winner);
 			win_type = GameResult::WinType::DEATHMATCH;
 			auto interest = this->state_syncer->GetInterestingness();
@@ -254,7 +256,8 @@ const GameResult MainDriver::Run() {
 
 	// Log the winner
 	auto winner_player_id = GetPlayerIdFromWinner(winner);
-	EndGame(winner_player_id, false);
+	EndGame(winner_player_id, false,
+	        {player_results[0].score, player_results[1].score});
 
 	return GameResult{winner, win_type, interest, player_results};
 }

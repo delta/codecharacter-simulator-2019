@@ -86,7 +86,7 @@ TEST_F(MainDriverTest, CleanRunByScore) {
 	    .Times(num_turns);
 	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER2, _))
 	    .Times(num_turns);
-	EXPECT_CALL(*v_logger, LogFinalGameParams(_, _)).Times(1);
+	EXPECT_CALL(*v_logger, LogFinalGameParams(_, _, _)).Times(1);
 	EXPECT_CALL(*v_logger, WriteGame(_)).Times(1);
 
 	driver = CreateMockMainDriver(move(state_syncer_mock), move(v_logger));
@@ -155,7 +155,7 @@ TEST_F(MainDriverTest, Player1WinByDeathmatch) {
 	    .Times(num_turns / 2);
 	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER2, _))
 	    .Times(num_turns / 2);
-	EXPECT_CALL(*v_logger, LogFinalGameParams(_, _)).Times(1);
+	EXPECT_CALL(*v_logger, LogFinalGameParams(_, _, _)).Times(1);
 	EXPECT_CALL(*v_logger, WriteGame(_)).Times(1);
 
 	driver = CreateMockMainDriver(move(state_syncer_mock), move(v_logger));
@@ -224,7 +224,7 @@ TEST_F(MainDriverTest, Player2WinByDeathmatch) {
 	    .Times(num_turns / 2);
 	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER2, _))
 	    .Times(num_turns / 2);
-	EXPECT_CALL(*v_logger, LogFinalGameParams(_, _)).Times(1);
+	EXPECT_CALL(*v_logger, LogFinalGameParams(_, _, _)).Times(1);
 	EXPECT_CALL(*v_logger, WriteGame(_)).Times(1);
 
 	driver = CreateMockMainDriver(move(state_syncer_mock), move(v_logger));
@@ -293,7 +293,7 @@ TEST_F(MainDriverTest, TieByDeathmatch) {
 	    .Times(num_turns / 2);
 	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER2, _))
 	    .Times(num_turns / 2);
-	EXPECT_CALL(*v_logger, LogFinalGameParams(_, _)).Times(1);
+	EXPECT_CALL(*v_logger, LogFinalGameParams(_, _, _)).Times(1);
 	EXPECT_CALL(*v_logger, WriteGame(_)).Times(1);
 
 	driver = CreateMockMainDriver(move(state_syncer_mock), move(v_logger));
@@ -351,7 +351,7 @@ TEST_F(MainDriverTest, EarlyPlayerExit) {
 	    .Times(num_turns / 2 + 1);
 	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER2, _))
 	    .Times(num_turns / 2 + 1);
-	EXPECT_CALL(*v_logger, LogFinalGameParams(_, _)).Times(1);
+	EXPECT_CALL(*v_logger, LogFinalGameParams(_, _, _)).Times(1);
 	EXPECT_CALL(*v_logger, WriteGame(_)).Times(1);
 
 	driver = CreateMockMainDriver(move(state_syncer_mock), move(v_logger));
@@ -403,7 +403,7 @@ TEST_F(MainDriverTest, InstructionLimitReached) {
 	    .Times(num_turns / 2 + 1);
 	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER2, _))
 	    .Times(num_turns / 2 + 1);
-	EXPECT_CALL(*v_logger, LogFinalGameParams(_, _)).Times(1);
+	EXPECT_CALL(*v_logger, LogFinalGameParams(_, _, _)).Times(1);
 	EXPECT_CALL(*v_logger, WriteGame(_)).Times(1);
 
 	driver = CreateMockMainDriver(move(state_syncer_mock), move(v_logger));
@@ -471,7 +471,7 @@ TEST_F(MainDriverTest, Cancellation) {
 	unique_ptr<LoggerMock> v_logger(new LoggerMock());
 	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER1, _)).Times(1);
 	EXPECT_CALL(*v_logger, LogInstructionCount(PlayerId::PLAYER2, _)).Times(1);
-	EXPECT_CALL(*v_logger, LogFinalGameParams(_, _)).Times(1);
+	EXPECT_CALL(*v_logger, LogFinalGameParams(_, _, _)).Times(1);
 	EXPECT_CALL(*v_logger, WriteGame(_)).Times(1);
 
 	driver = CreateMockMainDriver(move(state_syncer_mock), move(v_logger));
