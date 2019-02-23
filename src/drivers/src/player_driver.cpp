@@ -53,11 +53,13 @@ void PlayerDriver::Run() {
 		// Wait for the main driver to synchronize states or until the game has
 		// timed out
 		while (!this->shared_buffer->is_player_running &&
+		       !this->shared_buffer->is_game_complete &&
 		       !this->is_game_timed_out)
 			;
 
-		// If overall game time limit was exceeded, stop the player's code
-		if (this->is_game_timed_out)
+		// If overall game time limit was exceeded,
+		// Or if the game ended by deathmatch, stop player code and exit
+		if (this->is_game_timed_out || this->shared_buffer->is_game_complete)
 			break;
 
 		// Run player's code and get number of instructions they used and their

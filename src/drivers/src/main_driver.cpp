@@ -59,9 +59,10 @@ std::array<PlayerResult, 2> MainDriver::GetPlayerResults() {
 
 const GameResult MainDriver::Start() {
 	// Initialize contents of shared memory
-	for (int cur_player_id = 0; cur_player_id < 2; ++cur_player_id) {
-		this->shared_buffers[cur_player_id]->is_player_running = false;
-		this->shared_buffers[cur_player_id]->instruction_counter = 0;
+	for (auto buffer : shared_buffers) {
+		buffer->is_player_running = false;
+		buffer->is_game_complete = false;
+		buffer->instruction_counter = 0;
 	}
 
 	// Initialize player states with contents of main state
@@ -136,11 +137,13 @@ const GameResult MainDriver::Run() {
 	for (int i = 0; i < this->max_no_turns; ++i) {
 		// Loop over each player
 		for (int cur_player_id = 0; cur_player_id < 2; ++cur_player_id) {
-			// Let player do his updates
-			this->shared_buffers[cur_player_id]->is_player_running = true;
+			auto current_player_buffer = this->shared_buffers[cur_player_id];
+
+			// Let player do their updates
+			current_player_buffer->is_player_running = true;
 
 			// Wait for updates, the timer or cancellation
-			while (this->shared_buffers[cur_player_id]->is_player_running &&
+			while (current_player_buffer->is_player_running &&
 			       !this->is_game_timed_out && !this->cancel)
 				;
 
@@ -153,13 +156,12 @@ const GameResult MainDriver::Run() {
 
 			// Check for instruction counter to see if player has
 			// exceeded some limit
-			if (this->shared_buffers[cur_player_id]->instruction_counter >
+			if (current_player_buffer->instruction_counter >
 			    this->player_instruction_limit_game) {
 				player_results[cur_player_id].status =
 				    PlayerResult::Status::EXCEEDED_INSTRUCTION_LIMIT;
 				instruction_count_exceeded = true;
-			} else if (this->shared_buffers[cur_player_id]
-			               ->instruction_counter >
+			} else if (current_player_buffer->instruction_counter >
 			           this->player_instruction_limit_turn) {
 				skip_player_turn[cur_player_id] = true;
 			} else {
@@ -169,7 +171,7 @@ const GameResult MainDriver::Run() {
 			// Write the turn's instruction counts
 			logger->LogInstructionCount(
 			    static_cast<state::PlayerId>(cur_player_id),
-			    this->shared_buffers[cur_player_id]->instruction_counter);
+			    current_player_buffer->instruction_counter);
 		}
 
 		// If the game instruction count has been exceeded by some
@@ -204,6 +206,11 @@ const GameResult MainDriver::Run() {
 		// End the game as a deathmatch
 		state::PlayerId player_winner;
 		if (this->state_syncer->IsGameOver(player_winner)) {
+			// Cancel player drivers as a game over by deathmatch
+			for (auto buffer : shared_buffers) {
+				buffer->is_game_complete = true;
+			}
+
 			player_results = GetPlayerResults();
 			EndGame();
 			winner = GetWinnerFromPlayerId(player_winner);

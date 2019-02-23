@@ -38,7 +38,7 @@ class DRIVERS_EXPORT SharedMemoryMain {
 	 * @throw      std::exception      If shm already exists
 	 */
 	SharedMemoryMain(std::string shared_memory_name, bool is_player_running,
-	                 int64_t instruction_counter,
+	                 bool is_game_complete, int64_t instruction_counter,
 	                 const transfer_state::State &transfer_state);
 
 	/**

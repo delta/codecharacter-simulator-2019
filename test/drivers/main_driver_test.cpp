@@ -40,7 +40,7 @@ class MainDriverTest : public testing::Test {
 			// Remove shm if it already exists
 			boost::interprocess::shared_memory_object::remove(shm_name.c_str());
 			// Create new shm
-			shm.emplace_back(new SharedMemoryMain(shm_name, false, 0,
+			shm.emplace_back(new SharedMemoryMain(shm_name, false, false, 0,
 			                                      transfer_state::State()));
 		}
 

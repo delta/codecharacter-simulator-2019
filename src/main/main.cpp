@@ -214,7 +214,7 @@ unique_ptr<MainDriver> BuildMainDriver() {
 	for (int i = 0; i < 2; ++i) {
 		shm_names[i] = Game::GenerateRandomString(64) + to_string(i);
 		shm_mains.push_back(make_unique<SharedMemoryMain>(
-		    shm_names[i], false, 0, transfer_state::State()));
+		    shm_names[i], false, false, 0, transfer_state::State()));
 	}
 
 	return make_unique<MainDriver>(
