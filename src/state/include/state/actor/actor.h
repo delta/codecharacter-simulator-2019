@@ -66,6 +66,11 @@ class STATE_EXPORT Actor : public IUpdatable {
 	 */
 	int64_t damage_incurred;
 
+	/**
+	 * How many turns has the actor been alive for? Increments with each update
+	 */
+	int64_t age;
+
   public:
 	Actor();
 
@@ -168,5 +173,12 @@ class STATE_EXPORT Actor : public IUpdatable {
 	 * @return     Actor Position
 	 */
 	DoubleVec2D GetPosition();
+
+	/**
+	 * Get the age of this actor
+	 *
+	 * @return     int64_t age
+	 */
+	int64_t GetAge();
 };
 } // namespace state

@@ -17,7 +17,7 @@ Actor::Actor(ActorId id, PlayerId player_id, ActorType actor_type, int64_t hp,
              int64_t max_hp, DoubleVec2D position, GoldManager *gold_manager)
     : id(id), player_id(player_id), actor_type(actor_type), hp(hp),
       max_hp(max_hp), position(position), gold_manager(gold_manager),
-      damage_incurred(0) {}
+      damage_incurred(0), age(0) {}
 
 ActorId Actor::GetActorId() { return id; }
 
@@ -59,4 +59,6 @@ void Actor::Damage(int64_t damage_amount) {
 }
 
 DoubleVec2D Actor::GetPosition() { return position; }
+
+int64_t Actor::GetAge() { return age; }
 } // namespace state

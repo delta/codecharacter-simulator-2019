@@ -47,6 +47,7 @@ void Soldier::LateUpdate() {
 }
 
 void Soldier::Update() {
+	age++;
 	auto new_state = state->Update();
 
 	while (new_state != nullptr) {
