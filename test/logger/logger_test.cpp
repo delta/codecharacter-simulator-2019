@@ -187,6 +187,12 @@ TEST_F(LoggerTest, WriteReadTest) {
 	    .WillOnce(Return(money1))
 	    .WillRepeatedly(Return(money2));
 
+	std::array<int64_t, 2> scores1 = {100, 100};
+	std::array<int64_t, 2> scores2 = {300, 200};
+	EXPECT_CALL(*state, GetScores(_))
+	    .WillOnce(Return(scores1))
+	    .WillRepeatedly(Return(scores2));
+
 	vector<int64_t> inst_counts = {123456, 654321};
 	logger->LogInstructionCount(PlayerId::PLAYER1, inst_counts[0]);
 	logger->LogInstructionCount(PlayerId::PLAYER2, inst_counts[1]);
@@ -241,6 +247,12 @@ TEST_F(LoggerTest, WriteReadTest) {
 	ASSERT_EQ(game->states(0).gold(1), money1[1]);
 	ASSERT_EQ(game->states(1).gold(0), money2[0]);
 	ASSERT_EQ(game->states(1).gold(1), money2[1]);
+
+	// Check if scores are fine
+	ASSERT_EQ(game->states(0).scores(0), scores1[0]);
+	ASSERT_EQ(game->states(0).scores(1), scores1[1]);
+	ASSERT_EQ(game->states(1).scores(0), scores2[0]);
+	ASSERT_EQ(game->states(1).scores(1), scores2[1]);
 
 	// Check if soldiers are there
 	ASSERT_EQ(game->states(0).soldiers_size(), 2);
