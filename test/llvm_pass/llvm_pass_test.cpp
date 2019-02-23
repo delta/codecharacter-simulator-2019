@@ -23,8 +23,8 @@ class LLVMPassTest : public Test {
 	LLVMPassTest() {
 		boost::interprocess::shared_memory_object::remove(shm_name.c_str());
 
-		this->shm_main = make_unique<SharedMemoryMain>(shm_name, false, 0,
-		                                               transfer_state::State());
+		this->shm_main = make_unique<SharedMemoryMain>(
+		    shm_name, false, false, 0, transfer_state::State());
 		this->buf = shm_main->GetBuffer();
 	}
 

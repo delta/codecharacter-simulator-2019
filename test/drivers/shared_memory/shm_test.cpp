@@ -17,11 +17,13 @@ void RemoveShm() {
 TEST(SharedMemoryUtilsTest, ValidWriteRead) {
 	RemoveShm();
 	// Create owner of shm
-	SharedMemoryMain shm_main(shm_name, false, 0, transfer_state::State());
+	SharedMemoryMain shm_main(shm_name, false, false, 0,
+	                          transfer_state::State());
 
 	// Write to shm
 	SharedBuffer *buf = shm_main.GetBuffer();
 	buf->is_player_running = true;
+	buf->is_game_complete = false;
 	buf->instruction_counter = 1;
 
 	// Spawn shm client to read from shm
@@ -37,16 +39,20 @@ TEST(SharedMemoryUtilsTest, InvalidRead) {
 	EXPECT_THROW((SharedMemoryPlayer(shm_name)), std::exception);
 
 	// Test if destructor for owner is working
-	{ SharedMemoryMain shm_main(shm_name, false, 0, transfer_state::State()); }
+	{
+		SharedMemoryMain shm_main(shm_name, false, false, 0,
+		                          transfer_state::State());
+	}
 
 	EXPECT_THROW((SharedMemoryPlayer(shm_name)), std::exception);
 }
 
 TEST(SharedMemoryUtilsTest, InvalidCreate) {
 	RemoveShm();
-	SharedMemoryMain shm_main(shm_name, false, 0, transfer_state::State());
+	SharedMemoryMain shm_main(shm_name, false, false, 0,
+	                          transfer_state::State());
 	// Cannot have two owners
 	EXPECT_THROW(
-	    (SharedMemoryMain(shm_name, false, 0, transfer_state::State())),
+	    (SharedMemoryMain(shm_name, false, false, 0, transfer_state::State())),
 	    std::exception);
 }
