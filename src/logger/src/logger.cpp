@@ -399,7 +399,8 @@ void Logger::LogError(state::PlayerId player_id, ErrorType error_type,
 	errors[(int)player_id].push_back(error_code);
 }
 
-void Logger::LogFinalGameParams(PlayerId player_id, bool was_deathmatch) {
+void Logger::LogFinalGameParams(PlayerId player_id, bool was_deathmatch,
+                                std::array<int64_t, 2> final_scores) {
 	// Write the error mapping to logs
 	// Flip the mapping, int error_code -> string message
 	for (auto element : error_map) {
@@ -419,6 +420,11 @@ void Logger::LogFinalGameParams(PlayerId player_id, bool was_deathmatch) {
 		logs->set_winner(proto::TIE);
 		break;
 	}
+
+	// Set the final scores in the final game frame
+	auto last_state = logs->mutable_states(logs->states_size() - 1);
+	last_state->set_scores(0, final_scores[0]);
+	last_state->set_scores(1, final_scores[1]);
 }
 
 void Logger::WriteGame(std::ostream &write_stream) {

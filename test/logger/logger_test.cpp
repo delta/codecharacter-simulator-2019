@@ -222,8 +222,8 @@ TEST_F(LoggerTest, WriteReadTest) {
 	// Run once more
 	logger->LogState();
 
-	// A TIE match, ending by deathmatch
-	logger->LogFinalGameParams(PlayerId::PLAYER_NULL, true);
+	// A TIE match, ending by deathmatch, and hardcode a final score value
+	logger->LogFinalGameParams(PlayerId::PLAYER_NULL, true, {150, 150});
 
 	ostringstream str_stream;
 	logger->WriteGame(str_stream);
@@ -340,9 +340,11 @@ TEST_F(LoggerTest, WriteReadTest) {
 	ASSERT_EQ(game->states(5).villagers(0).id(), villager->GetActorId());
 	ASSERT_EQ(game->states(5).villagers(1).id(), villager2->GetActorId());
 
-	// Check for game winner and win type
+	// Check for game winner, win type, and score 150, 150 in the last turn
 	ASSERT_EQ(game->winner(), proto::Winner::TIE);
 	ASSERT_EQ(game->was_deathmatch(), true);
+	ASSERT_EQ(game->states(game->states_size() - 1).scores(0), 150);
+	ASSERT_EQ(game->states(game->states_size() - 1).scores(1), 150);
 
 	delete soldier;
 	delete soldier2;

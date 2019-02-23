@@ -117,7 +117,8 @@ class DRIVERS_EXPORT MainDriver {
 	 * @param was_deathmatch True if this game ended by deathmatch
 	 */
 	void EndGame(state::PlayerId player_id = state::PlayerId::PLAYER1,
-	             bool was_deathmatch = false);
+	             bool was_deathmatch = false,
+	             std::array<int64_t, 2> final_scores = {0, 0});
 
   public:
 	/**
