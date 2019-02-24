@@ -386,9 +386,16 @@ void CommandGiver::RunCommands(
 			// If the villager is moving to another destination
 			else if (should_move) {
 				// Validating the move position
-				bool is_valid = IsValidPosition(villager.destination);
+				// Flipping the position for player 2
+				Vec2D location = villager.destination;
+				if (Player_id == PlayerId::PLAYER2) {
+					location =
+					    FlipPosition(state_map, location.to_double()).to_int();
+				}
+				bool is_valid = IsValidPosition(location);
+
 				if (is_valid) {
-					MoveUnit(Player_id, villager.id, villager.destination);
+					MoveUnit(Player_id, villager.id, location);
 				} else {
 					logger->LogError(
 					    Player_id, logger::ErrorType::INVALID_MOVE_POSITION,
