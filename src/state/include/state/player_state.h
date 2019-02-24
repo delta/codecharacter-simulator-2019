@@ -273,7 +273,7 @@ struct State {
 	std::vector<Factory> factories;
 	std::vector<Factory> enemy_factories;
 
-	std::vector<Vec2D> gold_mine_locations;
+	std::vector<Vec2D> gold_mine_offsets;
 
 	int64_t score;
 	int64_t gold;
@@ -331,7 +331,7 @@ inline std::ostream &operator<<(std::ostream &os, State state) {
 	}
 
 	os << "-- Gold Mine Locations --" << endl;
-	for (auto const &gold_mine : state.gold_mine_locations) {
+	for (auto const &gold_mine : state.gold_mine_offsets) {
 		os << gold_mine << endl;
 	}
 

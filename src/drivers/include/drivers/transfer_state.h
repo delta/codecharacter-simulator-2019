@@ -42,8 +42,8 @@ struct State {
 	size_t num_factories;
 	size_t num_enemy_factories;
 
-	std::array<Vec2D, TOTAL_MAP_TILES> gold_mine_locations;
-	size_t num_gold_mine_locations;
+	std::array<Vec2D, TOTAL_MAP_TILES> gold_mine_offsets;
+	size_t num_gold_mine_offsets;
 
 	int64_t score;
 	int64_t gold;
@@ -77,8 +77,8 @@ ConvertToPlayerState(const transfer_state::State &ts) {
 	    arrayToVector(ts.enemy_factories, ts.num_enemy_factories);
 
 	// Copy gold mine locations
-	ps.gold_mine_locations =
-	    arrayToVector(ts.gold_mine_locations, ts.num_gold_mine_locations);
+	ps.gold_mine_offsets =
+	    arrayToVector(ts.gold_mine_offsets, ts.num_gold_mine_offsets);
 
 	// Copy gold and scores
 	ps.score = ts.score;
@@ -114,8 +114,7 @@ ConvertToTransferState(const player_state::State &ps) {
 	ts.enemy_factories = vectorToArray<MAX_NUM_FACTORIES>(ps.enemy_factories);
 
 	// Copy Gold Mine Locations
-	ts.gold_mine_locations =
-	    vectorToArray<TOTAL_MAP_TILES>(ps.gold_mine_locations);
+	ts.gold_mine_offsets = vectorToArray<TOTAL_MAP_TILES>(ps.gold_mine_offsets);
 
 	// Copy score and gold
 	ts.score = ps.score;
@@ -128,7 +127,7 @@ ConvertToTransferState(const player_state::State &ps) {
 	ts.num_enemy_villagers = ps.villagers.size();
 	ts.num_factories = ps.factories.size();
 	ts.num_enemy_factories = ps.factories.size();
-	ts.num_gold_mine_locations = ps.gold_mine_locations.size();
+	ts.num_gold_mine_offsets = ps.gold_mine_offsets.size();
 
 	return ts;
 }
