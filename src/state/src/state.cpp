@@ -374,6 +374,9 @@ void State::Update() {
 		}
 	}
 
+	// Handling build requests by villagers
+	HandleBuildRequests();
+
 	// Remove dead actors
 	for (auto &player_soldiers : soldiers) {
 		auto last_valid_elem = std::remove_if(
@@ -398,9 +401,6 @@ void State::Update() {
 
 		player_factories.erase(last_valid_elem, player_factories.end());
 	}
-
-	// Handling build requests by villagers
-	HandleBuildRequests();
 
 	// Updates scores and interestingness
 	UpdateScores();
