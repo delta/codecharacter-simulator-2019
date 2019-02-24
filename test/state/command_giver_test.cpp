@@ -161,10 +161,10 @@ class CommandGiverTest : public Test {
 		this->player_states[1].map[2][1] = G;
 		this->player_states[1].map[0][2] = G;
 
-		this->player_states[0].gold_mine_locations.push_back(Vec2D(2, 3));
-		this->player_states[0].gold_mine_locations.push_back(Vec2D(4, 2));
-		this->player_states[1].gold_mine_locations.push_back(Vec2D(2, 1));
-		this->player_states[1].gold_mine_locations.push_back(Vec2D(0, 2));
+		this->player_states[0].gold_mine_offsets.push_back(Vec2D(2, 3));
+		this->player_states[0].gold_mine_offsets.push_back(Vec2D(4, 2));
+		this->player_states[1].gold_mine_offsets.push_back(Vec2D(2, 1));
+		this->player_states[1].gold_mine_offsets.push_back(Vec2D(0, 2));
 		dummy_map[4][2] = TerrainType::GOLD_MINE;
 		dummy_map[2][3] = TerrainType::GOLD_MINE;
 

@@ -57,7 +57,7 @@ void StateSyncer::UpdatePlayerStates(
 		std::array<std::array<player_state::TerrainType, MAP_SIZE>, MAP_SIZE>
 		    new_map;
 		// Storing the gold mine locations
-		std::vector<Vec2D> gold_mine_locations;
+		std::vector<Vec2D> gold_mine_offsets;
 		for (int i = 0; i < map->GetSize(); ++i) {
 			for (int j = 0; j < map->GetSize(); ++j) {
 				auto &new_map_element = new_map[i][j];
@@ -79,7 +79,7 @@ void StateSyncer::UpdatePlayerStates(
 					} else {
 						gold_mine = Vec2D(i, j);
 					}
-					gold_mine_locations.push_back(gold_mine);
+					gold_mine_offsets.push_back(gold_mine);
 					break;
 				}
 			}
@@ -124,14 +124,13 @@ void StateSyncer::UpdatePlayerStates(
 
 		// Assigning the gold mine_locations to the player state
 		if (static_cast<PlayerId>(player_id) == PlayerId::PLAYER1) {
-			player_states[player_id].gold_mine_locations =
-			    std::move(gold_mine_locations);
+			player_states[player_id].gold_mine_offsets =
+			    std::move(gold_mine_offsets);
 		} else {
 			// Reverse the list for Player2
-			std::reverse(gold_mine_locations.begin(),
-			             gold_mine_locations.end());
-			player_states[player_id].gold_mine_locations =
-			    std::move(gold_mine_locations);
+			std::reverse(gold_mine_offsets.begin(), gold_mine_offsets.end());
+			player_states[player_id].gold_mine_offsets =
+			    std::move(gold_mine_offsets);
 		}
 	}
 
