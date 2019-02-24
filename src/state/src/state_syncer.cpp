@@ -16,10 +16,11 @@ StateSyncer::StateSyncer(std::unique_ptr<ICommandGiver> command_giver,
       logger(logger) {}
 
 void StateSyncer::UpdateMainState(
-    const std::array<player_state::State, 2> &player_states) {
+    const std::array<player_state::State, 2> &player_states,
+    std::array<bool, 2> skip_player_turn) {
 
 	// Call the CommandGiver
-	command_giver->RunCommands(player_states);
+	command_giver->RunCommands(player_states, skip_player_turn);
 
 	// Update main state
 	state->Update();

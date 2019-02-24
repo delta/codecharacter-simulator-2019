@@ -70,7 +70,7 @@ TEST_F(MainDriverTest, CleanRunByScore) {
 	// Declaring mock state syncer and setting expectations
 	unique_ptr<StateSyncerMock> state_syncer_mock(new StateSyncerMock());
 
-	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns);
+	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_, _)).Times(num_turns);
 	EXPECT_CALL(*state_syncer_mock, IsGameOver(_)).Times(num_turns);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_)).Times(num_turns + 1);
 
@@ -128,7 +128,7 @@ TEST_F(MainDriverTest, Player1WinByDeathmatch) {
 	unique_ptr<StateSyncerMock> state_syncer_mock(new StateSyncerMock());
 
 	// The game will end halfway in, with IsGameOver returning true
-	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns / 2);
+	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_, _)).Times(num_turns / 2);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_))
 	    .Times(num_turns / 2 + 1);
 
@@ -197,7 +197,7 @@ TEST_F(MainDriverTest, Player2WinByDeathmatch) {
 	unique_ptr<StateSyncerMock> state_syncer_mock(new StateSyncerMock());
 
 	// The game will end halfway in, with IsGameOver returning true
-	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns / 2);
+	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_, _)).Times(num_turns / 2);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_))
 	    .Times(num_turns / 2 + 1);
 
@@ -266,7 +266,7 @@ TEST_F(MainDriverTest, TieByDeathmatch) {
 	unique_ptr<StateSyncerMock> state_syncer_mock(new StateSyncerMock());
 
 	// The game will end halfway in, with IsGameOver returning true
-	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns / 2);
+	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_, _)).Times(num_turns / 2);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_))
 	    .Times(num_turns / 2 + 1);
 
@@ -336,7 +336,7 @@ TEST_F(MainDriverTest, EarlyPlayerExit) {
 	unique_ptr<StateSyncerMock> state_syncer_mock(new StateSyncerMock());
 
 	// Expect only half the number of turns to be run
-	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns / 2);
+	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_, _)).Times(num_turns / 2);
 	EXPECT_CALL(*state_syncer_mock, IsGameOver(_)).Times(num_turns / 2);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_))
 	    .Times(num_turns / 2 + 1);
@@ -389,7 +389,7 @@ TEST_F(MainDriverTest, InstructionLimitReached) {
 	unique_ptr<StateSyncerMock> state_syncer_mock(new StateSyncerMock());
 
 	// Expect only half the turns to run
-	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(num_turns / 2);
+	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_, _)).Times(num_turns / 2);
 	EXPECT_CALL(*state_syncer_mock, IsGameOver(_)).Times(num_turns / 2);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_))
 	    .Times(num_turns / 2 + 1);
@@ -460,7 +460,7 @@ TEST_F(MainDriverTest, Cancellation) {
 	unique_ptr<StateSyncerMock> state_syncer_mock(new StateSyncerMock());
 
 	// Expect only one turn to run
-	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_)).Times(1);
+	EXPECT_CALL(*state_syncer_mock, UpdateMainState(_, _)).Times(1);
 	EXPECT_CALL(*state_syncer_mock, IsGameOver(_)).Times(1);
 	EXPECT_CALL(*state_syncer_mock, UpdatePlayerStates(_)).Times(2);
 

@@ -126,7 +126,8 @@ class STATE_EXPORT CommandGiver : public ICommandGiver {
 	/**
 	 * @see ICommandGiver#RunCommands
 	 */
-	void RunCommands(const std::array<player_state::State, 2> &player_states);
+	void RunCommands(const std::array<player_state::State, 2> &player_states,
+	                 std::array<bool, 2> skip_player_turn);
 };
 
 } // namespace state

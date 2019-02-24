@@ -137,7 +137,7 @@ state::PlayerId GetPlayerIdFromWinner(GameResult::Winner winner) {
 
 const GameResult MainDriver::Run() {
 	// Initializing stuff...
-	auto skip_player_turn = std::vector<bool>{false, false};
+	auto skip_player_turn = std::array<bool, 2>{false, false};
 	auto player_results = std::array<PlayerResult, 2>{
 	    PlayerResult{0, PlayerResult::Status::UNDEFINED},
 	    PlayerResult{0, PlayerResult::Status::UNDEFINED}};
@@ -206,14 +206,14 @@ const GameResult MainDriver::Run() {
 
 		// Validate and run the player's commands. Skips a player if
 		// they have exceeded turn instruction limit
-		// TODO: Check for player turn skip
 
 		// Convert current transfer states into player states
 		for (int i = 0; i < 2; ++i) {
 			player_states[i] = transfer_state::ConvertToPlayerState(
 			    *(this->transfer_states[i]));
 		}
-		this->state_syncer->UpdateMainState(this->player_states);
+		this->state_syncer->UpdateMainState(this->player_states,
+		                                    skip_player_turn);
 
 		// Write the updated main state back to the player's state
 		// copies

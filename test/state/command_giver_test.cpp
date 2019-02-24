@@ -88,7 +88,7 @@ class CommandGiverTest : public Test {
 		EXPECT_CALL(*command_taker, GetSoldiers).WillOnce(Return(soldiers));
 		EXPECT_CALL(*command_taker, GetVillagers).WillOnce(Return(villagers));
 		EXPECT_CALL(*command_taker, GetFactories).WillOnce(Return(factories));
-		command_giver->RunCommands(player_states);
+		command_giver->RunCommands(player_states, {false, false});
 
 		if (actor_type == ActorType::SOLDIER) {
 			// Resetting the player state soldier
