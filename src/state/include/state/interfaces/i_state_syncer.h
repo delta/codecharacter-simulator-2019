@@ -22,8 +22,9 @@ class STATE_EXPORT IStateSyncer {
 	 *
 	 * @param[in] player_states Reference to two player states
 	 */
-	virtual void UpdateMainState(
-	    const std::array<player_state::State, 2> &player_states) = 0;
+	virtual void
+	UpdateMainState(const std::array<player_state::State, 2> &player_states,
+	                std::array<bool, 2> skip_player_turn) = 0;
 
 	/**
 	 * Method to update the two player state instances with the new values from

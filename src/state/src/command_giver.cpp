@@ -129,7 +129,8 @@ Vec2D CommandGiver::FlipOffset(const Map *map, Vec2D offset) {
 }
 
 void CommandGiver::RunCommands(
-    const std::array<player_state::State, 2> &player_states) {
+    const std::array<player_state::State, 2> &player_states,
+    std::array<bool, 2> skip_player_turn) {
 
 	// Getting all the soldiers, factory and villagers
 	auto state_soldiers = state->GetSoldiers();
@@ -142,6 +143,11 @@ void CommandGiver::RunCommands(
 
 	// For each player...
 	for (int player_id = 0; player_id < player_states.size(); ++player_id) {
+
+		// If this player's turn should be skipped, don't process moves
+		if (skip_player_turn[player_id]) {
+			continue;
+		}
 
 		// For each soldier...
 		for (int64_t soldier_index = 0;

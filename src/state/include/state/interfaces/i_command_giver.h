@@ -22,11 +22,12 @@ class STATE_EXPORT ICommandGiver {
 	/**
 	 * Runs the necessary commands on the command taker (state)
 	 *
-	 * @param[in] state main game state that to which commands must be give
 	 * @param[in] player_states Player state from which we get commands to run
+	 * @param[in] skip_player_turn If true for a player, turn is not processed
 	 */
 	virtual void
-	RunCommands(const std::array<player_state::State, 2> &player_states) = 0;
+	RunCommands(const std::array<player_state::State, 2> &player_states,
+	            std::array<bool, 2> skip_player_turn) = 0;
 };
 
 } // namespace state

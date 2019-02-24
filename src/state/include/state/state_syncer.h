@@ -72,8 +72,9 @@ class STATE_EXPORT StateSyncer : public IStateSyncer {
 	/**
 	 * @see IStateSyncer#UpdateMainState
 	 */
-	void UpdateMainState(
-	    const std::array<player_state::State, 2> &player_states) override;
+	void
+	UpdateMainState(const std::array<player_state::State, 2> &player_states,
+	                std::array<bool, 2> skip_player_turn) override;
 
 	/**
 	 * @see IStateSyncer#UpdatePlayerStates

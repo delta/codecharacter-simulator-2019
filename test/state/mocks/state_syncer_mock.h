@@ -5,8 +5,9 @@
 
 class StateSyncerMock : public state::IStateSyncer {
   public:
-	MOCK_METHOD1(UpdateMainState,
-	             void(const std::array<player_state::State, 2> &player_states));
+	MOCK_METHOD2(UpdateMainState,
+	             void(const std::array<player_state::State, 2> &player_states,
+	                  std::array<bool, 2> skip_player_turn));
 
 	MOCK_METHOD1(UpdatePlayerStates,
 	             void(std::array<player_state::State, 2> &player_states));
