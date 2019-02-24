@@ -5,6 +5,7 @@
 
 #include "state/state_syncer.h"
 
+#include <algorithm>
 #include <cmath>
 
 namespace state {
@@ -122,8 +123,16 @@ void StateSyncer::UpdatePlayerStates(
 		}
 
 		// Assigning the gold mine_locations to the player state
-		player_states[player_id].gold_mine_locations =
-		    std::move(gold_mine_locations);
+		if (static_cast<PlayerId>(player_id) == PlayerId::PLAYER1) {
+			player_states[player_id].gold_mine_locations =
+			    std::move(gold_mine_locations);
+		} else {
+			// Reverse the list for Player2
+			std::reverse(gold_mine_locations.begin(),
+			             gold_mine_locations.end());
+			player_states[player_id].gold_mine_locations =
+			    std::move(gold_mine_locations);
+		}
 	}
 
 	// Log the current state
