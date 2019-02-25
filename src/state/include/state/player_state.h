@@ -8,9 +8,11 @@
 #include "constants/state.h"
 #include "physics/vector.hpp"
 #include "state/interfaces/i_updatable.h"
+#include "state/player_state_helpers.h"
 #include "state/utilities.h"
 
 #include <array>
+#include <limits>
 #include <vector>
 
 namespace player_state {
@@ -275,6 +277,8 @@ struct State {
 
 	std::vector<Vec2D> gold_mine_offsets;
 
+	Vec2D closest_gold_mine(Vec2D position);
+
 	int64_t score;
 	int64_t gold;
 };
@@ -342,6 +346,24 @@ inline std::ostream &operator<<(std::ostream &os, State state) {
 	os << state.gold << endl;
 
 	return os;
+}
+
+/// Player State helper methods
+inline Vec2D State::closest_gold_mine(Vec2D position) {
+	// Set start distances
+	double min_distance = std::numeric_limits<double>::max();
+	Vec2D closest_gold_mine =
+	    gold_mine_offsets.size() ? gold_mine_offsets[0] : Vec2D::null;
+
+	// If there's a closer gold mine, set it
+	for (auto &gold_mine : gold_mine_offsets) {
+		if (OffsetToPosition(gold_mine).distance(position) < min_distance) {
+			min_distance = OffsetToPosition(gold_mine).distance(position);
+			closest_gold_mine = gold_mine;
+		}
+	}
+
+	return closest_gold_mine;
 }
 
 } // namespace player_state

@@ -1,7 +1,4 @@
 #include "player_code/player_code.h"
-#include <algorithm>
-#include <iostream>
-#include <vector>
 
 namespace player_code {
 

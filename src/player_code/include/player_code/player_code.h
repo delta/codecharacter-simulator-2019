@@ -1,8 +1,13 @@
 #pragma once
 
+#include "constants/constants.h"
 #include "player_code/player_code_export.h"
 #include "player_wrapper/interfaces/i_player_code.h"
 #include "state/player_state.h"
+#include "state/player_state_helpers.h"
+
+#include <iostream>
+#include <vector>
 
 namespace player_code {
 
