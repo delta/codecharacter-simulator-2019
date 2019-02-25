@@ -192,7 +192,7 @@ class STATE_EXPORT State : public ICommandTaker {
 
 	/**
 	 * Holds a buffer of dead actors for two turns, so that raw pointers to
-	 * these objects are valid for long enough complete actor deaths
+	 * these objects are valid for long enough to complete actor deaths
 	 */
 	std::array<std::vector<std::unique_ptr<Actor>>, 2> actors_to_delete;
 
