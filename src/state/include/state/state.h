@@ -191,6 +191,12 @@ class STATE_EXPORT State : public ICommandTaker {
 	std::array<int64_t, 2> scores;
 
 	/**
+	 * Holds a buffer of dead actors for two turns, so that raw pointers to
+	 * these objects are valid for long enough to complete actor deaths
+	 */
+	std::array<std::vector<std::unique_ptr<Actor>>, 2> actors_to_delete;
+
+	/**
 	 * Compute scores for this turn, and record them
 	 * Also update the interestingness factor
 	 */

@@ -26,7 +26,7 @@ State::State(std::unique_ptr<Map> map,
       model_soldier(std::move(model_soldier)),
       model_factory(std::move(model_factory)),
       interest_threshold(interest_threshold), was_player1_in_the_lead(false),
-      interestingness(0), scores({0, 0}) {}
+      interestingness(0), scores({0, 0}), actors_to_delete({}) {}
 
 /**
  * Helper function to get the enemy player id
@@ -378,29 +378,59 @@ void State::Update() {
 	HandleBuildRequests();
 
 	// Remove dead actors
+	auto current_actors_to_delete = std::vector<std::unique_ptr<Actor>>{};
 	for (auto &player_soldiers : soldiers) {
-		auto last_valid_elem = std::remove_if(
+		// Divide soldiers list into alive and dead actors, partition point p
+		auto partition_point = std::stable_partition(
 		    player_soldiers.begin(), player_soldiers.end(),
-		    [](std::unique_ptr<Soldier> &s) { return s->GetHp() == 0; });
+		    [](auto &s) { return s->GetHp() != 0; });
 
-		player_soldiers.erase(last_valid_elem, player_soldiers.end());
+		// Move all the dead soldiers into a buffer
+		current_actors_to_delete.insert(
+		    current_actors_to_delete.end(),
+		    std::make_move_iterator(partition_point),
+		    std::make_move_iterator(player_soldiers.end()));
+
+		// Erase dead soldiers from the actors list
+		player_soldiers.erase(partition_point, player_soldiers.end());
 	}
 
 	for (auto &player_villagers : villagers) {
-		auto last_valid_elem = std::remove_if(
+		auto partition_point = std::stable_partition(
 		    player_villagers.begin(), player_villagers.end(),
-		    [](std::unique_ptr<Villager> &v) { return v->GetHp() == 0; });
+		    [](auto &s) { return s->GetHp() != 0; });
 
-		player_villagers.erase(last_valid_elem, player_villagers.end());
+		current_actors_to_delete.insert(
+		    current_actors_to_delete.end(),
+		    std::make_move_iterator(partition_point),
+		    std::make_move_iterator(player_villagers.end()));
+
+		player_villagers.erase(partition_point, player_villagers.end());
 	}
 
 	for (auto &player_factories : factories) {
-		auto last_valid_elem = std::remove_if(
+		auto partition_point = std::stable_partition(
 		    player_factories.begin(), player_factories.end(),
-		    [](std::unique_ptr<Factory> &f) { return f->GetHp() == 0; });
+		    [](auto &s) { return s->GetHp() != 0; });
 
-		player_factories.erase(last_valid_elem, player_factories.end());
+		current_actors_to_delete.insert(
+		    current_actors_to_delete.end(),
+		    std::make_move_iterator(partition_point),
+		    std::make_move_iterator(player_factories.end()));
+
+		player_factories.erase(partition_point, player_factories.end());
 	}
+
+	// Delete the actors which are now two turns old
+	actors_to_delete[0].clear();
+
+	// Shift the actors which have been in the queue for one turn, and add the
+	// current buffer of actors to be deleted on this turn at the end
+	actors_to_delete[0] = std::move(actors_to_delete[1]);
+	actors_to_delete[1] = std::move(current_actors_to_delete);
+
+	// Handling build requests by villagers
+	HandleBuildRequests();
 
 	// Updates scores and interestingness
 	UpdateScores();
