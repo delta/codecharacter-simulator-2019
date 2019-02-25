@@ -381,9 +381,9 @@ void State::Update() {
 	auto current_actors_to_delete = std::vector<std::unique_ptr<Actor>>{};
 	for (auto &player_soldiers : soldiers) {
 		// Divide soldiers list into alive and dead actors, partition point p
-		auto p = std::stable_partition(
-		    player_soldiers.begin(), player_soldiers.end(),
-		    [&](auto &s) { return s->GetHp() != 0; });
+		auto p = std::stable_partition(player_soldiers.begin(),
+		                               player_soldiers.end(),
+		                               [](auto &s) { return s->GetHp() != 0; });
 
 		// Move all the dead soldiers into a buffer
 		current_actors_to_delete.insert(
@@ -395,9 +395,9 @@ void State::Update() {
 	}
 
 	for (auto &player_villagers : villagers) {
-		auto p = std::stable_partition(
-		    player_villagers.begin(), player_villagers.end(),
-		    [&](auto &s) { return s->GetHp() != 0; });
+		auto p = std::stable_partition(player_villagers.begin(),
+		                               player_villagers.end(),
+		                               [](auto &s) { return s->GetHp() != 0; });
 
 		current_actors_to_delete.insert(
 		    current_actors_to_delete.end(), std::make_move_iterator(p),
@@ -407,9 +407,9 @@ void State::Update() {
 	}
 
 	for (auto &player_factories : factories) {
-		auto p = std::stable_partition(
-		    player_factories.begin(), player_factories.end(),
-		    [&](auto &s) { return s->GetHp() != 0; });
+		auto p = std::stable_partition(player_factories.begin(),
+		                               player_factories.end(),
+		                               [](auto &s) { return s->GetHp() != 0; });
 
 		current_actors_to_delete.insert(
 		    current_actors_to_delete.end(), std::make_move_iterator(p),
