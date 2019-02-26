@@ -179,13 +179,22 @@ struct _Unit : _Actor {
 	Vec2D destination;
 	int64_t target;
 
-	void move(Vec2D p_destination) { destination = p_destination; }
+	void move(Vec2D p_destination) {
+		destination = p_destination;
+		target = -1;
+	}
 
 	// Attack with actor id
-	void attack(int64_t p_target) { target = p_target; }
+	void attack(int64_t p_target) {
+		target = p_target;
+		destination = Vec2D::null;
+	}
 
 	// Attack with actor object
-	void attack(_Actor &p_target) { target = p_target.id; }
+	void attack(_Actor &p_target) {
+		target = p_target.id;
+		destination = Vec2D::null;
+	}
 
 	_Unit() : _Actor(), destination(Vec2D::null), target(-1) {}
 };
@@ -220,19 +229,33 @@ struct Villager : _Unit {
 	void build(Vec2D p_build_offset, FactoryProduction p_build_factory_type) {
 		build_offset = p_build_offset;
 		build_factory_type = p_build_factory_type;
+		target_factory_id = -1;
+		mine_target = Vec2D::null;
 	}
 
 	// Join build at an existing factory using position
-	void build(Vec2D p_build_offset) { build_offset = p_build_offset; }
+	void build(Vec2D p_build_offset) {
+		build_offset = p_build_offset;
+		target_factory_id = -1;
+		mine_target = Vec2D::null;
+	}
 
 	// Join build at an existing factory using actor id
-	void build(int64_t p_factory_id) { target_factory_id = p_factory_id; }
+	void build(int64_t p_factory_id) {
+		target_factory_id = p_factory_id;
+		target_factory_id = -1;
+		mine_target = Vec2D::null;
+	}
 
 	// Join build at an existing factory using factory reference
 	void build(Factory &factory) { target_factory_id = factory.id; }
 
 	// Mine at a particular location
-	void mine(Vec2D p_mine_target) { mine_target = p_mine_target; }
+	void mine(Vec2D p_mine_target) {
+		mine_target = p_mine_target;
+		target_factory_id = -1;
+		build_offset = Vec2D::null;
+	}
 
 	Villager()
 	    : _Unit(), target_factory_id(-1), mine_target(Vec2D::null),
