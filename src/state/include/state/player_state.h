@@ -129,89 +129,6 @@ struct _Actor {
 	_Actor() : id(0), position(Vec2D{0, 0}), hp(100), age(0) {}
 };
 
-struct _Unit : _Actor {
-	Vec2D destination;
-	int64_t target;
-
-	void move(Vec2D p_destination) { destination = p_destination; }
-
-	// Attack with actor id
-	void attack(int64_t p_target) { target = p_target; }
-
-	// Attack with actor object
-	void attack(_Actor &p_target) { target = p_target.id; }
-
-	_Unit() : _Actor(), destination(Vec2D::null), target(-1) {}
-};
-
-struct Soldier : _Unit {
-	SoldierState state;
-
-	Soldier() : _Unit() {}
-};
-
-inline std::ostream &operator<<(std::ostream &os, Soldier soldier) {
-	using std::endl;
-
-	os << "Soldier(id: " << soldier.id << ") {" << endl;
-	os << "    position: " << soldier.position << endl;
-	os << "    hp: " << soldier.hp << endl;
-	os << "    age: " << soldier.age << endl;
-	os << "    destination: " << soldier.destination << endl;
-	os << "    target: " << soldier.target << endl;
-	os << "    state: " << soldier.state << endl;
-	os << "}";
-
-	return os;
-}
-
-struct Villager : _Unit {
-	int64_t target_factory_id;
-	Vec2D mine_target;
-	Vec2D build_offset;
-	FactoryProduction build_factory_type; // Note: Defaults to villager if unset
-	VillagerState state;
-
-	// Build a new factory
-	void build(Vec2D p_build_offset, FactoryProduction p_build_factory_type) {
-		build_offset = p_build_offset;
-		build_factory_type = p_build_factory_type;
-	}
-
-	// Join build at an existing factory using position
-	void build(Vec2D p_build_offset) { build_offset = p_build_offset; }
-
-	// Join build at an existing factory using actor id
-	void build(int64_t p_factory_id) { target_factory_id = p_factory_id; }
-
-	// Mine at a particular location
-	void mine(Vec2D p_mine_target) { mine_target = p_mine_target; }
-
-	Villager()
-	    : _Unit(), target_factory_id(-1), mine_target(Vec2D::null),
-	      build_offset(Vec2D::null),
-	      build_factory_type(FactoryProduction::VILLAGER) {}
-};
-
-inline std::ostream &operator<<(std::ostream &os, Villager villager) {
-	using std::endl;
-
-	os << "Villager(id: " << villager.id << ") {" << endl;
-	os << "    position: " << villager.position << endl;
-	os << "    hp: " << villager.hp << endl;
-	os << "    age: " << villager.age << endl;
-	os << "    destination: " << villager.destination << endl;
-	os << "    target: " << villager.target << endl;
-	os << "    target_factory_id: " << villager.target_factory_id << endl;
-	os << "    mine_target: " << villager.mine_target << endl;
-	os << "    build_offset: " << villager.build_offset << endl;
-	os << "    build_factory_type: " << villager.build_factory_type << endl;
-	os << "    state: " << villager.state << endl;
-	os << "}";
-
-	return os;
-}
-
 struct Factory : _Actor {
 	double_t build_percent;
 	bool built;
@@ -258,7 +175,101 @@ inline std::ostream &operator<<(std::ostream &os, Factory factory) {
 	return os;
 }
 
+struct _Unit : _Actor {
+	Vec2D destination;
+	int64_t target;
+
+	void move(Vec2D p_destination) { destination = p_destination; }
+
+	// Attack with actor id
+	void attack(int64_t p_target) { target = p_target; }
+
+	// Attack with actor object
+	void attack(_Actor &p_target) { target = p_target.id; }
+
+	_Unit() : _Actor(), destination(Vec2D::null), target(-1) {}
+};
+
+struct Soldier : _Unit {
+	SoldierState state;
+
+	Soldier() : _Unit() {}
+};
+
+inline std::ostream &operator<<(std::ostream &os, Soldier soldier) {
+	using std::endl;
+
+	os << "Soldier(id: " << soldier.id << ") {" << endl;
+	os << "    position: " << soldier.position << endl;
+	os << "    hp: " << soldier.hp << endl;
+	os << "    age: " << soldier.age << endl;
+	os << "    state: " << soldier.state << endl;
+	os << "}";
+
+	return os;
+}
+
+struct Villager : _Unit {
+	int64_t target_factory_id;
+	Vec2D mine_target;
+	Vec2D build_offset;
+	FactoryProduction build_factory_type; // Note: Defaults to villager if unset
+	VillagerState state;
+
+	// Build a new factory
+	void build(Vec2D p_build_offset, FactoryProduction p_build_factory_type) {
+		build_offset = p_build_offset;
+		build_factory_type = p_build_factory_type;
+	}
+
+	// Join build at an existing factory using position
+	void build(Vec2D p_build_offset) { build_offset = p_build_offset; }
+
+	// Join build at an existing factory using actor id
+	void build(int64_t p_factory_id) { target_factory_id = p_factory_id; }
+
+	// Join build at an existing factory using factory reference
+	void build(Factory &factory) { target_factory_id = factory.id; }
+
+	// Mine at a particular location
+	void mine(Vec2D p_mine_target) { mine_target = p_mine_target; }
+
+	Villager()
+	    : _Unit(), target_factory_id(-1), mine_target(Vec2D::null),
+	      build_offset(Vec2D::null),
+	      build_factory_type(FactoryProduction::VILLAGER) {}
+};
+
+inline std::ostream &operator<<(std::ostream &os, Villager villager) {
+	using std::endl;
+
+	os << "Villager(id: " << villager.id << ") {" << endl;
+	os << "    position: " << villager.position << endl;
+	os << "    hp: " << villager.hp << endl;
+	os << "    age: " << villager.age << endl;
+	os << "    state: " << villager.state << endl;
+	os << "}";
+
+	return os;
+}
+
 enum class TerrainType { LAND, WATER, GOLD_MINE };
+
+inline std::ostream &operator<<(std::ostream &os, TerrainType &t) {
+	switch (t) {
+	case TerrainType::LAND:
+		os << "L";
+		break;
+	case TerrainType::WATER:
+		os << "W";
+		break;
+	case TerrainType::GOLD_MINE:
+		os << "G";
+		break;
+	}
+
+	return os;
+}
 
 /**
  * Main player state object. One such struct is provided to each player
