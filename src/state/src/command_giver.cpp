@@ -62,7 +62,10 @@ bool CommandGiver::IsValidTarget(int64_t player_id, int64_t enemy_actor_id,
 }
 
 bool CommandGiver::IsOccupied(
-    Vec2D offset, std::array<std::vector<Factory *>, 2> state_factories) {
+    int64_t player_id, Vec2D offset,
+    std::array<std::vector<Factory *>, 2> state_factories,
+    ActorId &occupied_actor_id) {
+
 	// Getting the position from the offset
 	auto position = DoubleVec2D{};
 	auto element_size = this->state->GetMap()->GetElementSize();
@@ -71,13 +74,13 @@ bool CommandGiver::IsOccupied(
 
 	// Looking through the current state factories and checking if the position
 	// is already occupied by another factory
-	for (int64_t player_id = 0; player_id < 2; ++player_id) {
-		for (auto factory : state_factories[player_id]) {
-			if (factory->GetPosition() == position) {
-				return true;
-			}
+	for (auto factory : state_factories[player_id]) {
+		if (factory->GetPosition() == position) {
+			occupied_actor_id = factory->GetActorId();
+			return true;
 		}
 	}
+
 	return false;
 }
 
@@ -246,6 +249,8 @@ void CommandGiver::RunCommands(
 	// For each player...
 	for (int player_id = 0; player_id < player_states.size(); ++player_id) {
 
+		int64_t enemy_id = 1 - player_id;
+
 		// For each villager...
 		for (int64_t villager_index = 0;
 		     villager_index < player_states[player_id].villagers.size();
@@ -255,15 +260,7 @@ void CommandGiver::RunCommands(
 			auto villager = player_states[player_id].villagers[villager_index];
 			auto state_villager = state_villagers[player_id][villager_index];
 
-			int64_t factory_target = villager.target_factory_id;
 			PlayerId Player_id = static_cast<PlayerId>(player_id);
-
-			// Check what the villager wants to perform
-			bool should_create_factory = villager.build_offset != Vec2D::null;
-			bool should_build_factory = villager.target_factory_id != -1;
-			bool should_move = villager.destination != Vec2D::null;
-			bool should_attack = villager.target != -1;
-			bool should_mine = villager.mine_target != Vec2D::null;
 
 			// Check if the villager's id is valid
 			if (villager.id != state_villager->GetActorId()) {
@@ -272,6 +269,31 @@ void CommandGiver::RunCommands(
 				                 "Cannot alter villager id");
 				continue;
 			}
+
+			// If this is player2, first, flip the build_offset
+			if (villager.build_offset != Vec2D::null &&
+			    static_cast<PlayerId>(player_id) == PlayerId::PLAYER2) {
+				villager.build_offset =
+				    FlipOffset(state->GetMap(), villager.build_offset);
+			}
+
+			// In case the villager is targetting an offset where there's
+			// already a friendly factory, make it reference the factory by id
+			ActorId occupied_actor_id;
+			if (villager.build_offset != Vec2D::null &&
+			    IsOccupied(player_id, villager.build_offset, state_factories,
+			               occupied_actor_id)) {
+				std::cout << "Targetting self factory..\n";
+				villager.target_factory_id = occupied_actor_id;
+				villager.build_offset = Vec2D::null;
+			}
+
+			// Check what the villager wants to perform
+			bool should_create_factory = villager.build_offset != Vec2D::null;
+			bool should_build_factory = villager.target_factory_id != -1;
+			bool should_move = villager.destination != Vec2D::null;
+			bool should_attack = villager.target != -1;
+			bool should_mine = villager.mine_target != Vec2D::null;
 
 			// Check to make sure only one action is being attempted
 			std::vector<bool> checks{should_create_factory,
@@ -297,8 +319,10 @@ void CommandGiver::RunCommands(
 						case TerrainType::LAND:
 							if (state_factories[player_id].size() <
 							    MAX_NUM_FACTORIES) {
+								ActorId occupied_actor_id;
 								bool is_occupied = IsOccupied(
-								    villager.build_offset, state_factories);
+								    enemy_id, villager.build_offset,
+								    state_factories, occupied_actor_id);
 								if (is_occupied) {
 									logger->LogError(
 									    Player_id,
@@ -319,10 +343,6 @@ void CommandGiver::RunCommands(
 										unit_type = ActorType::VILLAGER;
 										break;
 									}
-									if (Player_id == PlayerId::PLAYER2) {
-										build_offset =
-										    FlipOffset(state_map, build_offset);
-									}
 									CreateFactory(Player_id, villager.id,
 									              build_offset, unit_type);
 								}
@@ -331,7 +351,7 @@ void CommandGiver::RunCommands(
 								logger->LogError(
 								    Player_id,
 								    logger::ErrorType::NO_MORE_FACTORIES,
-								    "Trying to build more factories that the "
+								    "Trying to build more factories than the "
 								    "factory limit");
 							}
 							break;
@@ -342,18 +362,18 @@ void CommandGiver::RunCommands(
 							    "Villager trying to build factory on water");
 							break;
 						case TerrainType::GOLD_MINE:
-							logger->LogError(
-							    Player_id,
-							    logger::ErrorType::
-							        NO_BUILD_FACTORY_ON_GOLD_MINE,
-							    "Villager trying to build factory ");
+							logger->LogError(Player_id,
+							                 logger::ErrorType::
+							                     NO_BUILD_FACTORY_ON_GOLD_MINE,
+							                 "Villager trying to build factory "
+							                 "on gold mine");
 							break;
 						}
 					} else {
 						logger->LogError(Player_id,
 						                 logger::ErrorType::INSUFFICIENT_FUNDS,
-						                 "You do not have sufficient funds to "
-						                 "purchase a factory");
+						                 "You do not have sufficient gold to "
+						                 "construct a factory");
 					}
 				} else {
 					logger->LogError(Player_id,
@@ -368,7 +388,7 @@ void CommandGiver::RunCommands(
 				// Validating whether factory exists
 				bool factory_exists = false;
 				for (auto &factory : state_factories[player_id]) {
-					if (factory->GetActorId() == factory_target)
+					if (factory->GetActorId() == villager.target_factory_id)
 						factory_exists = true;
 					break;
 				}
@@ -376,6 +396,7 @@ void CommandGiver::RunCommands(
 					BuildFactory(Player_id, villager.id,
 					             villager.target_factory_id);
 				} else {
+					std::cout << "Villager trying to build..\n";
 					logger->LogError(
 					    Player_id,
 					    logger::ErrorType::NO_BUILD_FACTORY_THAT_DOSENT_EXIST,

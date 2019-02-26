@@ -95,10 +95,13 @@ class STATE_EXPORT CommandGiver : public ICommandGiver {
 
 	/**
 	 * Helper function to check whether a position already has a factory in it's
-	 * position
+	 * position, by the given player_id
+	 *
+	 * If occupied, returns actor id of that factory through occupied_actor_id
 	 */
-	bool IsOccupied(Vec2D offset,
-	                std::array<std::vector<Factory *>, 2> state_factories);
+	bool IsOccupied(int64_t player_id, Vec2D offset,
+	                std::array<std::vector<Factory *>, 2> state_factories,
+	                ActorId &occupied_actor_id);
 
 	/**
 	 * Helper function to flip a given position
