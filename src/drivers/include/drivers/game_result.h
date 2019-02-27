@@ -59,6 +59,16 @@ struct DRIVERS_EXPORT GameResult {
 		EXCEEDED_INSTRUCTION_LIMIT,
 
 		/**
+		 * One of the players threw a runtime error, and hence lose
+		 */
+		RUNTIME_ERROR,
+
+		/**
+		 * One of the players timed out
+		 */
+		TIMEOUT,
+
+		/**
 		 * Undefined
 		 */
 		NONE
@@ -116,6 +126,12 @@ operator<<(std::ostream &os, const GameResult::WinType win_type) {
 		break;
 	case GameResult::WinType::EXCEEDED_INSTRUCTION_LIMIT:
 		os << "EXCEEDED_INSTRUCTION_LIMIT";
+		break;
+	case GameResult::WinType::RUNTIME_ERROR:
+		os << "RUNTIME_ERROR";
+		break;
+	case GameResult::WinType::TIMEOUT:
+		os << "TIMEOUT";
 		break;
 	case GameResult::WinType::NONE:
 		os << "NONE";

@@ -39,7 +39,12 @@ struct DRIVERS_EXPORT PlayerResult {
 		/**
 		 * The player's code had a runtime error
 		 */
-		RUNTIME_ERROR
+		RUNTIME_ERROR,
+
+		/**
+		 * A player took too long to finish their turn
+		 */
+		TIMEOUT
 	};
 
 	/**
@@ -67,6 +72,9 @@ operator<<(std::ostream &ostream, const PlayerResult::Status &status) {
 		break;
 	case PlayerResult::Status::RUNTIME_ERROR:
 		ostream << "RUNTIME_ERROR";
+		break;
+	case PlayerResult::Status::TIMEOUT:
+		ostream << "TIMEOUT";
 		break;
 	}
 	return ostream;
