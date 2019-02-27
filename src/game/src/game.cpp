@@ -46,35 +46,35 @@ const drivers::GameResult Game::Start() {
 
 	// Monitor child processes
 	// If one fails, terminate the rest
+
 	std::vector<std::atomic_bool> players_failed(2);
 	std::atomic_bool any_player_failed(false);
 	std::vector<std::thread> player_monitors;
+
+	// For each player...
 	for (int player_id = 0; player_id < 2; ++player_id) {
+
+		// Get both processes, including the opponents'
 		auto &process = player_processes[player_id];
+		auto &other_process = player_processes[1 - player_id];
+
 		players_failed[player_id] = false;
 		auto &player_failed = players_failed[player_id];
-		player_monitors.emplace_back([&process, &player_failed,
-		                              &any_player_failed, player_id] {
-			bool is_process_done = false;
-			while (!is_process_done) {
-				if (any_player_failed) {
-					process.terminate();
-					is_process_done = true;
-				} else {
-					std::error_code wait_error;
-					std::this_thread::sleep_for(
-					    std::chrono::milliseconds(1000));
-					is_process_done = process.wait_for(
-					    std::chrono::milliseconds(1), wait_error);
 
-					if (wait_error.value() != 0 || process.exit_code() != 0) {
-						any_player_failed = true;
-						player_failed = true;
-						is_process_done = true;
-					}
-				}
-			}
-		});
+		// Start the player_monitors
+		player_monitors.emplace_back(
+		    [&process, &other_process, &player_failed, &any_player_failed] {
+			    // Wait for the player processes to exit
+			    process.wait();
+
+			    // If the process did not exit gracefully, suspend the game and
+			    // kill the other player process
+			    if (process.exit_code() != 0 && !any_player_failed) {
+				    player_failed = true;
+				    any_player_failed = true;
+				    kill(other_process.id(), SIGTERM);
+			    }
+		    });
 	}
 
 	for (auto &monitor : player_monitors) {
@@ -90,8 +90,20 @@ const drivers::GameResult Game::Start() {
 			if (players_failed[player_id]) {
 				result.player_results[player_id].status =
 				    drivers::PlayerResult::Status::RUNTIME_ERROR;
+				result.win_type = drivers::GameResult::WinType::RUNTIME_ERROR;
 			}
 		}
+
+		// Assign winner
+		if (players_failed[0] && players_failed[1]) {
+			// This case is currently impossible. Driver quits on Player1 Error
+			result.winner = drivers::GameResult::Winner::TIE;
+		} else if (players_failed[0]) {
+			result.winner = drivers::GameResult::Winner::PLAYER2;
+		} else if (players_failed[1]) {
+			result.winner = drivers::GameResult::Winner::PLAYER1;
+		}
+
 	} else {
 		main_runner.join();
 	}

@@ -283,7 +283,6 @@ void CommandGiver::RunCommands(
 			if (villager.build_offset != Vec2D::null &&
 			    IsOccupied(player_id, villager.build_offset, state_factories,
 			               occupied_actor_id)) {
-				std::cout << "Targetting self factory..\n";
 				villager.target_factory_id = occupied_actor_id;
 				villager.build_offset = Vec2D::null;
 			}
