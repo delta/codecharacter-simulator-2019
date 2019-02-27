@@ -122,11 +122,11 @@ ConvertToTransferState(const player_state::State &ps) {
 
 	// Copy sizes
 	ts.num_soldiers = ps.soldiers.size();
-	ts.num_enemy_soldiers = ps.soldiers.size();
+	ts.num_enemy_soldiers = ps.enemy_soldiers.size();
 	ts.num_villagers = ps.villagers.size();
-	ts.num_enemy_villagers = ps.villagers.size();
+	ts.num_enemy_villagers = ps.enemy_villagers.size();
 	ts.num_factories = ps.factories.size();
-	ts.num_enemy_factories = ps.factories.size();
+	ts.num_enemy_factories = ps.enemy_factories.size();
 	ts.num_gold_mine_offsets = ps.gold_mine_offsets.size();
 
 	return ts;
