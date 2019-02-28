@@ -387,9 +387,10 @@ void CommandGiver::RunCommands(
 				// Validating whether factory exists
 				bool factory_exists = false;
 				for (auto &factory : state_factories[player_id]) {
-					if (factory->GetActorId() == villager.target_factory_id)
+					if (factory->GetActorId() == villager.target_factory_id) {
 						factory_exists = true;
-					break;
+						break;
+					}
 				}
 				if (factory_exists) {
 					BuildFactory(Player_id, villager.id,
@@ -399,7 +400,7 @@ void CommandGiver::RunCommands(
 					logger->LogError(
 					    Player_id,
 					    logger::ErrorType::NO_BUILD_FACTORY_THAT_DOSENT_EXIST,
-					    "Villager trying to build factory that dosen't exist");
+					    "Villager trying to build factory that doesn't exist");
 				}
 			}
 
