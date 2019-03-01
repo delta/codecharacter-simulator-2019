@@ -32,7 +32,7 @@ const size_t ELEMENT_SIZE = 10;
 const int64_t SOLDIER_MAX_HP = 150;
 
 // Max Starting HP for Villager
-const int64_t VILLAGER_MAX_HP = 50;
+const int64_t VILLAGER_MAX_HP = 90;
 
 // HP of an unbuilt factory
 const int64_t FACTORY_BASE_HP = 50;
@@ -41,7 +41,7 @@ const int64_t FACTORY_BASE_HP = 50;
 const int64_t FACTORY_MAX_HP = 4000;
 
 // Total construction effort needed per factory
-const int64_t FACTORY_CONSTRUCTION_TOTAL = 1000;
+const int64_t FACTORY_CONSTRUCTION_TOTAL = 300;
 
 // Frequency with which a factory produces villagers
 const int64_t FACTORY_VILLAGER_FREQUENCY = 4;
@@ -53,7 +53,7 @@ const int64_t FACTORY_SOLDIER_FREQUENCY = 6;
 const int64_t SOLDIER_SPEED = 6;
 
 // Speed of a villager
-const int64_t VILLAGER_SPEED = 5;
+const int64_t VILLAGER_SPEED = 4;
 
 // Attack range of a soldier
 const int64_t SOLDIER_ATTACK_RANGE = 9;
@@ -65,10 +65,10 @@ const int64_t VILLAGER_ATTACK_RANGE = 9;
 const int64_t SOLDIER_ATTACK_DAMAGE = 15;
 
 // Attack damage of a villager
-const int64_t VILLAGER_ATTACK_DAMAGE = 9;
+const int64_t VILLAGER_ATTACK_DAMAGE = 5;
 
 // Build effort in one turn of the villager
-const int64_t VILLAGER_BUILD_EFFORT = 4;
+const int64_t VILLAGER_BUILD_EFFORT = 6;
 
 // Build range of the villager
 const int64_t VILLAGER_BUILD_RANGE = 9;
