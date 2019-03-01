@@ -8,7 +8,7 @@
 #include <cstdint>
 
 // Amount of gold each player has at the start of the game
-const int64_t GOLD_START = 300;
+const int64_t GOLD_START = 1800;
 
 // Maxiumm amount of gold each player can have
 const int64_t GOLD_MAX = INT64_MAX;
