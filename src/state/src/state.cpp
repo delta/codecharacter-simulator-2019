@@ -52,19 +52,13 @@ void State::ProduceUnit(PlayerId player_id, ActorType actor_type,
 			return;
 		}
 
-		// Checking if the state has enough money for building a villager
-		auto build_cost = gold_manager->GetCreateUnitCost(ActorType::VILLAGER);
-		auto current_gold = gold_manager->GetBalance(player_id);
+		// Create and add the new villager
+		auto new_villager = VillagerBuilder(player_id, position);
+		this->villagers[player_id_index].push_back(std::move(new_villager));
 
-		if (build_cost < current_gold) {
-			// Create and add the new villager
-			auto new_villager = VillagerBuilder(player_id, position);
-			this->villagers[player_id_index].push_back(std::move(new_villager));
-
-			// Deduct Villager production cost
-			auto villager = this->villagers[player_id_index].back().get();
-			gold_manager->DeductUnitCreateCost(player_id, villager);
-		}
+		// Deduct Villager production cost
+		auto villager = this->villagers[player_id_index].back().get();
+		gold_manager->DeductUnitCreateCost(player_id, villager);
 
 	} else if (actor_type == ActorType::SOLDIER) {
 		// If number of soldiers would exceed MAX_NUM_SOLDIERS, stop
@@ -76,15 +70,13 @@ void State::ProduceUnit(PlayerId player_id, ActorType actor_type,
 		auto build_cost = gold_manager->GetCreateUnitCost(ActorType::SOLDIER);
 		auto current_gold = gold_manager->GetBalance(player_id);
 
-		if (current_gold > build_cost) {
-			// Create and add the new soldier
-			auto new_soldier = SoldierBuilder(player_id, position);
-			this->soldiers[player_id_index].push_back(std::move(new_soldier));
+		// Create and add the new soldier
+		auto new_soldier = SoldierBuilder(player_id, position);
+		this->soldiers[player_id_index].push_back(std::move(new_soldier));
 
-			// Deduct Soldier production cost
-			auto soldier = this->soldiers[player_id_index].back().get();
-			gold_manager->DeductUnitCreateCost(player_id, soldier);
-		}
+		// Deduct Soldier production cost
+		auto soldier = this->soldiers[player_id_index].back().get();
+		gold_manager->DeductUnitCreateCost(player_id, soldier);
 
 	} else {
 		throw std::logic_error("Invalid actor_type passed");
