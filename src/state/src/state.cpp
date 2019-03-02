@@ -174,7 +174,14 @@ void State::HandleBuildRequests() {
 				// Calling MakeFactory for the given player as there are no
 				// build collisions
 				PlayerId player_id = static_cast<PlayerId>(id);
-				MakeFactory(player_id, villager_id, build_pos, production_type);
+
+				// Ensure the player has enough gold
+				auto current_gold = gold_manager->GetBalance(player_id);
+				auto cost = gold_manager->GetCreateUnitCost(ActorType::FACTORY);
+				if (current_gold > cost) {
+					MakeFactory(player_id, villager_id, build_pos,
+					            production_type);
+				}
 			}
 		}
 	}
