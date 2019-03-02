@@ -46,8 +46,21 @@ std::unique_ptr<IActorState> FactoryProductionState::Update() {
 		}
 
 		// Make a villager and reset production
-		factory->ProduceUnit();
-		current_production_tick = 0;
+		// Checking if the player has enough gold to create unit
+		auto current_gold = gold_manager->GetBalance(factory->GetPlayerId());
+		auto create_unit_cost =
+		    gold_manager->GetCreateUnitCost(ActorType::VILLAGER);
+
+		if (current_gold >= create_unit_cost) {
+			factory->ProduceUnit();
+			current_production_tick = 0;
+		}
+
+		// If the player dosen't have enough gold, switching the factory back to
+		// idle state
+		else {
+			return std::make_unique<FactoryIdleState>(factory);
+		}
 
 	} else {
 		// Do we need to make a soldier?
@@ -57,8 +70,21 @@ std::unique_ptr<IActorState> FactoryProductionState::Update() {
 		}
 
 		// Make a soldier and reset production
-		factory->ProduceUnit();
-		current_production_tick = 0;
+		// Checking if the player has enough gold to produce a soldier
+		auto current_gold = gold_manager->GetBalance(factory->GetPlayerId());
+		auto create_unit_cost =
+		    gold_manager->GetCreateUnitCost(ActorType::SOLDIER);
+
+		if (current_gold >= create_unit_cost) {
+			factory->ProduceUnit();
+			current_production_tick = 0;
+		}
+
+		// If the player dosen't have enough gold, switching the factory back to
+		// idle state
+		else {
+			return std::make_unique<FactoryIdleState>(factory);
+		}
 	}
 
 	current_production_tick++;

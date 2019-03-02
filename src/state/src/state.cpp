@@ -66,6 +66,10 @@ void State::ProduceUnit(PlayerId player_id, ActorType actor_type,
 			return;
 		}
 
+		// Checking if the state has enough money for building a soldier
+		auto build_cost = gold_manager->GetCreateUnitCost(ActorType::SOLDIER);
+		auto current_gold = gold_manager->GetBalance(player_id);
+
 		// Create and add the new soldier
 		auto new_soldier = SoldierBuilder(player_id, position);
 		this->soldiers[player_id_index].push_back(std::move(new_soldier));
@@ -356,6 +360,10 @@ void State::Update() {
 		}
 	}
 
+	// Handling build requests by villagers before updating factories to
+	// prioritize factory creation before unit production
+	HandleBuildRequests();
+
 	for (auto &player_factories : factories) {
 		for (auto &factory : player_factories) {
 			factory->Update();
@@ -380,9 +388,6 @@ void State::Update() {
 			factory->LateUpdate();
 		}
 	}
-
-	// Handling build requests by villagers
-	HandleBuildRequests();
 
 	// Remove dead actors
 	auto current_actors_to_delete = std::vector<std::unique_ptr<Actor>>{};
@@ -435,9 +440,6 @@ void State::Update() {
 	// current buffer of actors to be deleted on this turn at the end
 	actors_to_delete[0] = std::move(actors_to_delete[1]);
 	actors_to_delete[1] = std::move(current_actors_to_delete);
-
-	// Handling build requests by villagers
-	HandleBuildRequests();
 
 	// Updates scores and interestingness
 	UpdateScores();
