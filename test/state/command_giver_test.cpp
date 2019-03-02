@@ -220,9 +220,9 @@ class CommandGiverTest : public Test {
 			    new_villager);
 		}
 
-		this->player_states[0].gold = 500;
-		this->player_states[1].gold = 500;
-		this->player_gold = {500, 500};
+		this->player_states[0].gold = 5000;
+		this->player_states[1].gold = 5000;
+		this->player_gold = {5000, 5000};
 	}
 };
 

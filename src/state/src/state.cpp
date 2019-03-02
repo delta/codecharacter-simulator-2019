@@ -52,13 +52,19 @@ void State::ProduceUnit(PlayerId player_id, ActorType actor_type,
 			return;
 		}
 
-		// Create and add the new villager
-		auto new_villager = VillagerBuilder(player_id, position);
-		this->villagers[player_id_index].push_back(std::move(new_villager));
+		// Checking if the state has enough money for building a villager
+		auto build_cost = gold_manager->GetCreateUnitCost(ActorType::VILLAGER);
+		auto current_gold = gold_manager->GetBalance(player_id);
 
-		// Deduct Villager production cost
-		auto villager = this->villagers[player_id_index].back().get();
-		gold_manager->DeductUnitCreateCost(player_id, villager);
+		if (build_cost < current_gold) {
+			// Create and add the new villager
+			auto new_villager = VillagerBuilder(player_id, position);
+			this->villagers[player_id_index].push_back(std::move(new_villager));
+
+			// Deduct Villager production cost
+			auto villager = this->villagers[player_id_index].back().get();
+			gold_manager->DeductUnitCreateCost(player_id, villager);
+		}
 
 	} else if (actor_type == ActorType::SOLDIER) {
 		// If number of soldiers would exceed MAX_NUM_SOLDIERS, stop
@@ -66,13 +72,19 @@ void State::ProduceUnit(PlayerId player_id, ActorType actor_type,
 			return;
 		}
 
-		// Create and add the new soldier
-		auto new_soldier = SoldierBuilder(player_id, position);
-		this->soldiers[player_id_index].push_back(std::move(new_soldier));
+		// Checking if the state has enough money for building a soldier
+		auto build_cost = gold_manager->GetCreateUnitCost(ActorType::SOLDIER);
+		auto current_gold = gold_manager->GetBalance(player_id);
 
-		// Deduct Soldier production cost
-		auto soldier = this->soldiers[player_id_index].back().get();
-		gold_manager->DeductUnitCreateCost(player_id, soldier);
+		if (current_gold > build_cost) {
+			// Create and add the new soldier
+			auto new_soldier = SoldierBuilder(player_id, position);
+			this->soldiers[player_id_index].push_back(std::move(new_soldier));
+
+			// Deduct Soldier production cost
+			auto soldier = this->soldiers[player_id_index].back().get();
+			gold_manager->DeductUnitCreateCost(player_id, soldier);
+		}
 
 	} else {
 		throw std::logic_error("Invalid actor_type passed");
@@ -356,6 +368,10 @@ void State::Update() {
 		}
 	}
 
+	// Handling build requests by villagers before updating factories to
+	// prioritize factory creation before unit production
+	HandleBuildRequests();
+
 	for (auto &player_factories : factories) {
 		for (auto &factory : player_factories) {
 			factory->Update();
@@ -380,9 +396,6 @@ void State::Update() {
 			factory->LateUpdate();
 		}
 	}
-
-	// Handling build requests by villagers
-	HandleBuildRequests();
 
 	// Remove dead actors
 	auto current_actors_to_delete = std::vector<std::unique_ptr<Actor>>{};
@@ -435,9 +448,6 @@ void State::Update() {
 	// current buffer of actors to be deleted on this turn at the end
 	actors_to_delete[0] = std::move(actors_to_delete[1]);
 	actors_to_delete[1] = std::move(current_actors_to_delete);
-
-	// Handling build requests by villagers
-	HandleBuildRequests();
 
 	// Updates scores and interestingness
 	UpdateScores();

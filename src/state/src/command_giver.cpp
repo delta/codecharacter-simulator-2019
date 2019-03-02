@@ -396,7 +396,6 @@ void CommandGiver::RunCommands(
 					BuildFactory(Player_id, villager.id,
 					             villager.target_factory_id);
 				} else {
-					std::cout << "Villager trying to build..\n";
 					logger->LogError(
 					    Player_id,
 					    logger::ErrorType::NO_BUILD_FACTORY_THAT_DOSENT_EXIST,
