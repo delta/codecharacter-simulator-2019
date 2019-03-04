@@ -85,7 +85,8 @@ void Factory::LateUpdate() {
 }
 
 void Factory::Update() {
-	age++;
+	if (state->GetName() != FactoryStateName::UNBUILT)
+		age++;
 	auto new_state = state->Update();
 
 	while (new_state != nullptr) {
