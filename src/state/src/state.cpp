@@ -116,6 +116,11 @@ void State::MakeFactory(PlayerId p_player_id, ActorId villager_id, Vec2D offset,
 
 	// If the factory doesn't exist, create it
 	if (factory == nullptr) {
+		// Check for factory in productions as well
+		if (this->factories[player_id].size() == MAX_NUM_FACTORIES) {
+			return;
+		}
+
 		auto new_factory = FactoryBuilder(p_player_id, offset, produce_unit);
 		factories[player_id].push_back(std::move(new_factory));
 
