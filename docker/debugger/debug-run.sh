@@ -4,11 +4,14 @@ cd /root/codecharacter/build
 cmake .. -DBUILD_PROJECT=player_code -DCMAKE_BUILD_TYPE="Debug"
 make -j $(expr $(grep -c '^processor' /proc/cpuinfo) - 1) install
 
-cp /root/simulator/lib/libplayer_1_code ~/
+cp /root/simulator/lib/libplayer_1_code.so ~/
+
+# Copy in player 2 code
+cd /root/codecharacter/src/player_code/src
+mv player_code.cpp.2 player_code.cpp
 
 # Make player library2
-cd /root/codecharacter/src/player_code/src
-mv player_code2.cpp player_code.cpp
+cd /root/codecharacter/build
 cmake .. -DBUILD_PROJECT=player_code -DCMAKE_BUILD_TYPE="Debug"
 make -j $(expr $(grep -c '^processor' /proc/cpuinfo) - 1) install
 
