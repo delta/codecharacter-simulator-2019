@@ -208,29 +208,33 @@ class StateSyncerTest : public Test {
 		// Initializing factories for the state
 		auto factory1_soldier = new Factory(
 		    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::FACTORY, 500,
-		    500, DoubleVec2D(this->ele_size, 0), this->gold_manager.get(),
-		    this->score_manager.get(), 100, 100, ActorType::SOLDIER, 5, 5,
-		    UnitProductionCallback{});
+		    500, DoubleVec2D(this->ele_size / 2, this->ele_size / 2),
+		    this->gold_manager.get(), this->score_manager.get(), 100, 100,
+		    ActorType::SOLDIER, 5, 5, UnitProductionCallback{});
 
 		auto factory1_villager = new Factory(
 		    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::FACTORY, 500,
-		    500, DoubleVec2D(0, this->ele_size), this->gold_manager.get(),
-		    this->score_manager.get(), 100, 100, ActorType::VILLAGER, 5, 5,
-		    UnitProductionCallback{});
+		    500,
+		    DoubleVec2D(this->ele_size + this->ele_size / 2,
+		                this->ele_size + this->ele_size / 2),
+		    this->gold_manager.get(), this->score_manager.get(), 100, 100,
+		    ActorType::VILLAGER, 5, 5, UnitProductionCallback{});
 
 		auto factory2_soldier = new Factory(
 		    Actor::GetNextActorId(), PlayerId::PLAYER2, ActorType::FACTORY, 500,
 		    500,
-		    DoubleVec2D(this->ele_size * (this->map_size - 1) - 1,
-		                this->ele_size * this->map_size - 1),
+		    DoubleVec2D(
+		        this->ele_size * (this->map_size - 1) + this->ele_size / 2,
+		        this->ele_size * (this->map_size - 1) + this->ele_size / 2),
 		    this->gold_manager.get(), this->score_manager.get(), 100, 100,
 		    ActorType::SOLDIER, 5, 5, UnitProductionCallback{});
 
 		auto factory2_villager = new Factory(
 		    Actor::GetNextActorId(), PlayerId::PLAYER2, ActorType::FACTORY, 500,
 		    500,
-		    DoubleVec2D(this->ele_size * this->map_size - 1,
-		                this->ele_size * (this->map_size - 1) - 1),
+		    DoubleVec2D(
+		        this->ele_size * (this->map_size - 2) + this->ele_size / 2,
+		        this->ele_size * (this->map_size - 2) + this->ele_size / 2),
 		    this->gold_manager.get(), this->score_manager.get(), 100, 100,
 		    ActorType::VILLAGER, 5, 5, UnitProductionCallback{});
 
@@ -263,12 +267,14 @@ TEST_F(StateSyncerTest, UpdationTest) {
 	// Adding another factory to check addition of a new factory
 	auto factories2 = this->factories;
 
-	// Creating model soldiers and villagers
-	Factory *factory2 = new Factory(
-	    Actor::GetNextActorId(), PlayerId::PLAYER1, ActorType::VILLAGER, 500,
-	    500, DoubleVec2D(this->ele_size, this->ele_size),
-	    this->gold_manager.get(), this->score_manager.get(), 100, 100,
-	    ActorType::VILLAGER, 5, 5, UnitProductionCallback{});
+	// Creating new factory for testing
+	Factory *factory2 =
+	    new Factory(Actor::GetNextActorId(), PlayerId::PLAYER1,
+	                ActorType::VILLAGER, 500, 500,
+	                DoubleVec2D(this->ele_size + this->ele_size / 2,
+	                            this->ele_size + this->ele_size / 2),
+	                this->gold_manager.get(), this->score_manager.get(), 100,
+	                100, ActorType::VILLAGER, 5, 5, UnitProductionCallback{});
 
 	factories2[0].push_back(factory2);
 
@@ -350,25 +356,31 @@ TEST_F(StateSyncerTest, UpdationTest) {
 
 	// Checking the factory positions from player states
 	ASSERT_EQ(this->player_states[0].factories[0].position,
-	          Vec2D(this->ele_size, 0));
+	          Vec2D(this->ele_size / 2, this->ele_size / 2));
 	ASSERT_EQ(this->player_states[0].factories[1].position,
-	          Vec2D(0, this->ele_size));
-	ASSERT_EQ(this->player_states[0].enemy_factories[0].position,
-	          Vec2D(this->ele_size * (this->map_size - 1) - 1,
-	                this->ele_size * this->map_size - 1));
-	ASSERT_EQ(this->player_states[0].enemy_factories[1].position,
-	          Vec2D(this->ele_size * this->map_size - 1,
-	                this->ele_size * (this->map_size - 1) - 1));
+	          Vec2D(this->ele_size + this->ele_size / 2,
+	                this->ele_size + this->ele_size / 2));
+	ASSERT_EQ(
+	    this->player_states[0].enemy_factories[0].position,
+	    Vec2D(this->ele_size * (this->map_size - 1) + this->ele_size / 2,
+	          this->ele_size * (this->map_size - 1) + this->ele_size / 2));
+	ASSERT_EQ(
+	    this->player_states[0].enemy_factories[1].position,
+	    Vec2D(this->ele_size * (this->map_size - 2) + this->ele_size / 2,
+	          this->ele_size * (this->map_size - 2) + this->ele_size / 2));
 	ASSERT_EQ(this->player_states[1].factories[0].position,
-	          Vec2D(this->ele_size, 0));
+	          Vec2D(this->ele_size / 2, this->ele_size / 2));
 	ASSERT_EQ(this->player_states[1].factories[1].position,
-	          Vec2D(0, this->ele_size));
-	ASSERT_EQ(this->player_states[1].enemy_factories[0].position,
-	          Vec2D(this->ele_size * (this->map_size - 1) - 1,
-	                this->ele_size * this->map_size - 1));
-	ASSERT_EQ(this->player_states[1].enemy_factories[1].position,
-	          Vec2D(this->ele_size * this->map_size - 1,
-	                this->ele_size * (this->map_size - 1) - 1));
+	          Vec2D(this->ele_size + this->ele_size / 2,
+	                this->ele_size + this->ele_size / 2));
+	ASSERT_EQ(
+	    this->player_states[1].enemy_factories[0].position,
+	    Vec2D(this->ele_size * (this->map_size - 1) + this->ele_size / 2,
+	          this->ele_size * (this->map_size - 1) + this->ele_size / 2));
+	ASSERT_EQ(
+	    this->player_states[1].enemy_factories[1].position,
+	    Vec2D(this->ele_size * (this->map_size - 2) + this->ele_size / 2,
+	          this->ele_size * (this->map_size - 2) + this->ele_size / 2));
 
 	// Checking if the type of production of the factories is still the same
 	ASSERT_EQ(this->player_states[0].factories[0].production_state,
@@ -390,10 +402,12 @@ TEST_F(StateSyncerTest, UpdationTest) {
 	// Now, a new factory is added at position (this->ele_size, this->ele_size)
 	// for player 1 Checking if this factory exists
 	ASSERT_EQ(this->player_states[0].factories[2].position,
-	          Vec2D(this->ele_size, this->ele_size));
-	ASSERT_EQ(this->player_states[1].enemy_factories[2].position,
-	          Vec2D(this->ele_size * (this->map_size - 1) - 1,
-	                this->ele_size * (this->map_size - 1) - 1));
+	          Vec2D(this->ele_size + this->ele_size / 2,
+	                this->ele_size + this->ele_size / 2));
+	ASSERT_EQ(
+	    this->player_states[1].enemy_factories[2].position,
+	    Vec2D(this->ele_size * (this->map_size - 2) + this->ele_size / 2,
+	          this->ele_size * (this->map_size - 2) + this->ele_size / 2));
 
 	// Updating player states again
 	this->state_syncer->UpdatePlayerStates(this->player_states);
