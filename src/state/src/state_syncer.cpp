@@ -351,8 +351,20 @@ void StateSyncer::AssignFactoryAttributes(
 		if (static_cast<PlayerId>(player_id) == PlayerId::PLAYER1) {
 			new_factory.position = state_factory->GetPosition().to_int();
 		} else {
-			new_factory.position =
-			    FlipPosition(map, state_factory->GetPosition()).to_int();
+			// First flipping the offset and then assinging position
+			Vec2D old_position = state_factory->GetPosition().to_int();
+			auto element_size = map->GetElementSize();
+			auto offset_x = old_position.x / element_size;
+			auto offset_y = old_position.y / element_size;
+
+			// Flipping the offset
+			offset_x = map->GetSize() - 1 - offset_x;
+			offset_y = map->GetSize() - 1 - offset_y;
+
+			// Converting the offset to a position again
+			auto new_pos_x = offset_x * element_size + (element_size / 2);
+			auto new_pos_y = offset_y * element_size + (element_size / 2);
+			new_factory.position = Vec2D(new_pos_x, new_pos_y);
 		}
 
 		// Pushing the factory into the new_factories vector
