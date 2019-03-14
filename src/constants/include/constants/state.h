@@ -38,7 +38,7 @@ const int64_t VILLAGER_MAX_HP = 90;
 const int64_t FACTORY_BASE_HP = 50;
 
 // Max Starting HP for Factory
-const int64_t FACTORY_MAX_HP = 4000;
+const int64_t FACTORY_MAX_HP = 2500;
 
 // Total construction effort needed per factory
 const int64_t FACTORY_CONSTRUCTION_TOTAL = 300;
