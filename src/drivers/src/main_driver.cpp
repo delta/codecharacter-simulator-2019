@@ -6,6 +6,7 @@
 #include "drivers/main_driver.h"
 #include "drivers/game_result.h"
 
+#include <csignal>
 #include <fstream>
 
 namespace drivers {
@@ -58,6 +59,8 @@ std::array<PlayerResult, 2> MainDriver::GetPlayerResults() {
 
 	return player_results;
 }
+
+void MainDriver::SetPids(std::array<int, 2> pids) { this->process_pids = pids; }
 
 const GameResult MainDriver::Start() {
 	// Initialize contents of shared memory
@@ -167,6 +170,14 @@ const GameResult MainDriver::Run() {
 				return GameResult{winner, win_type, 0, player_results};
 			}
 
+			// If the game timed out
+			if (this->is_game_timed_out) {
+
+				// THIS IS AN UGLY HACK! PLEASE CHANGE THIS. TODO.
+				auto success = kill(process_pids[cur_player_id], SIGTERM);
+				return GameResult{};
+			}
+
 			// Check for instruction counter to see if player has
 			// exceeded some limit
 			if (current_player_buffer->instruction_counter >
@@ -264,7 +275,9 @@ const GameResult MainDriver::Run() {
 
 void MainDriver::Cancel() {
 	this->cancel = true;
-	while (this->cancel)
+	auto wait_time = std::chrono::seconds(1);
+	auto end_time = std::chrono::system_clock::now() + wait_time;
+	while (std::chrono::system_clock::now() < end_time)
 		;
 }
 } // namespace drivers

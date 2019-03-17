@@ -64,6 +64,11 @@ class DRIVERS_EXPORT MainDriver {
 	int64_t max_no_turns;
 
 	/**
+	 * Process IDs of the two player processes
+	 */
+	std::array<int, 2> process_pids;
+
+	/**
 	 * true if the game has timed out without completing and Start has been
 	 * called, false otherwise
 	 */
@@ -131,6 +136,8 @@ class DRIVERS_EXPORT MainDriver {
 	           Timer::Interval game_duration,
 	           std::unique_ptr<logger::ILogger> logger,
 	           std::string log_file_name);
+
+	void SetPids(std::array<int, 2> pids);
 
 	/**
 	 * Blocking function that starts the game.
