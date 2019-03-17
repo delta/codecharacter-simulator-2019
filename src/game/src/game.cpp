@@ -39,6 +39,9 @@ const drivers::GameResult Game::Start() {
 		                              player_process_errors[i]);
 	}
 
+	main_driver->SetPids(
+	    std::array<int, 2>{player_processes[0].id(), player_processes[1].id()});
+
 	// Starting main driver
 	drivers::GameResult result;
 	std::thread main_runner(
